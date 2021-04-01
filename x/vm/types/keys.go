@@ -1,45 +1,32 @@
-package vm_storage
+package types
 
 import (
 	"bytes"
 	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/dfinance/dvm-proto/go/vm_grpc"
 )
 
 const (
-	// Default address length (Move address length)
-	VMAddressLength = 20
+	ModuleName   = "vm"
+	StoreKey     = ModuleName
+	RouterKey    = ModuleName
+	QuerierRoute = ModuleName
+	GovRouterKey = ModuleName
 )
 
 var (
 	// Storage keys
-	KeyDelimiter = []byte(":") // we should rely on this delimiter (for bytes.Split for example) as VM accessPath.Path might include symbols like: [':', '@',..]
-	VMKey        = []byte("vm")
-	// Move stdlib addresses
-	StdLibAddress         = make([]byte, VMAddressLength)
-	StdLibAddressShortStr = "0x1"
+	KeyDelimiter = []byte(":")  // we should rely on this delimiter (for bytes.Split for example) as VM accessPath.Path might include symbols like: [':', '@',..]
+	VMKey        = []byte("vm") // storage key prefix for VMStorage data
 )
 
-// DSDataMiddleware defines prototype for DataSource server middleware.
-type DSDataMiddleware func(ctx sdk.Context, path *vm_grpc.VMAccessPath) ([]byte, error)
+// GetVMStorageKey returns VMStorage key for vm_grpc.VMAccessPath.
+func GetVMStorageKey(path *vm_grpc.VMAccessPath) []byte {
+	if path == nil {
+		return nil
+	}
 
-// VMStorage interface used by other keepers to get/set VM data.
-type VMStorage interface {
-	// Setters / getters for a VM storage values
-	SetValue(ctx sdk.Context, accessPath *vm_grpc.VMAccessPath, value []byte)
-	GetValue(ctx sdk.Context, accessPath *vm_grpc.VMAccessPath) []byte
-
-	// Delete VM value from a VM storage
-	DelValue(ctx sdk.Context, accessPath *vm_grpc.VMAccessPath)
-
-	// Check value in a VM storage exists
-	HasValue(ctx sdk.Context, accessPath *vm_grpc.VMAccessPath) bool
-}
-
-// GetPathKey returns storage key for VM values from VM AccessPath.
-func GetPathKey(path *vm_grpc.VMAccessPath) []byte {
 	return bytes.Join(
 		[][]byte{
 			VMKey,
@@ -50,13 +37,13 @@ func GetPathKey(path *vm_grpc.VMAccessPath) []byte {
 	)
 }
 
-// GetPathPrefixKey returns storage key prefix for VM values (used for iteration).
-func GetPathPrefixKey() []byte {
+// GetVMStorageKeyPrefix returns VMStorage keys prefix (used for iteration).
+func GetVMStorageKeyPrefix() []byte {
 	return append(VMKey, KeyDelimiter...)
 }
 
-// MustParsePathKey parses VM storage key and panics on failure.
-func MustParsePathKey(key []byte) *vm_grpc.VMAccessPath {
+// MustParseVMStorageKey parses VMStorage key and panics on failure.
+func MustParseVMStorageKey(key []byte) *vm_grpc.VMAccessPath {
 	accessPath := vm_grpc.VMAccessPath{}
 
 	// we expect key to be correct: vm:{address_20bytes}:{path_at_least_1byte}
@@ -98,13 +85,4 @@ func MustParsePathKey(key []byte) *vm_grpc.VMAccessPath {
 	accessPath.Path = pathValue
 
 	return &accessPath
-}
-
-// Bech32ToLibra converts Bech32 to Libra hex.
-func Bech32ToLibra(addr sdk.AccAddress) []byte {
-	return addr.Bytes()
-}
-
-func init() {
-	StdLibAddress[VMAddressLength-1] = 1
 }

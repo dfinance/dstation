@@ -1,7 +1,6 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
 	stdlog "log"
 	"os"
@@ -42,12 +41,7 @@ var (
 )
 
 // SetGenesisDefaults takes default app genesis state and overwrites Cosmos SDK / Dfinance params.
-func SetGenesisDefaults(cdc codec.Marshaler, appStateBz json.RawMessage) (json.RawMessage, error) {
-	var genState app.GenesisState
-	if err := json.Unmarshal(appStateBz, &genState); err != nil {
-		return nil, fmt.Errorf("appStateBz json unmarshal: %w", err)
-	}
-
+func SetGenesisDefaults(cdc codec.Marshaler, genState app.GenesisState) (app.GenesisState, error) {
 	// Bank module genesis
 	{
 		moduleName, moduleState := bankTypes.ModuleName, bankTypes.GenesisState{}
@@ -324,12 +318,7 @@ func SetGenesisDefaults(cdc codec.Marshaler, appStateBz json.RawMessage) (json.R
 		}
 	}
 
-	genStateBz, err := json.MarshalIndent(genState, "", " ")
-	if err != nil {
-		return nil, fmt.Errorf("genState json marshal: %w", err)
-	}
-
-	return genStateBz, nil
+	return genState, nil
 }
 
 func init() {

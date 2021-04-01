@@ -1,14 +1,19 @@
 package app
 
 import (
+	"fmt"
 	"io"
+	"math/big"
+	"net"
 	"net/http"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
+	"google.golang.org/grpc"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmJson "github.com/tendermint/tendermint/libs/json"
@@ -83,6 +88,12 @@ import (
 	upgradeKeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradeTypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
+	"github.com/dfinance/dstation/pkg"
+	"github.com/dfinance/dstation/x/vm"
+	vmConfig "github.com/dfinance/dstation/x/vm/config"
+	vmKeeper "github.com/dfinance/dstation/x/vm/keeper"
+	vmTypes "github.com/dfinance/dstation/x/vm/types"
+
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -112,6 +123,7 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		vm.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -162,6 +174,7 @@ type DnApp struct { // nolint: golint
 	IBCKeeper        *ibcKeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper   evidenceKeeper.Keeper
 	TransferKeeper   ibcTransferKeeper.Keeper
+	VmKeeper         vmKeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilityKeeper.ScopedKeeper
@@ -172,6 +185,11 @@ type DnApp struct { // nolint: golint
 
 	// simulation manager
 	sm *module.SimulationManager
+
+	// vm connections
+	vmConfig   vmConfig.VMConfig
+	vmConn     *grpc.ClientConn
+	dsListener net.Listener
 }
 
 // Name returns the name of the App.
@@ -297,10 +315,66 @@ func (app *DnApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
+// Initialize connection to VM server.
+func (app *DnApp) InitializeVMConnection(addr string, appOpts serverTypes.AppOptions) {
+	// Custom (used for mock connection)
+	if obj := appOpts.Get(FlagCustomVMConnection); obj != nil {
+		conn, ok := obj.(*grpc.ClientConn)
+		if !ok {
+			panic(fmt.Errorf("%s appOpt: type assertion failed: %T", FlagCustomVMConnection, obj))
+		}
+		app.vmConn = conn
+		return
+	}
+
+	// gRPC connection
+	app.Logger().Info(fmt.Sprintf("Creating VM connection, address: %s", addr))
+	conn, err := pkg.GetGRpcClientConnection(addr, 1*time.Second)
+	if err != nil {
+		panic(err)
+	}
+	app.vmConn = conn
+
+	app.Logger().Info(fmt.Sprintf("Non-blocking connection initialized, status: %s", app.vmConn.GetState()))
+}
+
+// Initialize listener to listen for connections from VM for data server.
+func (app *DnApp) InitializeVMDataServer(addr string, appOpts serverTypes.AppOptions) {
+	// Custom (used for mock connection)
+	if obj := appOpts.Get(FlagCustomDSListener); obj != nil {
+		listener, ok := obj.(net.Listener)
+		if !ok {
+			panic(fmt.Errorf("%s appOpt: type assertion failed: %T", FlagCustomDSListener, obj))
+		}
+		app.dsListener = listener
+		return
+	}
+
+	app.Logger().Info(fmt.Sprintf("Starting VM data server listener, address: %s", addr))
+	listener, err := pkg.GetGRpcNetListener(addr)
+	if err != nil {
+		panic(err)
+	}
+	app.dsListener = listener
+
+	app.Logger().Info("VM data server is running")
+}
+
+// CloseConnections closes VM connection and stops DS server.
+func (app DnApp) CloseConnections() {
+	app.VmKeeper.StopDSServer()
+	if app.dsListener != nil {
+		app.dsListener.Close()
+	}
+	if app.vmConn != nil {
+		app.vmConn.Close()
+	}
+}
+
 // NewDnApp returns a reference to an initialized Dnode service.
 func NewDnApp(
 	logger log.Logger, db tmDb.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig EncodingConfig, appOpts serverTypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
+	homePath string, invCheckPeriod uint, encodingConfig EncodingConfig, vmConfig vmConfig.VMConfig, appOpts serverTypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *DnApp {
 
 	appCodec := encodingConfig.Marshaler
@@ -317,6 +391,7 @@ func NewDnApp(
 		mintTypes.StoreKey, distrTypes.StoreKey, slashingTypes.StoreKey,
 		govTypes.StoreKey, paramsTypes.StoreKey, ibcHost.StoreKey, upgradeTypes.StoreKey,
 		evidenceTypes.StoreKey, ibcTransferTypes.StoreKey, capabilityTypes.StoreKey,
+		vmTypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramsTypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilityTypes.MemStoreKey)
@@ -330,7 +405,16 @@ func NewDnApp(
 		keys:              keys,
 		tkeys:             tkeys,
 		memKeys:           memKeys,
+		vmConfig:          vmConfig,
 	}
+
+	// Initialize VM connections
+	app.InitializeVMDataServer(vmConfig.DataListen, appOpts)
+	app.InitializeVMConnection(vmConfig.Address, appOpts)
+
+	// Reduce ConsensusPower reduction coefficient (1 xfi == 1 power unit)
+	// 1 xfi == 1000000000000000000 (exp == 18)
+	sdk.PowerReduction = sdk.NewIntFromBigInt(new(big.Int).Exp(big.NewInt(10), big.NewInt(18), nil))
 
 	app.ParamsKeeper = initParamsKeeper(appCodec, legacyAmino, keys[paramsTypes.StoreKey], tkeys[paramsTypes.TStoreKey])
 	// set the BaseApp's parameter store
@@ -341,7 +425,7 @@ func NewDnApp(
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibcHost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibcTransferTypes.ModuleName)
 
-	// add keepers
+	// Add keepers
 	app.AccountKeeper = authKeeper.NewAccountKeeper(
 		appCodec, keys[authTypes.StoreKey], app.GetSubspace(authTypes.ModuleName), authTypes.ProtoBaseAccount, maccPerms,
 	)
@@ -367,7 +451,7 @@ func NewDnApp(
 	)
 	app.UpgradeKeeper = upgradeKeeper.NewKeeper(skipUpgradeHeights, keys[upgradeTypes.StoreKey], appCodec, homePath)
 
-	// register the staking hooks
+	// Register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
 		stakingTypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
@@ -378,7 +462,11 @@ func NewDnApp(
 		appCodec, keys[ibcHost.StoreKey], app.GetSubspace(ibcHost.ModuleName), app.StakingKeeper, scopedIBCKeeper,
 	)
 
-	// register the proposal types
+	app.VmKeeper = vmKeeper.NewKeeper(
+		appCodec, keys[vmTypes.StoreKey], app.vmConn, app.dsListener, app.vmConfig,
+	)
+
+	// Register the proposal types
 	govRouter := govTypes.NewRouter()
 	govRouter.AddRoute(govTypes.RouterKey, govTypes.ProposalHandler).
 		AddRoute(paramsProposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
@@ -420,9 +508,6 @@ func NewDnApp(
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
-
-	// NOTE: Any module instantiated in the module manager that is later modified
-	// must be passed by reference here.
 	app.mm = module.NewManager(
 		genutil.NewAppModule(
 			app.AccountKeeper, app.StakingKeeper, app.BaseApp.DeliverTx,
@@ -443,6 +528,7 @@ func NewDnApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+		vm.NewAppModule(appCodec, app.VmKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -450,10 +536,20 @@ func NewDnApp(
 	// CanWithdrawInvariant invariant.
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
-		upgradeTypes.ModuleName, mintTypes.ModuleName, distrTypes.ModuleName, slashingTypes.ModuleName,
-		evidenceTypes.ModuleName, stakingTypes.ModuleName, ibcHost.ModuleName,
+		upgradeTypes.ModuleName,
+		mintTypes.ModuleName,
+		distrTypes.ModuleName,
+		slashingTypes.ModuleName,
+		evidenceTypes.ModuleName,
+		stakingTypes.ModuleName,
+		ibcHost.ModuleName,
+		vmTypes.ModuleName,
 	)
-	app.mm.SetOrderEndBlockers(crisisTypes.ModuleName, govTypes.ModuleName, stakingTypes.ModuleName)
+	app.mm.SetOrderEndBlockers(
+		crisisTypes.ModuleName,
+		govTypes.ModuleName,
+		stakingTypes.ModuleName,
+	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -461,9 +557,20 @@ func NewDnApp(
 	// so that other modules that want to create or claim capabilities afterwards in InitChain
 	// can do so safely.
 	app.mm.SetOrderInitGenesis(
-		capabilityTypes.ModuleName, authTypes.ModuleName, bankTypes.ModuleName, distrTypes.ModuleName, stakingTypes.ModuleName,
-		slashingTypes.ModuleName, govTypes.ModuleName, mintTypes.ModuleName, crisisTypes.ModuleName,
-		ibcHost.ModuleName, genutilTypes.ModuleName, evidenceTypes.ModuleName, ibcTransferTypes.ModuleName,
+		capabilityTypes.ModuleName,
+		authTypes.ModuleName,
+		bankTypes.ModuleName,
+		distrTypes.ModuleName,
+		stakingTypes.ModuleName,
+		slashingTypes.ModuleName,
+		govTypes.ModuleName,
+		mintTypes.ModuleName,
+		crisisTypes.ModuleName,
+		ibcHost.ModuleName,
+		genutilTypes.ModuleName,
+		evidenceTypes.ModuleName,
+		ibcTransferTypes.ModuleName,
+		vmTypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -524,6 +631,9 @@ func NewDnApp(
 	}
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
+
+	// Start the VM data source server after all the initialization is done
+	app.VmKeeper.StartDSServer()
 
 	return app
 }

@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -11,6 +12,7 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/types"
 
+	"github.com/dfinance/dstation/app"
 	dnConfig "github.com/dfinance/dstation/cmd/dstation/config"
 )
 
@@ -30,17 +32,27 @@ func SetGenesisDefaultsCmd(defaultNodeHome string) *cobra.Command {
 				return fmt.Errorf("failed to read genesis doc from file: %w", err)
 			}
 
-			appState, err := dnConfig.SetGenesisDefaults(clientCtx.JSONMarshaler.(codec.Marshaler), genDoc.AppState)
+			var genState app.GenesisState
+			if err := json.Unmarshal(genDoc.AppState, &genState); err != nil {
+				return fmt.Errorf("genDoc.AppState json unmarshal: %w", err)
+			}
+
+			appState, err := dnConfig.SetGenesisDefaults(clientCtx.JSONMarshaler.(codec.Marshaler), genState)
 			if err != nil {
 				return fmt.Errorf("failed to set default genesis params:: %w", err)
 			}
-			genDoc.AppState = appState
+
+			appStateBz, err := json.MarshalIndent(appState, "", " ")
+			if err != nil {
+				return fmt.Errorf("appState json marshal: %w", err)
+			}
+			genDoc.AppState = appStateBz
 
 			if err = genutil.ExportGenesisFile(genDoc, genFile); err != nil {
 				return fmt.Errorf("failed to export gensis file: %w", err)
 			}
 
-			return clientCtx.PrintString(string(appState))
+			return clientCtx.PrintString(string(appStateBz))
 		},
 	}
 

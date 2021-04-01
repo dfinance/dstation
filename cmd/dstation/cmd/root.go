@@ -25,16 +25,22 @@ import (
 	genutilCli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 	tmCli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	tmDb "github.com/tendermint/tm-db"
 
 	"github.com/dfinance/dstation/app"
 	"github.com/dfinance/dstation/cmd/dstation/config"
+	vmConfig "github.com/dfinance/dstation/x/vm/config"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the main function.
 func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
+	sdkConfig := sdk.GetConfig()
+	config.SetConfigBech32Prefixes(sdkConfig)
+	sdkConfig.Seal()
+
 	encodingConfig := app.MakeEncodingConfig()
 	authClient.Codec = encodingConfig.Marshaler
 
@@ -87,17 +93,19 @@ func appExporter(
 	logger log.Logger, db tmDb.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string, appOpts serverTypes.AppOptions,
 ) (serverTypes.ExportedApp, error) {
 
+	vmConfig := vmConfig.ReadVMConfig(viper.GetString(flags.FlagHome))
+
 	encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
 	var dnApp *app.DnApp
 	if height != -1 {
-		dnApp = app.NewDnApp(logger, db, traceStore, false, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts)
+		dnApp = app.NewDnApp(logger, db, traceStore, false, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, vmConfig, appOpts)
 
 		if err := dnApp.LoadHeight(height); err != nil {
 			return serverTypes.ExportedApp{}, err
 		}
 	} else {
-		dnApp = app.NewDnApp(logger, db, traceStore, true, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, appOpts)
+		dnApp = app.NewDnApp(logger, db, traceStore, true, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, vmConfig, appOpts)
 	}
 
 	return dnApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
@@ -165,6 +173,8 @@ func txCommand() *cobra.Command {
 func newApp(logger log.Logger, db tmDb.DB, traceStore io.Writer, appOpts serverTypes.AppOptions) serverTypes.Application {
 	var cache sdk.MultiStorePersistentCache
 
+	vmConfig := vmConfig.ReadVMConfig(viper.GetString(flags.FlagHome))
+
 	if cast.ToBool(appOpts.Get(server.FlagInterBlockCache)) {
 		cache = store.NewCommitKVStoreCacheManager()
 	}
@@ -194,6 +204,7 @@ func newApp(logger log.Logger, db tmDb.DB, traceStore io.Writer, appOpts serverT
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		app.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
+		vmConfig,
 		appOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),
@@ -206,5 +217,6 @@ func newApp(logger log.Logger, db tmDb.DB, traceStore io.Writer, appOpts serverT
 		baseapp.SetSnapshotStore(snapshotStore),
 		baseapp.SetSnapshotInterval(cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval))),
 		baseapp.SetSnapshotKeepRecent(cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))),
+		app.VMCrashHandleBaseAppOption(),
 	)
 }
