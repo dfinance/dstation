@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 // Test event build when VM return status is "keep changes".
@@ -19,8 +19,8 @@ func TestVM_KeepEvent(t *testing.T) {
 
 	// "keep" no error
 	{
-		exec := &vm_grpc.VMExecuteResponse{
-			Status: &vm_grpc.VMStatus{},
+		exec := &dvm.VMExecuteResponse{
+			Status: &dvm.VMStatus{},
 		}
 		events := NewContractEvents(exec)
 
@@ -40,9 +40,9 @@ func TestVM_DiscardEvent(t *testing.T) {
 	// "panic" with empty VMStatus_Abort
 	{
 		func() {
-			exec := &vm_grpc.VMExecuteResponse{
-				Status: &vm_grpc.VMStatus{
-					Error: &vm_grpc.VMStatus_Abort{},
+			exec := &dvm.VMExecuteResponse{
+				Status: &dvm.VMStatus{
+					Error: &dvm.VMStatus_Abort{},
 				},
 			}
 
@@ -57,9 +57,9 @@ func TestVM_DiscardEvent(t *testing.T) {
 	// "panic" with empty VMStatus_ExecutionFailure
 	{
 		func() {
-			exec := &vm_grpc.VMExecuteResponse{
-				Status: &vm_grpc.VMStatus{
-					Error: &vm_grpc.VMStatus_ExecutionFailure{},
+			exec := &dvm.VMExecuteResponse{
+				Status: &dvm.VMStatus{
+					Error: &dvm.VMStatus_ExecutionFailure{},
 				},
 			}
 
@@ -74,9 +74,9 @@ func TestVM_DiscardEvent(t *testing.T) {
 	// "panic" with empty VMStatus_MoveError
 	{
 		func() {
-			exec := &vm_grpc.VMExecuteResponse{
-				Status: &vm_grpc.VMStatus{
-					Error: &vm_grpc.VMStatus_MoveError{},
+			exec := &dvm.VMExecuteResponse{
+				Status: &dvm.VMStatus{
+					Error: &dvm.VMStatus_MoveError{},
 				},
 			}
 
@@ -95,18 +95,18 @@ func TestVM_DiscardEvent(t *testing.T) {
 		abortLocationAddress := sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 		errMessage := "this is error!!111"
 
-		exec := &vm_grpc.VMExecuteResponse{
-			Status: &vm_grpc.VMStatus{
-				Error: &vm_grpc.VMStatus_Abort{
-					Abort: &vm_grpc.Abort{
+		exec := &dvm.VMExecuteResponse{
+			Status: &dvm.VMStatus{
+				Error: &dvm.VMStatus_Abort{
+					Abort: &dvm.Abort{
 						AbortCode: abortCode,
-						AbortLocation: &vm_grpc.AbortLocation{
+						AbortLocation: &dvm.AbortLocation{
 							Module:  abortLocationModule,
 							Address: abortLocationAddress.Bytes(),
 						},
 					},
 				},
-				Message: &vm_grpc.Message{Text: errMessage},
+				Message: &dvm.Message{Text: errMessage},
 			},
 		}
 		events := NewContractEvents(exec)
@@ -138,14 +138,14 @@ func TestVM_DiscardEvent(t *testing.T) {
 	{
 		statusCode := uint64(500)
 		errMessage := "this is error!!111"
-		exec := &vm_grpc.VMExecuteResponse{
-			Status: &vm_grpc.VMStatus{
-				Error: &vm_grpc.VMStatus_ExecutionFailure{
-					ExecutionFailure: &vm_grpc.Failure{
+		exec := &dvm.VMExecuteResponse{
+			Status: &dvm.VMStatus{
+				Error: &dvm.VMStatus_ExecutionFailure{
+					ExecutionFailure: &dvm.Failure{
 						StatusCode: statusCode,
 					},
 				},
-				Message: &vm_grpc.Message{
+				Message: &dvm.Message{
 					Text: errMessage,
 				},
 			},
@@ -192,24 +192,24 @@ func TestVM_NewEventFromVM(t *testing.T) {
 	// seems Move using to_le_bytes
 	binary.LittleEndian.PutUint64(valBytes, value)
 
-	vmEvent := vm_grpc.VMEvent{
+	vmEvent := dvm.VMEvent{
 		SenderAddress: StdLibAddress,
-		SenderModule: &vm_grpc.ModuleIdent{
+		SenderModule: &dvm.ModuleIdent{
 			Name:    "testModule",
 			Address: Bech32ToLibra(moduleAddr),
 		},
-		EventType: &vm_grpc.LcsTag{
-			TypeTag: vm_grpc.LcsType_LcsU64,
-			StructIdent: &vm_grpc.StructIdent{
+		EventType: &dvm.LcsTag{
+			TypeTag: dvm.LcsType_LcsU64,
+			StructIdent: &dvm.StructIdent{
 				Address: []byte{1},
 				Module:  "Module_1",
 				Name:    "Struct_1",
-				TypeParams: []*vm_grpc.LcsTag{
+				TypeParams: []*dvm.LcsTag{
 					{
-						TypeTag: vm_grpc.LcsType_LcsBool,
+						TypeTag: dvm.LcsType_LcsBool,
 					},
 					{
-						TypeTag: vm_grpc.LcsType_LcsU128,
+						TypeTag: dvm.LcsType_LcsU128,
 					},
 				},
 			},
@@ -272,34 +272,34 @@ func TestVM_OutOfGasProcessEvent(t *testing.T) {
 	// seems Move using to_le_bytes
 	binary.LittleEndian.PutUint64(valBytes, value)
 
-	vmEvent := vm_grpc.VMEvent{
+	vmEvent := dvm.VMEvent{
 		SenderAddress: StdLibAddress,
-		SenderModule: &vm_grpc.ModuleIdent{
+		SenderModule: &dvm.ModuleIdent{
 			Name:    "testModule",
 			Address: Bech32ToLibra(moduleAddr),
 		},
-		EventType: &vm_grpc.LcsTag{
-			TypeTag: vm_grpc.LcsType_LcsU64,
-			StructIdent: &vm_grpc.StructIdent{
+		EventType: &dvm.LcsTag{
+			TypeTag: dvm.LcsType_LcsU64,
+			StructIdent: &dvm.StructIdent{
 				Address: []byte{1},
 				Module:  "Module_1",
 				Name:    "Struct_1",
-				TypeParams: []*vm_grpc.LcsTag{
+				TypeParams: []*dvm.LcsTag{
 					{
-						TypeTag: vm_grpc.LcsType_LcsBool,
-						StructIdent: &vm_grpc.StructIdent{
+						TypeTag: dvm.LcsType_LcsBool,
+						StructIdent: &dvm.StructIdent{
 							Address: []byte{2},
 							Module:  "Module_1",
 							Name:    "Struct_2",
-							TypeParams: []*vm_grpc.LcsTag{
+							TypeParams: []*dvm.LcsTag{
 								{
-									TypeTag: vm_grpc.LcsType_LcsU8,
+									TypeTag: dvm.LcsType_LcsU8,
 								},
 							},
 						},
 					},
 					{
-						TypeTag: vm_grpc.LcsType_LcsU128,
+						TypeTag: dvm.LcsType_LcsU128,
 					},
 				},
 			},
@@ -307,7 +307,7 @@ func TestVM_OutOfGasProcessEvent(t *testing.T) {
 		EventData: valBytes,
 	}
 
-	require.PanicsWithValue(t, sdk.ErrorOutOfGas{"event type processing"}, func() {
+	require.PanicsWithValue(t, sdk.ErrorOutOfGas{Descriptor: "event type processing"}, func() {
 		NewMoveEvent(sdk.NewGasMeter(1000), &vmEvent)
 	})
 }

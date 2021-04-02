@@ -19,6 +19,7 @@ import (
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
+	"github.com/dfinance/dstation/x/vm/client/cli"
 	"github.com/dfinance/dstation/x/vm/keeper"
 	"github.com/dfinance/dstation/x/vm/types"
 )
@@ -68,20 +69,19 @@ func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Rout
 }
 
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the staking module.
+// nolint:errcheck
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
 	types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
 }
 
 // GetTxCmd returns the root tx command for the staking module.
 func (AppModuleBasic) GetTxCmd() *cobra.Command {
-	//return cli.NewTxCmd()
-	return nil
+	return cli.GetTxCmd()
 }
 
 // GetQueryCmd returns no root query command for the staking module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	//return cli.GetQueryCmd()
-	return nil
+	return cli.GetQueryCmd()
 }
 
 // AppModule implements an application module for the staking module.

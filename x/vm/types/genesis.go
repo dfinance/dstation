@@ -4,15 +4,15 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 func (m GenesisState_WriteOp) String() string {
 	return fmt.Sprintf("%s::%s", m.Address, m.Path)
 }
 
-// ToBytes converts WriteOp to vm_grpc.VMAccessPath and []byte representation for value.
-func (m GenesisState_WriteOp) ToBytes() (*vm_grpc.VMAccessPath, []byte, error) {
+// ToBytes converts WriteOp to dvm.VMAccessPath and []byte representation for value.
+func (m GenesisState_WriteOp) ToBytes() (*dvm.VMAccessPath, []byte, error) {
 	bzAddr, err := hex.DecodeString(m.Address)
 	if err != nil {
 		return nil, nil, fmt.Errorf("address: hex decode: %w", err)
@@ -31,7 +31,7 @@ func (m GenesisState_WriteOp) ToBytes() (*vm_grpc.VMAccessPath, []byte, error) {
 		return nil, nil, fmt.Errorf("value: hex decode: %w", err)
 	}
 
-	return &vm_grpc.VMAccessPath{
+	return &dvm.VMAccessPath{
 		Address: bzAddr,
 		Path:    bzPath,
 	}, bzValue, nil

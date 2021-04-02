@@ -3,8 +3,8 @@ module github.com/dfinance/dstation
 go 1.15
 
 require (
+	github.com/OneOfOne/xxhash v1.2.2
 	github.com/cosmos/cosmos-sdk v0.42.2
-	github.com/dfinance/dvm-proto/go v0.0.0-20201007122036-27be7297df4e
 	github.com/dfinance/glav v0.0.0-20200814081332-c4701f6c12a6
 	github.com/dfinance/lcs v0.1.7-big
 	github.com/gogo/protobuf v1.3.3

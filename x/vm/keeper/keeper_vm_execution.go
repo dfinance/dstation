@@ -5,9 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkErrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
 
 	dnTypes "github.com/dfinance/dstation/pkg/types"
+	"github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
@@ -30,7 +30,7 @@ func (k Keeper) ExecuteContract(ctx sdk.Context, msg types.MsgExecuteScript) err
 
 // DeployContract deploys Move module (contract) and processes execution results (events, writeSets).
 func (k Keeper) DeployContract(ctx sdk.Context, msg types.MsgDeployModule) error {
-	execList := make([]*vm_grpc.VMExecuteResponse, 0, len(msg.Modules))
+	execList := make([]*dvm.VMExecuteResponse, 0, len(msg.Modules))
 	for i, code := range msg.Modules {
 		req := types.NewVMPublishModuleRequests(ctx, msg.Signer, code)
 
@@ -73,7 +73,7 @@ func (k Keeper) DeployContractDryRun(ctx sdk.Context, msg types.MsgDeployModule)
 }
 
 // processVMExecution processes VM execution result: emits events, converts VM events, updates writeSets.
-func (k Keeper) processVMExecution(ctx sdk.Context, exec *vm_grpc.VMExecuteResponse) {
+func (k Keeper) processVMExecution(ctx sdk.Context, exec *dvm.VMExecuteResponse) {
 	// Consume gas (if execution took too much gas - panic and mark transaction as out of gas)
 	ctx.GasMeter().ConsumeGas(exec.GasUsed, "vm script/module execution")
 
@@ -93,11 +93,11 @@ func (k Keeper) processVMExecution(ctx sdk.Context, exec *vm_grpc.VMExecuteRespo
 }
 
 // processVMWriteSet processes VM execution writeSets (set/delete).
-func (k Keeper) processVMWriteSet(ctx sdk.Context, writeSet []*vm_grpc.VMValue) {
+func (k Keeper) processVMWriteSet(ctx sdk.Context, writeSet []*dvm.VMValue) {
 	for _, value := range writeSet {
-		if value.Type == vm_grpc.VmWriteOp_Deletion {
+		if value.Type == dvm.VmWriteOp_Deletion {
 			k.DelValue(ctx, value.Path)
-		} else if value.Type == vm_grpc.VmWriteOp_Value {
+		} else if value.Type == dvm.VmWriteOp_Value {
 			k.SetValue(ctx, value.Path, value.Value)
 		} else {
 			// must not happens

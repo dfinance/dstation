@@ -6,8 +6,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkErrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/dfinance/dvm-proto/go/types_grpc"
 	"github.com/stretchr/testify/require"
+
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 func TestVM_MsgDeployModule(t *testing.T) {
@@ -19,7 +20,7 @@ func TestVM_MsgDeployModule(t *testing.T) {
 
 	// ok
 	{
-		msg := NewMsgDeployModule(acc, [][]byte{code})
+		msg := NewMsgDeployModule(acc, code)
 
 		require.Equal(t, acc.String(), msg.Signer)
 		require.Equal(t, code, msg.Modules[0])
@@ -34,13 +35,13 @@ func TestVM_MsgDeployModule(t *testing.T) {
 
 	// fail
 	{
-		msg := NewMsgDeployModule([]byte{}, [][]byte{code})
+		msg := NewMsgDeployModule([]byte{}, code)
 		require.True(t, errors.Is(msg.ValidateBasic(), sdkErrors.ErrInvalidAddress))
 	}
 
 	// fail
 	{
-		msg := NewMsgDeployModule(acc, [][]byte{})
+		msg := NewMsgDeployModule(acc)
 		require.True(t, errors.Is(msg.ValidateBasic(), ErrEmptyContract))
 	}
 }
@@ -53,9 +54,9 @@ func TestVM_MsgExecuteScript(t *testing.T) {
 	code := make([]byte, 128)
 
 	args := []MsgExecuteScript_ScriptArg{
-		{Type: types_grpc.VMTypeTag_U64, Value: []byte{0x1, 0x2, 0x3, 0x4}},
-		{Type: types_grpc.VMTypeTag_Vector, Value: []byte{0x0}},
-		{Type: types_grpc.VMTypeTag_Address, Value: Bech32ToLibra(acc)},
+		{Type: dvm.VMTypeTag_U64, Value: []byte{0x1, 0x2, 0x3, 0x4}},
+		{Type: dvm.VMTypeTag_Vector, Value: []byte{0x0}},
+		{Type: dvm.VMTypeTag_Address, Value: Bech32ToLibra(acc)},
 	}
 
 	// ok

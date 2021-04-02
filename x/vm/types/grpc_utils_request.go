@@ -2,12 +2,13 @@ package types
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
+
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
-// NewVMPublishModuleRequest builds a new vm_grpc.VMPublishModule VM request.
-func NewVMPublishModuleRequests(ctx sdk.Context, signerAddrRaw string, code []byte) *vm_grpc.VMPublishModule {
-	return &vm_grpc.VMPublishModule{
+// NewVMPublishModuleRequest builds a new dvm.VMPublishModule VM request.
+func NewVMPublishModuleRequests(ctx sdk.Context, signerAddrRaw string, code []byte) *dvm.VMPublishModule {
+	return &dvm.VMPublishModule{
 		Sender:       MustBech32ToLibra(signerAddrRaw),
 		MaxGasAmount: getVMLimitedGas(ctx),
 		GasUnitPrice: VmGasPrice,
@@ -15,17 +16,17 @@ func NewVMPublishModuleRequests(ctx sdk.Context, signerAddrRaw string, code []by
 	}
 }
 
-// NewVMExecuteScriptRequest builds a new vm_grpc.VMExecuteScript VM request.
-func NewVMExecuteScriptRequest(ctx sdk.Context, signerAddrRaw string, code []byte, args ...MsgExecuteScript_ScriptArg) *vm_grpc.VMExecuteScript {
-	vmArgs := make([]*vm_grpc.VMArgs, 0, len(args))
+// NewVMExecuteScriptRequest builds a new dvm.VMExecuteScript VM request.
+func NewVMExecuteScriptRequest(ctx sdk.Context, signerAddrRaw string, code []byte, args ...MsgExecuteScript_ScriptArg) *dvm.VMExecuteScript {
+	vmArgs := make([]*dvm.VMArgs, 0, len(args))
 	for _, arg := range args {
-		vmArgs = append(vmArgs, &vm_grpc.VMArgs{
+		vmArgs = append(vmArgs, &dvm.VMArgs{
 			Type:  arg.Type,
 			Value: arg.Value,
 		})
 	}
 
-	return &vm_grpc.VMExecuteScript{
+	return &dvm.VMExecuteScript{
 		Senders:      [][]byte{MustBech32ToLibra(signerAddrRaw)},
 		MaxGasAmount: getVMLimitedGas(ctx),
 		GasUnitPrice: VmGasPrice,

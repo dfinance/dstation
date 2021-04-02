@@ -70,6 +70,10 @@ func (m MsgExecuteScript) GetSigners() []sdk.AccAddress {
 
 // NewMsgExecuteScript creates a new MsgExecuteScript message.
 func NewMsgExecuteScript(signer sdk.AccAddress, script []byte, args ...MsgExecuteScript_ScriptArg) MsgExecuteScript {
+	if len(args) == 0 {
+		args = nil
+	}
+
 	return MsgExecuteScript{
 		Signer: signer.String(),
 		Script: script,
@@ -127,7 +131,7 @@ func (m MsgDeployModule) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgDeployModule creates a new MsgDeployModule message.
-func NewMsgDeployModule(signer sdk.AccAddress, modules [][]byte) MsgDeployModule {
+func NewMsgDeployModule(signer sdk.AccAddress, modules ...[]byte) MsgDeployModule {
 	return MsgDeployModule{
 		Signer:  signer.String(),
 		Modules: modules,

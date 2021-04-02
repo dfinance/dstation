@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
 
+	"github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
@@ -28,7 +28,7 @@ func (k Keeper) InitGenesis(ctx sdk.Context, state *types.GenesisState) {
 // ExportGenesis exports module genesis state using current params state.
 func (k Keeper) ExportGenesis(ctx sdk.Context) *types.GenesisState {
 	state := types.GenesisState{}
-	k.iterateVMStorageValues(ctx, func(accessPath *vm_grpc.VMAccessPath, value []byte) bool {
+	k.iterateVMStorageValues(ctx, func(accessPath *dvm.VMAccessPath, value []byte) bool {
 		writeSetOp := types.GenesisState_WriteOp{
 			Address: hex.EncodeToString(accessPath.Address),
 			Path:    hex.EncodeToString(accessPath.Path),

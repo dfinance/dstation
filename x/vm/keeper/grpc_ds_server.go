@@ -8,10 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dfinance/dvm-proto/go/ds_grpc"
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
 	"google.golang.org/grpc"
 
+	"github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -20,7 +19,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var _ ds_grpc.DSServiceServer = &DSServer{}
+var _ dvm.DSServiceServer = &DSServer{}
 
 // DSServer is a DataSource server that catches VM client data requests.
 type DSServer struct {
@@ -70,7 +69,7 @@ func (srv *DSServer) Start(listener net.Listener) {
 	}
 
 	srv.server = grpc.NewServer()
-	ds_grpc.RegisterDSServiceServer(srv.server, srv)
+	dvm.RegisterDSServiceServer(srv.server, srv)
 
 	go func() {
 		if err := srv.server.Serve(listener); err != nil {
@@ -78,8 +77,6 @@ func (srv *DSServer) Start(listener net.Listener) {
 		}
 	}()
 	time.Sleep(10 * time.Millisecond) // force context switch for server to start
-
-	return
 }
 
 // Stop stops gRPC DS server.
@@ -94,9 +91,21 @@ func (srv *DSServer) Stop() {
 	srv.server.Stop()
 }
 
+func (srv *DSServer) GetOraclePrice(context.Context, *dvm.OraclePriceRequest) (*dvm.OraclePriceResponse, error) {
+	return nil, nil
+}
+
+func (srv *DSServer) GetNativeBalance(context.Context, *dvm.NativeBalanceRequest) (*dvm.NativeBalanceResponse, error) {
+	return nil, nil
+}
+
+func (srv *DSServer) GetCurrencyInfo(context.Context, *dvm.CurrencyInfoRequest) (*dvm.CurrencyInfoResponse, error) {
+	return nil, nil
+}
+
 // GetRaw implements gRPC service handler: returns value from the storage.
-func (srv *DSServer) GetRaw(_ context.Context, req *ds_grpc.DSAccessPath) (*ds_grpc.DSRawResponse, error) {
-	path := &vm_grpc.VMAccessPath{
+func (srv *DSServer) GetRaw(_ context.Context, req *dvm.DSAccessPath) (*dvm.DSRawResponse, error) {
+	path := &dvm.VMAccessPath{
 		Address: req.Address,
 		Path:    req.Path,
 	}
@@ -109,7 +118,7 @@ func (srv *DSServer) GetRaw(_ context.Context, req *ds_grpc.DSAccessPath) (*ds_g
 		return ErrNoData(req), nil
 	}
 	if blob != nil {
-		return &ds_grpc.DSRawResponse{Blob: blob}, nil
+		return &dvm.DSRawResponse{Blob: blob}, nil
 	}
 
 	// check storage
@@ -122,17 +131,17 @@ func (srv *DSServer) GetRaw(_ context.Context, req *ds_grpc.DSAccessPath) (*ds_g
 	blob = srv.storage.GetValue(srv.ctx, path)
 	srv.Logger().Debug(fmt.Sprintf("Return values: %s\n", hex.EncodeToString(blob)))
 
-	return &ds_grpc.DSRawResponse{Blob: blob}, nil
+	return &dvm.DSRawResponse{Blob: blob}, nil
 }
 
 // MultiGetRaw implements gRPC service handler: returns multiple values from the storage.
-func (srv *DSServer) MultiGetRaw(_ context.Context, req *ds_grpc.DSAccessPaths) (*ds_grpc.DSRawResponses, error) {
+func (srv *DSServer) MultiGetRaw(_ context.Context, req *dvm.DSAccessPaths) (*dvm.DSRawResponses, error) {
 	return nil, status.Errorf(codes.Unimplemented, "MultiGetRaw unimplemented")
 }
 
 // processMiddlewares checks that accessPath can be processed by any registered middleware.
 // Contract: if {data} != nil, middleware was found.
-func (srv *DSServer) processMiddlewares(path *vm_grpc.VMAccessPath) (data []byte, err error) {
+func (srv *DSServer) processMiddlewares(path *dvm.VMAccessPath) (data []byte, err error) {
 	for _, f := range srv.dataMiddlewares {
 		data, err = f(srv.ctx, path)
 		if err != nil || data != nil {
@@ -151,9 +160,9 @@ func NewDSServer(storage types.VMStorage) *DSServer {
 }
 
 // ErrNoData builds gRPC error response when data wasn't found.
-func ErrNoData(path *ds_grpc.DSAccessPath) *ds_grpc.DSRawResponse {
-	return &ds_grpc.DSRawResponse{
-		ErrorCode:    ds_grpc.DSRawResponse_NO_DATA,
+func ErrNoData(path *dvm.DSAccessPath) *dvm.DSRawResponse {
+	return &dvm.DSRawResponse{
+		ErrorCode:    dvm.ErrorCode_NO_DATA,
 		ErrorMessage: fmt.Sprintf("data not found for access path: %s", path.String()),
 	}
 }

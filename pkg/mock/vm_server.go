@@ -7,11 +7,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	grpcStatus "google.golang.org/grpc/status"
 	"google.golang.org/grpc/test/bufconn"
+
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 const (
@@ -27,7 +28,7 @@ var (
 type VMServer struct {
 	sync.Mutex
 	//
-	response      *vm_grpc.VMExecuteResponse
+	response      *dvm.VMExecuteResponse
 	responseDelay time.Duration
 	failCountdown uint
 	//
@@ -36,15 +37,15 @@ type VMServer struct {
 	vmGrpcServer *grpc.Server
 }
 
-func (s *VMServer) PublishModule(context.Context, *vm_grpc.VMPublishModule) (*vm_grpc.VMExecuteResponse, error) {
+func (s *VMServer) PublishModule(context.Context, *dvm.VMPublishModule) (*dvm.VMExecuteResponse, error) {
 	return s.buildResponse()
 }
 
-func (s *VMServer) ExecuteScript(context.Context, *vm_grpc.VMExecuteScript) (*vm_grpc.VMExecuteResponse, error) {
+func (s *VMServer) ExecuteScript(context.Context, *dvm.VMExecuteScript) (*dvm.VMExecuteResponse, error) {
 	return s.buildResponse()
 }
 
-func (s *VMServer) SetResponse(resp *vm_grpc.VMExecuteResponse) {
+func (s *VMServer) SetResponse(resp *dvm.VMExecuteResponse) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -109,7 +110,7 @@ func (s *VMServer) GetDSClientConnection() *grpc.ClientConn {
 	return conn
 }
 
-func (s *VMServer) buildResponse() (*vm_grpc.VMExecuteResponse, error) {
+func (s *VMServer) buildResponse() (*dvm.VMExecuteResponse, error) {
 	s.Lock()
 	defer s.Unlock()
 
@@ -125,41 +126,41 @@ func (s *VMServer) buildResponse() (*vm_grpc.VMExecuteResponse, error) {
 		resp = s.getDefaultResponse()
 	}
 
-	return s.response, nil
+	return resp, nil
 }
 
-func (s *VMServer) getDefaultResponse() *vm_grpc.VMExecuteResponse {
-	values := []*vm_grpc.VMValue{
+func (s *VMServer) getDefaultResponse() *dvm.VMExecuteResponse {
+	values := []*dvm.VMValue{
 		{
-			Type:  vm_grpc.VmWriteOp_Value,
+			Type:  dvm.VmWriteOp_Value,
 			Value: GetRandomBytes(8),
 			Path:  GetRandomVMAccessPath(),
 		},
 		{
-			Type:  vm_grpc.VmWriteOp_Value,
+			Type:  dvm.VmWriteOp_Value,
 			Value: GetRandomBytes(32),
 			Path:  GetRandomVMAccessPath(),
 		},
 	}
 
-	events := []*vm_grpc.VMEvent{
+	events := []*dvm.VMEvent{
 		{
 			SenderAddress: VMStdLibAddress,
-			EventType: &vm_grpc.LcsTag{
-				TypeTag: vm_grpc.LcsType_LcsVector,
-				VectorType: &vm_grpc.LcsTag{
-					TypeTag: vm_grpc.LcsType_LcsU8,
+			EventType: &dvm.LcsTag{
+				TypeTag: dvm.LcsType_LcsVector,
+				VectorType: &dvm.LcsTag{
+					TypeTag: dvm.LcsType_LcsU8,
 				},
 			},
 			EventData: GetRandomBytes(32),
 		},
 	}
 
-	return &vm_grpc.VMExecuteResponse{
+	return &dvm.VMExecuteResponse{
 		WriteSet: values,
 		Events:   events,
 		GasUsed:  10000,
-		Status:   &vm_grpc.VMStatus{},
+		Status:   &dvm.VMStatus{},
 	}
 }
 
@@ -169,8 +170,8 @@ func NewVMServer() *VMServer {
 		vmListener:   bufconn.Listen(bufferedListenerSize),
 		vmGrpcServer: grpc.NewServer(),
 	}
-	vm_grpc.RegisterVMModulePublisherServer(vmServer.vmGrpcServer, vmServer)
-	vm_grpc.RegisterVMScriptExecutorServer(vmServer.vmGrpcServer, vmServer)
+	dvm.RegisterVMModulePublisherServer(vmServer.vmGrpcServer, vmServer)
+	dvm.RegisterVMScriptExecutorServer(vmServer.vmGrpcServer, vmServer)
 
 	go func() {
 		if err := vmServer.vmGrpcServer.Serve(vmServer.vmListener); err != nil {
@@ -181,8 +182,8 @@ func NewVMServer() *VMServer {
 	return vmServer
 }
 
-func GetRandomVMAccessPath() *vm_grpc.VMAccessPath {
-	return &vm_grpc.VMAccessPath{
+func GetRandomVMAccessPath() *dvm.VMAccessPath {
+	return &dvm.VMAccessPath{
 		Address: GetRandomBytes(VMAddressLength),
 		Path:    GetRandomBytes(VMAddressLength),
 	}

@@ -6,7 +6,9 @@ import "google/protobuf/timestamp.proto";
 import "gogoproto/gogo.proto";
 
 import "cosmos_proto/cosmos.proto";
-import "dvm_proto/common-types.proto";
+
+import "dfinance/dvm/common-types.proto";
+import "dfinance/dvm/metadata.proto";
 
 option go_package = "github.com/dfinance/dstation/x/vm/types";
 
@@ -19,7 +21,7 @@ message MsgExecuteScript {
     option (gogoproto.equal) = false;
     option (gogoproto.goproto_getters) = false;
 
-    types.VMTypeTag type = 1 [
+    dvm.VMTypeTag type = 1 [
       (gogoproto.moretags) = "yaml:\"type\""
     ];
     bytes value = 2 [
@@ -107,4 +109,18 @@ message VmStatus {
   string message = 5 [
     (gogoproto.moretags) = "yaml:\"message\""
   ];
+}
+
+// CompiledItem contains VM compilation result.
+message CompiledItem {
+  enum CodeType {
+    MODULE = 0;
+    SCRIPT = 1;
+  }
+
+  bytes                 byte_code = 1;
+  string                name      = 2;
+  repeated dvm.Function methods   = 3;
+  repeated dvm.Struct   types     = 4;
+  CodeType              code_type = 5;
 }

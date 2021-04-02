@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 const (
@@ -21,8 +21,8 @@ var (
 	VMKey        = []byte("vm") // storage key prefix for VMStorage data
 )
 
-// GetVMStorageKey returns VMStorage key for vm_grpc.VMAccessPath.
-func GetVMStorageKey(path *vm_grpc.VMAccessPath) []byte {
+// GetVMStorageKey returns VMStorage key for dvm.VMAccessPath.
+func GetVMStorageKey(path *dvm.VMAccessPath) []byte {
 	if path == nil {
 		return nil
 	}
@@ -43,8 +43,8 @@ func GetVMStorageKeyPrefix() []byte {
 }
 
 // MustParseVMStorageKey parses VMStorage key and panics on failure.
-func MustParseVMStorageKey(key []byte) *vm_grpc.VMAccessPath {
-	accessPath := vm_grpc.VMAccessPath{}
+func MustParseVMStorageKey(key []byte) *dvm.VMAccessPath {
+	accessPath := dvm.VMAccessPath{}
 
 	// we expect key to be correct: vm:{address_20bytes}:{path_at_least_1byte}
 	expectedMinLen := len(VMKey) + len(KeyDelimiter) + VMAddressLength + len(KeyDelimiter) + 1

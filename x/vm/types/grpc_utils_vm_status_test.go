@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/types"
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
 	"github.com/stretchr/testify/require"
+
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 const (
@@ -75,36 +76,36 @@ func TestVM_NewVMStatusFromABCILogs(t *testing.T) {
 		TxHash: hash,
 		Logs: types.ABCIMessageLogs{
 			types.NewABCIMessageLog(0, "",
-				NewContractEvents(&vm_grpc.VMExecuteResponse{
-					Status: &vm_grpc.VMStatus{
-						Error: &vm_grpc.VMStatus_ExecutionFailure{
-							ExecutionFailure: &vm_grpc.Failure{
+				NewContractEvents(&dvm.VMExecuteResponse{
+					Status: &dvm.VMStatus{
+						Error: &dvm.VMStatus_ExecutionFailure{
+							ExecutionFailure: &dvm.Failure{
 								StatusCode: codes[0],
 							},
 						},
-						Message: &vm_grpc.Message{
+						Message: &dvm.Message{
 							Text: msgs[0],
 						},
 					},
 				}),
 			),
 			types.NewABCIMessageLog(1, "",
-				NewContractEvents(&vm_grpc.VMExecuteResponse{
-					Status: &vm_grpc.VMStatus{
-						Error: &vm_grpc.VMStatus_ExecutionFailure{
-							ExecutionFailure: &vm_grpc.Failure{
+				NewContractEvents(&dvm.VMExecuteResponse{
+					Status: &dvm.VMStatus{
+						Error: &dvm.VMStatus_ExecutionFailure{
+							ExecutionFailure: &dvm.Failure{
 								StatusCode: codes[1],
 							},
 						},
-						Message: &vm_grpc.Message{
+						Message: &dvm.Message{
 							Text: msgs[1],
 						},
 					},
 				}),
 			),
 			types.NewABCIMessageLog(2, "",
-				NewContractEvents(&vm_grpc.VMExecuteResponse{
-					Status: &vm_grpc.VMStatus{},
+				NewContractEvents(&dvm.VMExecuteResponse{
+					Status: &dvm.VMStatus{},
 				}),
 			),
 		},

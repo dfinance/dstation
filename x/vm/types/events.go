@@ -6,7 +6,8 @@ import (
 	"strconv"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
+
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 const (
@@ -33,8 +34,8 @@ const (
 
 // NewContractEvents creates Events on successful / failed VM execution.
 // "keep" status emits two events, "discard" status emits one event.
-// panic if vm_grpc.VMExecuteResponse or vm_grpc.VMExecuteResponse.Status == nil
-func NewContractEvents(exec *vm_grpc.VMExecuteResponse) sdk.Events {
+// panic if dvm.VMExecuteResponse or dvm.VMExecuteResponse.Status == nil
+func NewContractEvents(exec *dvm.VMExecuteResponse) sdk.Events {
 	if exec == nil {
 		panic(fmt.Errorf("building contract sdk.Events: exec is nil"))
 	}
@@ -87,7 +88,7 @@ func NewContractEvents(exec *vm_grpc.VMExecuteResponse) sdk.Events {
 
 // NewMoveEvent converts VM event to SDK event.
 // GasMeter is used to prevent long parsing (lots of nested structs).
-func NewMoveEvent(gasMeter sdk.GasMeter, vmEvent *vm_grpc.VMEvent) sdk.Event {
+func NewMoveEvent(gasMeter sdk.GasMeter, vmEvent *dvm.VMEvent) sdk.Event {
 	if vmEvent == nil {
 		panic(fmt.Errorf("building Move sdk.Event: event is nil"))
 	}
@@ -102,7 +103,7 @@ func NewMoveEvent(gasMeter sdk.GasMeter, vmEvent *vm_grpc.VMEvent) sdk.Event {
 }
 
 // GetEventSourceAttribute returns SDK event attribute for VM event source (script / module) serialized to string.
-func GetEventSourceAttribute(senderModule *vm_grpc.ModuleIdent) string {
+func GetEventSourceAttribute(senderModule *dvm.ModuleIdent) string {
 	if senderModule == nil {
 		return AttributeValueSourceScript
 	}

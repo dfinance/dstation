@@ -203,7 +203,7 @@ var (
 	errorCodes map[string]string
 )
 
-// StringifyVMStatusMajorCode returns vm_grpc.VMStatus majorCode string representation.
+// StringifyVMStatusMajorCode returns dvm.VMStatus majorCode string representation.
 func StringifyVMStatusMajorCode(majorCode string) string {
 	if v, ok := errorCodes[majorCode]; ok {
 		return v

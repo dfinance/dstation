@@ -4,11 +4,11 @@ import (
 	"encoding/hex"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
 
 	"github.com/dfinance/dstation/pkg/mock"
 	"github.com/dfinance/dstation/pkg/tests"
 	dnTypes "github.com/dfinance/dstation/pkg/types"
+	"github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
@@ -17,11 +17,11 @@ func (s *KeeperMockVmTestSuite) TestDeployContract() {
 
 	// Build msg
 	accAddr, _, _ := tests.GenAccAddress()
-	vmResp := &vm_grpc.VMExecuteResponse{
-		WriteSet: []*vm_grpc.VMValue{
+	vmResp := &dvm.VMExecuteResponse{
+		WriteSet: []*dvm.VMValue{
 			{
-				Type: vm_grpc.VmWriteOp_Value,
-				Path: &vm_grpc.VMAccessPath{
+				Type: dvm.VmWriteOp_Value,
+				Path: &dvm.VMAccessPath{
 					Address: types.Bech32ToLibra(accAddr),
 					Path:    mock.GetRandomBytes(mock.VMAddressLength),
 				},
@@ -30,9 +30,9 @@ func (s *KeeperMockVmTestSuite) TestDeployContract() {
 		},
 		Events:  nil,
 		GasUsed: 10000,
-		Status:  &vm_grpc.VMStatus{},
+		Status:  &dvm.VMStatus{},
 	}
-	msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
+	msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 	// Request
 	{
@@ -68,36 +68,36 @@ func (s *KeeperMockVmTestSuite) TestExecuteContract() {
 
 	// Build msg
 	accAddr, _, _ := tests.GenAccAddress()
-	vmResp := &vm_grpc.VMExecuteResponse{
-		WriteSet: []*vm_grpc.VMValue{
+	vmResp := &dvm.VMExecuteResponse{
+		WriteSet: []*dvm.VMValue{
 			{
-				Type: vm_grpc.VmWriteOp_Value,
-				Path: &vm_grpc.VMAccessPath{
+				Type: dvm.VmWriteOp_Value,
+				Path: &dvm.VMAccessPath{
 					Address: types.Bech32ToLibra(accAddr),
 					Path:    mock.GetRandomBytes(mock.VMAddressLength),
 				},
 				Value: mock.GetRandomBytes(512),
 			},
 			{
-				Type: vm_grpc.VmWriteOp_Deletion,
-				Path: &vm_grpc.VMAccessPath{
+				Type: dvm.VmWriteOp_Deletion,
+				Path: &dvm.VMAccessPath{
 					Address: types.Bech32ToLibra(accAddr),
 					Path:    mock.GetRandomBytes(mock.VMAddressLength),
 				},
 				Value: mock.GetRandomBytes(256),
 			},
 		},
-		Events: []*vm_grpc.VMEvent{
+		Events: []*dvm.VMEvent{
 			{
 				SenderAddress: mock.VMStdLibAddress,
-				EventType: &vm_grpc.LcsTag{
-					TypeTag: vm_grpc.LcsType_LcsU64,
+				EventType: &dvm.LcsTag{
+					TypeTag: dvm.LcsType_LcsU64,
 				},
 				EventData: []byte{0x10},
 			},
 		},
 		GasUsed: 10000,
-		Status:  &vm_grpc.VMStatus{},
+		Status:  &dvm.VMStatus{},
 	}
 	msg := types.NewMsgExecuteScript(accAddr, []byte{0x1})
 
@@ -177,11 +177,11 @@ func (s *KeeperMockVmTestSuite) TestFailedExecution() {
 	{
 		// Build msg
 		accAddr, _, _ := tests.GenAccAddress()
-		vmResp := &vm_grpc.VMExecuteResponse{
+		vmResp := &dvm.VMExecuteResponse{
 			WriteSet: nil,
 			Events:   nil,
 			GasUsed:  10000,
-			Status:   &vm_grpc.VMStatus{},
+			Status:   &dvm.VMStatus{},
 		}
 		msg := types.NewMsgExecuteScript(accAddr, []byte{0x1})
 
@@ -213,17 +213,17 @@ func (s *KeeperMockVmTestSuite) TestFailedExecution() {
 	{
 		// Build msg
 		accAddr, _, _ := tests.GenAccAddress()
-		vmResp := &vm_grpc.VMExecuteResponse{
+		vmResp := &dvm.VMExecuteResponse{
 			WriteSet: nil,
 			Events:   nil,
 			GasUsed:  10000,
-			Status: &vm_grpc.VMStatus{
-				Error: &vm_grpc.VMStatus_ExecutionFailure{
-					ExecutionFailure: &vm_grpc.Failure{
+			Status: &dvm.VMStatus{
+				Error: &dvm.VMStatus_ExecutionFailure{
+					ExecutionFailure: &dvm.Failure{
 						StatusCode: 100,
 					},
 				},
-				Message: &vm_grpc.Message{
+				Message: &dvm.Message{
 					Text: "something went wrong",
 				},
 			},
@@ -285,13 +285,13 @@ func (s *KeeperMockVmTestSuite) TestFailedExecution() {
 	{
 		// Build msg
 		accAddr, _, _ := tests.GenAccAddress()
-		vmResp := &vm_grpc.VMExecuteResponse{
+		vmResp := &dvm.VMExecuteResponse{
 			WriteSet: nil,
 			Events:   nil,
 			GasUsed:  10000,
-			Status: &vm_grpc.VMStatus{
-				Error: &vm_grpc.VMStatus_Abort{
-					Abort: &vm_grpc.Abort{
+			Status: &dvm.VMStatus{
+				Error: &dvm.VMStatus_Abort{
+					Abort: &dvm.Abort{
 						AbortCode: 100,
 					},
 				},
@@ -345,13 +345,13 @@ func (s *KeeperMockVmTestSuite) TestFailedExecution() {
 	{
 		// Build msg
 		accAddr, _, _ := tests.GenAccAddress()
-		vmResp := &vm_grpc.VMExecuteResponse{
+		vmResp := &dvm.VMExecuteResponse{
 			WriteSet: nil,
 			Events:   nil,
 			GasUsed:  10000,
-			Status: &vm_grpc.VMStatus{
-				Error: &vm_grpc.VMStatus_MoveError{
-					MoveError: &vm_grpc.MoveError{
+			Status: &dvm.VMStatus{
+				Error: &dvm.VMStatus_MoveError{
+					MoveError: &dvm.MoveError{
 						StatusCode: 100,
 					},
 				},

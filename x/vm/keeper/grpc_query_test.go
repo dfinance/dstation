@@ -2,7 +2,6 @@ package keeper_test
 
 import (
 	"context"
-	"encoding/hex"
 
 	"github.com/dfinance/dstation/pkg/mock"
 	"github.com/dfinance/dstation/x/vm/types"
@@ -15,8 +14,8 @@ func (s *KeeperMockVmTestSuite) TestQuerier() {
 	// fail: invalid address
 	{
 		resp, err := client.Data(context.Background(), &types.QueryDataRequest{
-			Address: "abc",
-			Path:    hex.EncodeToString(vmPath.Path),
+			Address: []byte{0x1, 0x2},
+			Path:    vmPath.Path,
 		})
 		s.Require().Error(err)
 		s.Require().Nil(resp)
@@ -25,8 +24,8 @@ func (s *KeeperMockVmTestSuite) TestQuerier() {
 	// fail: invalid path
 	{
 		resp, err := client.Data(context.Background(), &types.QueryDataRequest{
-			Address: hex.EncodeToString(vmPath.Address),
-			Path:    "@$@",
+			Address: vmPath.Address,
+			Path:    []byte{},
 		})
 		s.Require().Error(err)
 		s.Require().Nil(resp)
@@ -35,8 +34,8 @@ func (s *KeeperMockVmTestSuite) TestQuerier() {
 	// ok: non-existing
 	{
 		resp, err := client.Data(context.Background(), &types.QueryDataRequest{
-			Address: hex.EncodeToString(vmPath.Address),
-			Path:    hex.EncodeToString(vmPath.Path),
+			Address: vmPath.Address,
+			Path:    vmPath.Path,
 		})
 		s.Require().NoError(err)
 		s.Require().NotNil(resp)
@@ -48,11 +47,11 @@ func (s *KeeperMockVmTestSuite) TestQuerier() {
 		keeper.SetValue(ctx, vmPath, writeSetData)
 
 		resp, err := client.Data(context.Background(), &types.QueryDataRequest{
-			Address: hex.EncodeToString(vmPath.Address),
-			Path:    hex.EncodeToString(vmPath.Path),
+			Address: vmPath.Address,
+			Path:    vmPath.Path,
 		})
 		s.Require().NoError(err)
 		s.Require().NotNil(resp)
-		s.Require().Equal(hex.EncodeToString(writeSetData), resp.Value)
+		s.Require().Equal(writeSetData, resp.Value)
 	}
 }

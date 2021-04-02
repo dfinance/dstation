@@ -3,7 +3,9 @@ package dfinance.vm.v1beta1;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
+
 import "cosmos/base/abci/v1beta1/abci.proto";
+
 import "dfinance/vm/vm.proto";
 
 option go_package = "github.com/dfinance/dstation/x/vm/types";

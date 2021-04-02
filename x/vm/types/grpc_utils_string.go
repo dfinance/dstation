@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/dfinance/dvm-proto/go/types_grpc"
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
 	"github.com/tendermint/tendermint/libs/log"
+
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 const (
@@ -23,8 +23,8 @@ const (
 	EventTypeNoGasLevels   = 2     // defines number of nesting levels that do not charge gas
 )
 
-// StringifyVMAccessPath converts vm_grpc.VMAccessPath to HEX string.
-func StringifyVMAccessPath(path *vm_grpc.VMAccessPath) string {
+// StringifyVMAccessPath converts dvm.VMAccessPath to HEX string.
+func StringifyVMAccessPath(path *dvm.VMAccessPath) string {
 	if path == nil {
 		return "nil"
 	}
@@ -39,9 +39,9 @@ func StringifyVMAccessPath(path *vm_grpc.VMAccessPath) string {
 	)
 }
 
-// StringifyVMTypeTag convert types_grpc.VMTypeTag to string representation.
-func StringifyVMTypeTag(tag types_grpc.VMTypeTag) (string, error) {
-	if val, ok := types_grpc.VMTypeTag_name[int32(tag)]; !ok {
+// StringifyVMTypeTag convert dvm.VMTypeTag to string representation.
+func StringifyVMTypeTag(tag dvm.VMTypeTag) (string, error) {
+	if val, ok := dvm.VMTypeTag_name[int32(tag)]; !ok {
 		return "", fmt.Errorf("can't find string representation of VMTypeTag %d, check correctness of type value", tag)
 	} else {
 		return val, nil
@@ -49,7 +49,7 @@ func StringifyVMTypeTag(tag types_grpc.VMTypeTag) (string, error) {
 }
 
 // StringifyVMTypeTagPanic wraps StringifyVMTypeTag and panics on error.
-func StringifyVMTypeTagPanic(tag types_grpc.VMTypeTag) string {
+func StringifyVMTypeTagPanic(tag dvm.VMTypeTag) string {
 	val, err := StringifyVMTypeTag(tag)
 	if err != nil {
 		panic(err)
@@ -58,9 +58,9 @@ func StringifyVMTypeTagPanic(tag types_grpc.VMTypeTag) string {
 	return val
 }
 
-// StringifyVMLCSTag converts vm_grpc.LcsTag to string representation (recursive).
+// StringifyVMLCSTag converts dvm.LcsTag to string representation (recursive).
 // <indentCount> defines number of prefixed indent string for each line.
-func StringifyVMLCSTag(tag *vm_grpc.LcsTag, indentCount ...int) (string, error) {
+func StringifyVMLCSTag(tag *dvm.LcsTag, indentCount ...int) (string, error) {
 	const strIndent = "  "
 
 	curIndentCount := 0
@@ -89,8 +89,8 @@ func StringifyVMLCSTag(tag *vm_grpc.LcsTag, indentCount ...int) (string, error) 
 		return fmt.Errorf("indent %d: %s: %w", curIndentCount, comment, err)
 	}
 
-	buildLcsTypeStr := func(t vm_grpc.LcsType) (string, error) {
-		val, ok := vm_grpc.LcsType_name[int32(t)]
+	buildLcsTypeStr := func(t dvm.LcsType) (string, error) {
+		val, ok := dvm.LcsType_name[int32(t)]
 		if !ok {
 			return "", fmt.Errorf("can't find string representation of LcsTag %d, check correctness of type value", t)
 		}
@@ -147,7 +147,7 @@ func StringifyVMLCSTag(tag *vm_grpc.LcsTag, indentCount ...int) (string, error) 
 }
 
 // StringifyVMLCSTagPanic wraps StringifyVMLCSTag and panics on error.
-func StringifyVMLCSTagPanic(tag *vm_grpc.LcsTag, indentCount ...int) string {
+func StringifyVMLCSTagPanic(tag *dvm.LcsTag, indentCount ...int) string {
 	val, err := StringifyVMLCSTag(tag, indentCount...)
 	if err != nil {
 		panic(err)
@@ -156,20 +156,20 @@ func StringifyVMLCSTagPanic(tag *vm_grpc.LcsTag, indentCount ...int) string {
 	return val
 }
 
-// StringifyVMWriteOp converts vm_grpc.VmWriteOp to string representation.
-func StringifyVMWriteOp(wOp vm_grpc.VmWriteOp) string {
+// StringifyVMWriteOp converts dvm.VmWriteOp to string representation.
+func StringifyVMWriteOp(wOp dvm.VmWriteOp) string {
 	switch wOp {
-	case vm_grpc.VmWriteOp_Value:
+	case dvm.VmWriteOp_Value:
 		return "write"
-	case vm_grpc.VmWriteOp_Deletion:
+	case dvm.VmWriteOp_Deletion:
 		return "del"
 	default:
 		return "unknown"
 	}
 }
 
-// StringifyVMValue converts vm_grpc.VMValue (writeSet) to string representation.
-func StringifyVMValue(value *vm_grpc.VMValue) string {
+// StringifyVMValue converts dvm.VMValue (writeSet) to string representation.
+func StringifyVMValue(value *dvm.VMValue) string {
 	if value == nil {
 		return "nil"
 	}
@@ -185,8 +185,8 @@ func StringifyVMValue(value *vm_grpc.VMValue) string {
 	)
 }
 
-// StringifyVMStatus converts vm_grpc.VMStatus (execution result) to string representation.
-func StringifyVMStatus(status *vm_grpc.VMStatus) string {
+// StringifyVMStatus converts dvm.VMStatus (execution result) to string representation.
+func StringifyVMStatus(status *dvm.VMStatus) string {
 	strBuilder := strings.Builder{}
 	strBuilder.WriteString(fmt.Sprintf("Exec %q status:\n", status.String()))
 
@@ -204,8 +204,8 @@ func StringifyVMStatus(status *vm_grpc.VMStatus) string {
 	return strBuilder.String()
 }
 
-// StringifyVMEvent converts vm_grpc.VMEvent to string representation.
-func StringifyVMEvent(event *vm_grpc.VMEvent) string {
+// StringifyVMEvent converts dvm.VMEvent to string representation.
+func StringifyVMEvent(event *dvm.VMEvent) string {
 	strBuilder := strings.Builder{}
 
 	if event == nil {
@@ -228,15 +228,15 @@ func StringifyVMEvent(event *vm_grpc.VMEvent) string {
 	return strBuilder.String()
 }
 
-// StringifyEventType returns vm_grpc.LcsTag Move serialization.
+// StringifyEventType returns dvm.LcsTag Move serialization.
 // Func is similar to StringifyVMLCSTag, but result is one lined Move representation.
-func StringifyEventType(gasMeter sdk.GasMeter, tag *vm_grpc.LcsTag) (string, error) {
+func StringifyEventType(gasMeter sdk.GasMeter, tag *dvm.LcsTag) (string, error) {
 	// Start with initial gas for first event, and then go in progression based on depth.
 	return processEventType(gasMeter, tag, EventTypeProcessingGas, 1)
 }
 
 // StringifyEventTypePanic wraps StringifyEventType and panic on error.
-func StringifyEventTypePanic(gasMeter sdk.GasMeter, tag *vm_grpc.LcsTag) string {
+func StringifyEventTypePanic(gasMeter sdk.GasMeter, tag *dvm.LcsTag) string {
 	eventType, eventTypeErr := StringifyEventType(gasMeter, tag)
 	if eventTypeErr != nil {
 		debugMsg := ""
@@ -263,7 +263,7 @@ func StringifySenderAddress(addr []byte) string {
 }
 
 // PrintVMStackTrace prints VM stack trace if contract is not executed successfully.
-func PrintVMStackTrace(txId []byte, log log.Logger, exec *vm_grpc.VMExecuteResponse) {
+func PrintVMStackTrace(txId []byte, log log.Logger, exec *dvm.VMExecuteResponse) {
 	strBuilder := strings.Builder{}
 
 	strBuilder.WriteString(fmt.Sprintf("Stack trace %X:\n", txId))
@@ -289,20 +289,20 @@ func PrintVMStackTrace(txId []byte, log log.Logger, exec *vm_grpc.VMExecuteRespo
 	log.Debug(strBuilder.String())
 }
 
-// GetVMTypeTagByString converts {typeTag} gRPC enum string representation to types_grpc.VMTypeTag.
-func GetVMTypeTagByString(typeTag string) (types_grpc.VMTypeTag, error) {
-	if val, ok := types_grpc.VMTypeTag_value[typeTag]; !ok {
+// GetVMTypeTagByString converts {typeTag} gRPC enum string representation to dvm.VMTypeTag.
+func GetVMTypeTagByString(typeTag string) (dvm.VMTypeTag, error) {
+	if val, ok := dvm.VMTypeTag_value[typeTag]; !ok {
 		return -1, fmt.Errorf("can't find tag VMTypeTag %s, check correctness of type value", typeTag)
 	} else {
-		return types_grpc.VMTypeTag(val), nil
+		return dvm.VMTypeTag(val), nil
 	}
 }
 
-// GetStatusCodesFromVMStatus extracts majorStatus, subStatus and abortLocation from vm_grpc.VMStatus
+// GetStatusCodesFromVMStatus extracts majorStatus, subStatus and abortLocation from dvm.VMStatus
 // panic if error exist but error object == nil
-func GetStatusCodesFromVMStatus(status *vm_grpc.VMStatus) (majorStatus, subStatus uint64, location *vm_grpc.AbortLocation) {
+func GetStatusCodesFromVMStatus(status *dvm.VMStatus) (majorStatus, subStatus uint64, location *dvm.AbortLocation) {
 	switch sErr := status.GetError().(type) {
-	case *vm_grpc.VMStatus_Abort:
+	case *dvm.VMStatus_Abort:
 		majorStatus = VMAbortedCode
 		if sErr.Abort == nil {
 			panic(fmt.Errorf("getting status codes: VMStatus_Abort.Abort is nil"))
@@ -311,7 +311,7 @@ func GetStatusCodesFromVMStatus(status *vm_grpc.VMStatus) (majorStatus, subStatu
 		if l := sErr.Abort.GetAbortLocation(); l != nil {
 			location = l
 		}
-	case *vm_grpc.VMStatus_ExecutionFailure:
+	case *dvm.VMStatus_ExecutionFailure:
 		if sErr.ExecutionFailure == nil {
 			panic(fmt.Errorf("getting status codes: VMStatus_ExecutionFailure.ExecutionFailure is nil"))
 		}
@@ -319,7 +319,7 @@ func GetStatusCodesFromVMStatus(status *vm_grpc.VMStatus) (majorStatus, subStatu
 		if l := sErr.ExecutionFailure.GetAbortLocation(); l != nil {
 			location = l
 		}
-	case *vm_grpc.VMStatus_MoveError:
+	case *dvm.VMStatus_MoveError:
 		if sErr.MoveError == nil {
 			panic(fmt.Errorf("getting status codes: VMStatus_MoveError.MoveError is nil"))
 		}
@@ -333,7 +333,7 @@ func GetStatusCodesFromVMStatus(status *vm_grpc.VMStatus) (majorStatus, subStatu
 
 // processEventType recursively processes event type and returns result event type as a string.
 // If {depth} < 0 we do not charge gas as some nesting levels might be "free".
-func processEventType(gasMeter sdk.GasMeter, tag *vm_grpc.LcsTag, gas, depth uint64) (string, error) {
+func processEventType(gasMeter sdk.GasMeter, tag *dvm.LcsTag, gas, depth uint64) (string, error) {
 	// We can't consume gas later (after recognizing the type), because it open doors for security holes.
 	// Let's say dev will create type with a lot of generics, so transaction will take much more time to process.
 	// In result it could be a situation when validator doesn't have enough time to process transaction.
@@ -348,33 +348,33 @@ func processEventType(gasMeter sdk.GasMeter, tag *vm_grpc.LcsTag, gas, depth uin
 		return "", nil
 	}
 
-	// Helper function: lcsTypeToString returns vm_grpc.LcsType Move representation
-	lcsTypeToString := func(lcsType vm_grpc.LcsType) string {
+	// Helper function: lcsTypeToString returns dvm.LcsType Move representation
+	lcsTypeToString := func(lcsType dvm.LcsType) string {
 		switch lcsType {
-		case vm_grpc.LcsType_LcsBool:
+		case dvm.LcsType_LcsBool:
 			return "bool"
-		case vm_grpc.LcsType_LcsU8:
+		case dvm.LcsType_LcsU8:
 			return "u8"
-		case vm_grpc.LcsType_LcsU64:
+		case dvm.LcsType_LcsU64:
 			return "u64"
-		case vm_grpc.LcsType_LcsU128:
+		case dvm.LcsType_LcsU128:
 			return "u128"
-		case vm_grpc.LcsType_LcsSigner:
+		case dvm.LcsType_LcsSigner:
 			return "signer"
-		case vm_grpc.LcsType_LcsVector:
+		case dvm.LcsType_LcsVector:
 			return "vector"
-		case vm_grpc.LcsType_LcsStruct:
+		case dvm.LcsType_LcsStruct:
 			return "struct"
 		default:
-			return vm_grpc.LcsType_name[int32(lcsType)]
+			return dvm.LcsType_name[int32(lcsType)]
 		}
 	}
 
 	// Check data consistency
-	if tag.TypeTag == vm_grpc.LcsType_LcsVector && tag.VectorType == nil {
+	if tag.TypeTag == dvm.LcsType_LcsVector && tag.VectorType == nil {
 		return "", fmt.Errorf("TypeTag of type %q, but VectorType is nil", lcsTypeToString(tag.TypeTag))
 	}
-	if tag.TypeTag == vm_grpc.LcsType_LcsStruct && tag.StructIdent == nil {
+	if tag.TypeTag == dvm.LcsType_LcsStruct && tag.StructIdent == nil {
 		return "", fmt.Errorf("TypeTag of type %q, but StructIdent is nil", lcsTypeToString(tag.TypeTag))
 	}
 
@@ -384,7 +384,7 @@ func processEventType(gasMeter sdk.GasMeter, tag *vm_grpc.LcsTag, gas, depth uin
 		if err != nil {
 			return "", fmt.Errorf("VectorType serialization: %w", err)
 		}
-		return fmt.Sprintf("%s<%s>", lcsTypeToString(vm_grpc.LcsType_LcsVector), vectorType), nil
+		return fmt.Sprintf("%s<%s>", lcsTypeToString(dvm.LcsType_LcsVector), vectorType), nil
 	}
 
 	// Struct tag

@@ -6,7 +6,6 @@ import "google/protobuf/timestamp.proto";
 import "gogoproto/gogo.proto";
 
 import "cosmos_proto/cosmos.proto";
-import "dvm_proto/common-types.proto";
 
 option go_package = "github.com/dfinance/dstation/x/vm/types";
 

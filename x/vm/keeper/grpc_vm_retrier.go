@@ -6,15 +6,16 @@ import (
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
+
+	"github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 // VMExecRetryReq contains VM "execution" request meta (request details and retry settings).
 type VMExecRetryReq struct {
 	// Request to retry (module publish).
-	RawModule *vm_grpc.VMPublishModule
+	RawModule *dvm.VMPublishModule
 	// Request to retry (script execution)
-	RawScript *vm_grpc.VMExecuteScript
+	RawScript *dvm.VMExecuteScript
 	// Max number of request attempts (0 - infinite)
 	MaxAttempts uint
 	// Request timeout per attempt (0 - infinite) [ms]
@@ -22,7 +23,7 @@ type VMExecRetryReq struct {
 }
 
 // sendExecuteReq sends request with retry mechanism.
-func (k Keeper) sendExecuteReq(ctx sdk.Context, moduleReq *vm_grpc.VMPublishModule, scriptReq *vm_grpc.VMExecuteScript) (*vm_grpc.VMExecuteResponse, error) {
+func (k Keeper) sendExecuteReq(ctx sdk.Context, moduleReq *dvm.VMPublishModule, scriptReq *dvm.VMExecuteScript) (*dvm.VMExecuteResponse, error) {
 	if moduleReq == nil && scriptReq == nil {
 		return nil, fmt.Errorf("request (module / script) not specified")
 	}
@@ -42,7 +43,7 @@ func (k Keeper) sendExecuteReq(ctx sdk.Context, moduleReq *vm_grpc.VMPublishModu
 
 // retryExecReq sends request with retry mechanism and waits for connection and execution.
 // Contract: either RawModule or RawScript must be specified for RetryExecReq.
-func (k Keeper) retryExecReq(ctx sdk.Context, req VMExecRetryReq) (retResp *vm_grpc.VMExecuteResponse, retErr error) {
+func (k Keeper) retryExecReq(ctx sdk.Context, req VMExecRetryReq) (retResp *dvm.VMExecuteResponse, retErr error) {
 	const failedRetryLogPeriod = 100
 
 	doneCh := make(chan bool)
@@ -58,7 +59,7 @@ func (k Keeper) retryExecReq(ctx sdk.Context, req VMExecRetryReq) (retResp *vm_g
 		for {
 			var connCtx context.Context
 			var connCancel context.CancelFunc
-			var resp *vm_grpc.VMExecuteResponse
+			var resp *dvm.VMExecuteResponse
 			var err error
 
 			curAttempt++

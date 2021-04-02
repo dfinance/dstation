@@ -3,12 +3,12 @@ package keeper_test
 import (
 	"time"
 
-	"github.com/dfinance/dvm-proto/go/vm_grpc"
-
 	"github.com/dfinance/dstation/pkg/tests"
+	"github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
+// nolint:errcheck
 func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 	// Rollback to defaults
 	defer func() {
@@ -26,8 +26,8 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(0, 0)
 
 		// Build msg
-		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
-		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
+		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
 		vmServer.SetResponseDelay(50 * time.Millisecond)
@@ -42,8 +42,8 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(1, 5000)
 
 		// Build msg
-		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
-		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
+		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
 		vmServer.SetResponseDelay(10 * time.Millisecond)
@@ -58,8 +58,8 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(1, 0)
 
 		// Build msg
-		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
-		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
+		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
 		vmServer.SetResponseDelay(500 * time.Millisecond)
@@ -74,8 +74,8 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(10, 50)
 
 		// Build msg
-		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
-		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
+		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
 		vmServer.SetResponseDelay(10 * time.Millisecond)
@@ -90,8 +90,8 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(10, 0)
 
 		// Build msg
-		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
-		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
+		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
 		vmServer.SetResponseDelay(100 * time.Millisecond)
@@ -106,8 +106,8 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(0, 0)
 
 		// Build msg
-		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
-		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
+		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
 		vmServer.SetResponseDelay(3000 * time.Millisecond)
@@ -122,8 +122,8 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(5, 30)
 
 		// Build msg
-		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
-		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
+		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
 		vmServer.SetResponseDelay(300 * time.Millisecond)
@@ -143,8 +143,8 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(5, 0)
 
 		// Build msg
-		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
-		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
+		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
 		vmServer.SetResponseDelay(50 * time.Millisecond)

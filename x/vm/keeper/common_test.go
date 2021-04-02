@@ -7,11 +7,11 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/dfinance/dvm-proto/go/ds_grpc"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/dfinance/dstation/pkg/mock"
 	"github.com/dfinance/dstation/pkg/tests"
+	"github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/keeper"
 	"github.com/dfinance/dstation/x/vm/types"
 )
@@ -46,8 +46,8 @@ func (s *KeeperMockVmTestSuite) SetupTest() {
 	s.ctx = s.ctx.WithEventManager(sdk.NewEventManager())
 }
 
-func (s *KeeperMockVmTestSuite) DoDSClientRequest(handler func(ctx context.Context, client ds_grpc.DSServiceClient)) {
-	client := ds_grpc.NewDSServiceClient(s.app.MockVMServer.GetDSClientConnection())
+func (s *KeeperMockVmTestSuite) DoDSClientRequest(handler func(ctx context.Context, client dvm.DSServiceClient)) {
+	client := dvm.NewDSServiceClient(s.app.MockVMServer.GetDSClientConnection())
 	ctx, ctxCancel := context.WithDeadline(context.Background(), time.Now().Add(100*time.Millisecond))
 	defer ctxCancel()
 
@@ -55,5 +55,6 @@ func (s *KeeperMockVmTestSuite) DoDSClientRequest(handler func(ctx context.Conte
 }
 
 func TestVmKeeper_MockVM(t *testing.T) {
+	t.Parallel()
 	suite.Run(t, new(KeeperMockVmTestSuite))
 }

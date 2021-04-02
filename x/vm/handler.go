@@ -18,7 +18,6 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 		case *types.MsgDeployModule:
 			res, err := msgServer.DeployModule(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
-
 		case *types.MsgExecuteScript:
 			res, err := msgServer.ExecuteScript(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
