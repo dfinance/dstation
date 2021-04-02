@@ -35,8 +35,11 @@ type DSimApp struct {
 }
 
 // GetContext creates a new sdk.Context.
-func (app *DSimApp) GetContext() sdk.Context {
-	return app.DnApp.NewContext(false, tmProto.Header{})
+func (app *DSimApp) GetContext(checkTx bool) sdk.Context {
+	return app.DnApp.NewUncachedContext(checkTx, tmProto.Header{
+		Height: app.curBlockHeight,
+		Time:   app.curBlockTime,
+	})
 }
 
 // TearDown stops VM, servers and closes all connections.
@@ -66,6 +69,12 @@ func (app *DSimApp) BeginBlock() {
 func (app *DSimApp) EndBlock() {
 	app.DnApp.EndBlock(abci.RequestEndBlock{})
 	app.DnApp.Commit()
+}
+
+// SetCustomVMRetryParams alters VM config params.
+func (app *DSimApp) SetCustomVMRetryParams(maxAttempts, reqTimeoutInMs uint) {
+	app.vmConfig.MaxAttempts = maxAttempts
+	app.vmConfig.ReqTimeoutInMs = reqTimeoutInMs
 }
 
 // SetupDSimApp creates a new DSimApp, setups VM environment.
@@ -101,7 +110,7 @@ func SetupDSimApp(opts ...DSimAppOption) *DSimApp {
 		config.DefaultNodeHome,
 		1,
 		dnApp.MakeEncodingConfig(),
-		app.vmConfig,
+		&app.vmConfig,
 		app.appOptions,
 		dnApp.VMCrashHandleBaseAppOption(),
 	)

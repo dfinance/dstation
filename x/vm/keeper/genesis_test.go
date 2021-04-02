@@ -2,22 +2,15 @@ package keeper_test
 
 import (
 	"encoding/hex"
-	"testing"
-
-	"github.com/stretchr/testify/require"
 
 	"github.com/dfinance/dstation/pkg/mock"
-	"github.com/dfinance/dstation/pkg/tests"
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
-func TestVM_Genesis(t *testing.T) {
-	app := tests.SetupDSimApp(tests.WithMockVM())
-	defer app.TearDown()
+func (s *KeeperMockVmTestSuite) TestGenesis() {
+	ctx, keeper := s.ctx, s.keeper
 
-	ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
-
-	genStateExpected := types.DefaultGenesisState()
+	genStateExpected := keeper.ExportGenesis(ctx)
 	genStateAppendix := types.GenesisState{
 		WriteSet: make([]types.GenesisState_WriteOp, 0),
 	}
@@ -37,6 +30,6 @@ func TestVM_Genesis(t *testing.T) {
 	// ok: Add writeSets to an existing default genesis
 	{
 		keeper.InitGenesis(ctx, &genStateAppendix)
-		require.ElementsMatch(t, genStateExpected.WriteSet, keeper.ExportGenesis(ctx).WriteSet)
+		s.Require().ElementsMatch(genStateExpected.WriteSet, keeper.ExportGenesis(ctx).WriteSet)
 	}
 }

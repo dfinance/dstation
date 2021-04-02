@@ -1,150 +1,135 @@
 package keeper_test
 
 import (
-	"testing"
 	"time"
 
 	"github.com/dfinance/dvm-proto/go/vm_grpc"
-	"github.com/stretchr/testify/require"
 
 	"github.com/dfinance/dstation/pkg/tests"
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
-func TestVM_retryMechanism(t *testing.T) {
+func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
+	// Rollback to defaults
+	defer func() {
+		s.app.SetCustomVMRetryParams(0, 0)
+		s.vmServer.SetResponseDelay(0)
+		s.vmServer.SetFailCountdown(0)
+	}()
+
 	accAddr, _, _ := tests.GenAccAddress()
+	ctx, keeper, vmServer := s.ctx, s.keeper, s.vmServer
 
 	// ok
-	t.Log("OK: in one attempt (infinite settings)")
+	s.T().Log("OK: in one attempt (infinite settings)")
 	{
-		app := tests.SetupDSimApp(tests.WithMockVM(), tests.WithCustomVMRetryParams(0, 0))
-		defer app.TearDown()
-
-		ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+		s.app.SetCustomVMRetryParams(0, 0)
 
 		// Build msg
 		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
 
 		// Request
-		app.MockVMServer.SetResponseDelay(50 * time.Millisecond)
-		app.MockVMServer.SetFailCountdown(0)
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.DeployContract(ctx, msg))
+		vmServer.SetResponseDelay(50 * time.Millisecond)
+		vmServer.SetFailCountdown(0)
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.DeployContract(ctx, msg))
 	}
 
 	// ok
-	t.Log("OK: in one attempt (settings with limit)")
+	s.T().Log("OK: in one attempt (settings with limit)")
 	{
-		app := tests.SetupDSimApp(tests.WithMockVM(), tests.WithCustomVMRetryParams(1, 5000))
-		defer app.TearDown()
-
-		ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+		s.app.SetCustomVMRetryParams(1, 5000)
 
 		// Build msg
 		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
 
 		// Request
-		app.MockVMServer.SetResponseDelay(10 * time.Millisecond)
-		app.MockVMServer.SetFailCountdown(0)
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.DeployContract(ctx, msg))
+		vmServer.SetResponseDelay(10 * time.Millisecond)
+		vmServer.SetFailCountdown(0)
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.DeployContract(ctx, msg))
 	}
 
 	// ok
-	t.Log("OK: in one attempt (without request timeout)")
+	s.T().Log("OK: in one attempt (without request timeout)")
 	{
-		app := tests.SetupDSimApp(tests.WithMockVM(), tests.WithCustomVMRetryParams(1, 0))
-		defer app.TearDown()
-
-		ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+		s.app.SetCustomVMRetryParams(1, 0)
 
 		// Build msg
 		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
 
 		// Request
-		app.MockVMServer.SetResponseDelay(500 * time.Millisecond)
-		app.MockVMServer.SetFailCountdown(0)
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.DeployContract(ctx, msg))
+		vmServer.SetResponseDelay(500 * time.Millisecond)
+		vmServer.SetFailCountdown(0)
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.DeployContract(ctx, msg))
 	}
 
 	// ok
-	t.Log("OK: in multiple attempts (with request timeout)")
+	s.T().Log("OK: in multiple attempts (with request timeout)")
 	{
-		app := tests.SetupDSimApp(tests.WithMockVM(), tests.WithCustomVMRetryParams(10, 50))
-		defer app.TearDown()
-
-		ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+		s.app.SetCustomVMRetryParams(10, 50)
 
 		// Build msg
 		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
 
 		// Request
-		app.MockVMServer.SetResponseDelay(10 * time.Millisecond)
-		app.MockVMServer.SetFailCountdown(5)
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.DeployContract(ctx, msg))
+		vmServer.SetResponseDelay(10 * time.Millisecond)
+		vmServer.SetFailCountdown(5)
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.DeployContract(ctx, msg))
 	}
 
 	// ok
-	t.Log("OK: in multiple attempts (without request timeout)")
+	s.T().Log("OK: in multiple attempts (without request timeout)")
 	{
-		app := tests.SetupDSimApp(tests.WithMockVM(), tests.WithCustomVMRetryParams(10, 0))
-		defer app.TearDown()
-
-		ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+		s.app.SetCustomVMRetryParams(10, 0)
 
 		// Build msg
 		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
 
 		// Request
-		app.MockVMServer.SetResponseDelay(100 * time.Millisecond)
-		app.MockVMServer.SetFailCountdown(5)
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.DeployContract(ctx, msg))
+		vmServer.SetResponseDelay(100 * time.Millisecond)
+		vmServer.SetFailCountdown(5)
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.DeployContract(ctx, msg))
 	}
 
 	// ok
-	t.Log("OK: in one attempt with long response (without limits)")
+	s.T().Log("OK: in one attempt with long response (without limits)")
 	{
-		app := tests.SetupDSimApp(tests.WithMockVM(), tests.WithCustomVMRetryParams(0, 0))
-		defer app.TearDown()
-
-		ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+		s.app.SetCustomVMRetryParams(0, 0)
 
 		// Build msg
 		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
 
 		// Request
-		app.MockVMServer.SetResponseDelay(3000 * time.Millisecond)
-		app.MockVMServer.SetFailCountdown(0)
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.DeployContract(ctx, msg))
+		vmServer.SetResponseDelay(3000 * time.Millisecond)
+		vmServer.SetFailCountdown(0)
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.DeployContract(ctx, msg))
 	}
 
 	// fail
-	t.Log("FAIL: by timeout (deadline)")
+	s.T().Log("FAIL: by timeout (deadline)")
 	{
-		app := tests.SetupDSimApp(tests.WithMockVM(), tests.WithCustomVMRetryParams(5, 30))
-		defer app.TearDown()
-
-		ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+		s.app.SetCustomVMRetryParams(5, 30)
 
 		// Build msg
 		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
 
 		// Request
-		app.MockVMServer.SetResponseDelay(300 * time.Millisecond)
-		app.MockVMServer.SetFailCountdown(0)
-		app.MockVMServer.SetResponse(vmResp)
-		tests.CheckPanicErrorContains(t,
+		vmServer.SetResponseDelay(300 * time.Millisecond)
+		vmServer.SetFailCountdown(0)
+		vmServer.SetResponse(vmResp)
+		tests.CheckPanicErrorContains(s.T(),
 			func() {
 				keeper.DeployContract(ctx, msg)
 			},
@@ -153,22 +138,19 @@ func TestVM_retryMechanism(t *testing.T) {
 	}
 
 	// fail
-	t.Log("FAIL: by attempts")
+	s.T().Log("FAIL: by attempts")
 	{
-		app := tests.SetupDSimApp(tests.WithMockVM(), tests.WithCustomVMRetryParams(5, 0))
-		defer app.TearDown()
-
-		ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+		s.app.SetCustomVMRetryParams(5, 0)
 
 		// Build msg
 		vmResp := &vm_grpc.VMExecuteResponse{GasUsed: 1, Status: &vm_grpc.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, [][]byte{{0x1}})
 
 		// Request
-		app.MockVMServer.SetResponseDelay(50 * time.Millisecond)
-		app.MockVMServer.SetFailCountdown(10)
-		app.MockVMServer.SetResponse(vmResp)
-		tests.CheckPanicErrorContains(t,
+		vmServer.SetResponseDelay(50 * time.Millisecond)
+		vmServer.SetFailCountdown(10)
+		vmServer.SetResponse(vmResp)
+		tests.CheckPanicErrorContains(s.T(),
 			func() {
 				keeper.DeployContract(ctx, msg)
 			},

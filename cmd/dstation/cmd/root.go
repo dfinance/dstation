@@ -99,13 +99,13 @@ func appExporter(
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
 	var dnApp *app.DnApp
 	if height != -1 {
-		dnApp = app.NewDnApp(logger, db, traceStore, false, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, vmConfig, appOpts)
+		dnApp = app.NewDnApp(logger, db, traceStore, false, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, &vmConfig, appOpts)
 
 		if err := dnApp.LoadHeight(height); err != nil {
 			return serverTypes.ExportedApp{}, err
 		}
 	} else {
-		dnApp = app.NewDnApp(logger, db, traceStore, true, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, vmConfig, appOpts)
+		dnApp = app.NewDnApp(logger, db, traceStore, true, map[int64]bool{}, "", cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)), encCfg, &vmConfig, appOpts)
 	}
 
 	return dnApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
@@ -204,7 +204,7 @@ func newApp(logger log.Logger, db tmDb.DB, traceStore io.Writer, appOpts serverT
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		app.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
-		vmConfig,
+		&vmConfig,
 		appOpts,
 		baseapp.SetPruning(pruningOpts),
 		baseapp.SetMinGasPrices(cast.ToString(appOpts.Get(server.FlagMinGasPrices))),

@@ -187,7 +187,7 @@ type DnApp struct { // nolint: golint
 	sm *module.SimulationManager
 
 	// vm connections
-	vmConfig   vmConfig.VMConfig
+	vmConfig   *vmConfig.VMConfig
 	vmConn     *grpc.ClientConn
 	dsListener net.Listener
 }
@@ -374,7 +374,7 @@ func (app DnApp) CloseConnections() {
 // NewDnApp returns a reference to an initialized Dnode service.
 func NewDnApp(
 	logger log.Logger, db tmDb.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
-	homePath string, invCheckPeriod uint, encodingConfig EncodingConfig, vmConfig vmConfig.VMConfig, appOpts serverTypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
+	homePath string, invCheckPeriod uint, encodingConfig EncodingConfig, vmConfig *vmConfig.VMConfig, appOpts serverTypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
 ) *DnApp {
 
 	appCodec := encodingConfig.Marshaler

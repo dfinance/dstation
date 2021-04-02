@@ -212,47 +212,19 @@ func StringifyVMStatusMajorCode(majorCode string) string {
 	return VMErrUnknown
 }
 
-// VMStatus is a VM error response.
-type VMStatus struct {
-	Status    string `json:"status"`               // Status of error: error/discard
-	MajorCode string `json:"major_code,omitempty"` // Major code
-	SubCode   string `json:"sub_code,omitempty"`   // Sub code
-	StrCode   string `json:"str_code,omitempty"`   // Detailed explanation of code
-	Message   string `json:"message,omitempty"`    // Message
-}
-
-func (status VMStatus) String() string {
+func (m VmStatus) String() string {
 	return fmt.Sprintf("VM status:\n"+
 		"  Status: %s\n"+
 		"  Major code: %s\n"+
 		"  String code: %s\n"+
 		"  Sub code: %s\n"+
 		"  Message:  %s",
-		status.Status, status.MajorCode, status.StrCode, status.SubCode, status.Message,
+		m.Status, m.MajorCode, m.StrCode, m.SubCode, m.Message,
 	)
 }
 
-// NewVMStatus creates a new VMStatus error.
-func NewVMStatus(status, majorCode, subCode, message string) VMStatus {
-	strCode := ""
-
-	if status != AttributeValueStatusKeep {
-		strCode = StringifyVMStatusMajorCode(majorCode)
-	}
-
-	return VMStatus{
-		Status:    status,
-		MajorCode: majorCode,
-		SubCode:   subCode,
-		Message:   message,
-		StrCode:   strCode,
-	}
-}
-
-// Slice of VMStatus objects (VM error responses).
-type VMStatuses []VMStatus
-
-func (list VMStatuses) String() string {
+// StringifyVmStatuses build string representation of VmStatus list.
+func StringifyVmStatuses(list []VmStatus) string {
 	strBuilder := strings.Builder{}
 	strBuilder.WriteString("VMStatuses:\n")
 	for i, status := range list {
@@ -265,31 +237,41 @@ func (list VMStatuses) String() string {
 	return strBuilder.String()
 }
 
-// TxVMStatus is a response containing TX hash with VM errors.
-type TxVMStatus struct {
-	Hash       string     `json:"hash"`
-	VMStatuses VMStatuses `json:"vm_status"`
-}
+// NewVmStatus creates a new VMStatus error.
+func NewVmStatus(status, majorCode, subCode, message string) VmStatus {
+	strCode := ""
+	if status != AttributeValueStatusKeep {
+		strCode = StringifyVMStatusMajorCode(majorCode)
+	}
 
-func (tx TxVMStatus) String() string {
-	return fmt.Sprintf("Tx:\n"+
-		"  Hash: %s\n"+
-		"  Statuses: %s",
-		tx.Hash, tx.VMStatuses.String(),
-	)
-}
-
-// NewTxVMStatus creates a new TxVMStatus object.
-func NewTxVMStatus(hash string, statuses VMStatuses) TxVMStatus {
-	return TxVMStatus{
-		Hash:       hash,
-		VMStatuses: statuses,
+	return VmStatus{
+		Status:    status,
+		MajorCode: majorCode,
+		SubCode:   subCode,
+		Message:   message,
+		StrCode:   strCode,
 	}
 }
 
-// NewVMStatusFromABCILogs converts SDK TxResponse log events to TxVMStatus.
-func NewVMStatusFromABCILogs(tx types.TxResponse) TxVMStatus {
-	statuses := make(VMStatuses, 0)
+func (m TxVmStatus) String() string {
+	return fmt.Sprintf("Tx:\n"+
+		"  Hash: %s\n"+
+		"  Statuses: %s",
+		m.Hash, StringifyVmStatuses(m.VmStatuses),
+	)
+}
+
+// NewTxVmStatus creates a new TxVMStatus object.
+func NewTxVmStatus(hash string, statuses []VmStatus) TxVmStatus {
+	return TxVmStatus{
+		Hash:       hash,
+		VmStatuses: statuses,
+	}
+}
+
+// NewVmStatusFromABCILogs converts SDK TxResponse log events to TxVMStatus.
+func NewVmStatusFromABCILogs(tx types.TxResponse) TxVmStatus {
+	statuses := make([]VmStatus, 0)
 
 	for _, log := range tx.Logs {
 		for _, event := range log.Events {
@@ -329,12 +311,12 @@ func NewVMStatusFromABCILogs(tx types.TxResponse) TxVMStatus {
 					}
 				}
 
-				statuses = append(statuses, NewVMStatus(status, majorCode, subCode, message))
+				statuses = append(statuses, NewVmStatus(status, majorCode, subCode, message))
 			}
 		}
 	}
 
-	return NewTxVMStatus(tx.TxHash, statuses)
+	return NewTxVmStatus(tx.TxHash, statuses)
 }
 
 func init() {

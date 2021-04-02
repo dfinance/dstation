@@ -12,6 +12,22 @@
     - [MsgDeployModule](#dfinance.vm.v1beta1.MsgDeployModule)
     - [MsgExecuteScript](#dfinance.vm.v1beta1.MsgExecuteScript)
     - [MsgExecuteScript.ScriptArg](#dfinance.vm.v1beta1.MsgExecuteScript.ScriptArg)
+    - [TxVmStatus](#dfinance.vm.v1beta1.TxVmStatus)
+    - [VmStatus](#dfinance.vm.v1beta1.VmStatus)
+  
+- [dfinance/vm/query.proto](#dfinance/vm/query.proto)
+    - [QueryDataRequest](#dfinance.vm.v1beta1.QueryDataRequest)
+    - [QueryDataResponse](#dfinance.vm.v1beta1.QueryDataResponse)
+    - [QueryTxVmStatusRequest](#dfinance.vm.v1beta1.QueryTxVmStatusRequest)
+    - [QueryTxVmStatusResponse](#dfinance.vm.v1beta1.QueryTxVmStatusResponse)
+  
+    - [Query](#dfinance.vm.v1beta1.Query)
+  
+- [dfinance/vm/tx.proto](#dfinance/vm/tx.proto)
+    - [MsgDeployModuleResponse](#dfinance.vm.v1beta1.MsgDeployModuleResponse)
+    - [MsgExecuteScriptResponse](#dfinance.vm.v1beta1.MsgExecuteScriptResponse)
+  
+    - [Msg](#dfinance.vm.v1beta1.Msg)
   
 - [Scalar Value Types](#scalar-value-types)
 
@@ -120,11 +136,181 @@ MsgExecuteScript defines a SDK message to execute a script with args to VM.
 
 
 
+
+<a name="dfinance.vm.v1beta1.TxVmStatus"></a>
+
+### TxVmStatus
+TxVmStatus keeps VM statuses and errors for Tx.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `hash` | [string](#string) |  | Tx hash [HEX string] |
+| `vm_statuses` | [VmStatus](#dfinance.vm.v1beta1.VmStatus) | repeated | VM statuses for the Tx |
+
+
+
+
+
+
+<a name="dfinance.vm.v1beta1.VmStatus"></a>
+
+### VmStatus
+VmStatus is a VM error response.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `status` | [string](#string) |  | Error Status: error / discard |
+| `major_code` | [string](#string) |  | Major code |
+| `sub_code` | [string](#string) |  | Sub code |
+| `str_code` | [string](#string) |  | Detailed explanation of major code |
+| `message` | [string](#string) |  | Error message |
+
+
+
+
+
  <!-- end messages -->
 
  <!-- end enums -->
 
  <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/vm/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/vm/query.proto
+
+
+
+<a name="dfinance.vm.v1beta1.QueryDataRequest"></a>
+
+### QueryDataRequest
+QueryDataRequest is request type for Query/Data RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `address` | [string](#string) |  | VM address [HEX string] |
+| `path` | [string](#string) |  | VM path [HEX string] |
+
+
+
+
+
+
+<a name="dfinance.vm.v1beta1.QueryDataResponse"></a>
+
+### QueryDataResponse
+QueryDataResponse is response type for Query/Data RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [string](#string) |  | VMStorage value for address:path pair [HEX string] |
+
+
+
+
+
+
+<a name="dfinance.vm.v1beta1.QueryTxVmStatusRequest"></a>
+
+### QueryTxVmStatusRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `tx_meta` | [cosmos.base.abci.v1beta1.TxResponse](#cosmos.base.abci.v1beta1.TxResponse) |  | Tx meta received from /cosmos/tx/v1beta1/txs/{hash} |
+
+
+
+
+
+
+<a name="dfinance.vm.v1beta1.QueryTxVmStatusResponse"></a>
+
+### QueryTxVmStatusResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `vm_status` | [TxVmStatus](#dfinance.vm.v1beta1.TxVmStatus) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="dfinance.vm.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Data` | [QueryDataRequest](#dfinance.vm.v1beta1.QueryDataRequest) | [QueryDataResponse](#dfinance.vm.v1beta1.QueryDataResponse) | Data queries VMStorage value | GET|/dfinance/vm/v1beta1/data|
+| `TxVmStatus` | [QueryTxVmStatusRequest](#dfinance.vm.v1beta1.QueryTxVmStatusRequest) | [QueryTxVmStatusResponse](#dfinance.vm.v1beta1.QueryTxVmStatusResponse) | TxVmStatus queries VM status for Tx | GET|/dfinance/vm/v1beta1/tx_vm_status|
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/vm/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/vm/tx.proto
+
+
+
+<a name="dfinance.vm.v1beta1.MsgDeployModuleResponse"></a>
+
+### MsgDeployModuleResponse
+
+
+
+
+
+
+
+<a name="dfinance.vm.v1beta1.MsgExecuteScriptResponse"></a>
+
+### MsgExecuteScriptResponse
+
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="dfinance.vm.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the VM module Msg service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `DeployModule` | [MsgDeployModule](#dfinance.vm.v1beta1.MsgDeployModule) | [MsgDeployModuleResponse](#dfinance.vm.v1beta1.MsgDeployModuleResponse) | DeployModule deploys Move module/modules to VMStorage. | |
+| `ExecuteScript` | [MsgExecuteScript](#dfinance.vm.v1beta1.MsgExecuteScript) | [MsgExecuteScriptResponse](#dfinance.vm.v1beta1.MsgExecuteScriptResponse) | ExecuteScript executes provided Move script. | |
 
  <!-- end services -->
 

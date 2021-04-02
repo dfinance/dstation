@@ -1,0 +1,22 @@
+syntax = "proto3";
+package dfinance.vm.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/abci/v1beta1/abci.proto";
+import "dfinance/vm/vm.proto";
+
+option go_package = "github.com/dfinance/dstation/x/vm/types";
+
+// Msg defines the VM module Msg service.
+service Msg {
+  // DeployModule deploys Move module/modules to VMStorage.
+  rpc DeployModule(MsgDeployModule) returns (MsgDeployModuleResponse);
+
+  // ExecuteScript executes provided Move script.
+  rpc ExecuteScript(MsgExecuteScript) returns (MsgExecuteScriptResponse);
+}
+
+message MsgDeployModuleResponse {}
+
+message MsgExecuteScriptResponse {}

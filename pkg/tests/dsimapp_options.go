@@ -14,11 +14,3 @@ func WithMockVM() DSimAppOption {
 		app.appOptions.Set(dnApp.FlagCustomDSListener, app.MockVMServer.GetDSListener())
 	}
 }
-
-// WithCustomVMRetryParams alters VM config params.
-func WithCustomVMRetryParams(maxAttempts, reqTimeoutInMs uint) DSimAppOption {
-	return func(app *DSimApp) {
-		app.vmConfig.MaxAttempts = maxAttempts
-		app.vmConfig.ReqTimeoutInMs = reqTimeoutInMs
-	}
-}

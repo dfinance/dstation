@@ -22,19 +22,19 @@ const (
 	ERR_GAS_INT = 4002
 )
 
-// Test NewVMStatus.
+// Test NewVmStatus.
 func TestVM_NewVMStatus(t *testing.T) {
 	status := "error"
 	message := "out of gas"
 
-	vmStatus := NewVMStatus(status, ERR_GAS, ERR_ZERO_SUB, message)
+	vmStatus := NewVmStatus(status, ERR_GAS, ERR_ZERO_SUB, message)
 	require.Equal(t, vmStatus.Status, status)
 	require.Equal(t, vmStatus.MajorCode, ERR_GAS)
 	require.Equal(t, vmStatus.SubCode, ERR_ZERO_SUB)
 	require.Equal(t, vmStatus.Message, message)
 	require.Equal(t, ERR_GAS_MSG, vmStatus.StrCode)
 
-	vmStatus = NewVMStatus(AttributeValueStatusKeep, "", "", "")
+	vmStatus = NewVmStatus(AttributeValueStatusKeep, "", "", "")
 	require.Empty(t, vmStatus.StrCode)
 	require.Empty(t, vmStatus.Message)
 	require.Empty(t, vmStatus.MajorCode)
@@ -43,20 +43,20 @@ func TestVM_NewVMStatus(t *testing.T) {
 
 // Test NewTxVMResponse.
 func TestVM_NewTxVMStatus(t *testing.T) {
-	statuses := make(VMStatuses, 3)
+	statuses := make([]VmStatus, 3)
 
-	statuses[0] = NewVMStatus("error", ERR_GAS, "0", "")
-	statuses[1] = NewVMStatus("discard", ERR_SIG, "0", "invalid signature")
-	statuses[2] = NewVMStatus("error", ERR_U32, "0", "bad u32")
+	statuses[0] = NewVmStatus("error", ERR_GAS, "0", "")
+	statuses[1] = NewVmStatus("discard", ERR_SIG, "0", "invalid signature")
+	statuses[2] = NewVmStatus("error", ERR_U32, "0", "bad u32")
 
 	txHash := "00"
-	txVMStatus := NewTxVMStatus(txHash, statuses)
+	txVMStatus := NewTxVmStatus(txHash, statuses)
 
 	require.Equal(t, txHash, txVMStatus.Hash)
-	require.EqualValues(t, txVMStatus.VMStatuses, statuses)
+	require.EqualValues(t, txVMStatus.VmStatuses, statuses)
 }
 
-// New NewVMStatusFromABCILogs.
+// New NewVmStatusFromABCILogs.
 func TestVM_NewVMStatusFromABCILogs(t *testing.T) {
 	msgs := make([]string, 2)
 	msgs[0] = "out of gas"
@@ -110,14 +110,14 @@ func TestVM_NewVMStatusFromABCILogs(t *testing.T) {
 		},
 	}
 
-	status := NewVMStatusFromABCILogs(txResp)
+	status := NewVmStatusFromABCILogs(txResp)
 	require.Equal(t, hash, status.Hash)
-	require.Len(t, status.VMStatuses, len(txResp.Logs))
+	require.Len(t, status.VmStatuses, len(txResp.Logs))
 
 	for i, code := range strCodes {
 		isFound := false
 
-		for _, status := range status.VMStatuses {
+		for _, status := range status.VmStatuses {
 			if status.MajorCode == code {
 				require.False(t, isFound)
 

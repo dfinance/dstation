@@ -1,0 +1,49 @@
+syntax = "proto3";
+package dfinance.vm.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/base/abci/v1beta1/abci.proto";
+import "dfinance/vm/vm.proto";
+
+option go_package = "github.com/dfinance/dstation/x/vm/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Data queries VMStorage value
+  rpc Data(QueryDataRequest) returns (QueryDataResponse) {
+    option (google.api.http).get = "/dfinance/vm/v1beta1/data";
+  }
+
+  // TxVmStatus queries VM status for Tx
+  rpc TxVmStatus(QueryTxVmStatusRequest) returns (QueryTxVmStatusResponse) {
+    option (google.api.http).get = "/dfinance/vm/v1beta1/tx_vm_status";
+  }
+}
+
+// QueryDataRequest is request type for Query/Data RPC method.
+message QueryDataRequest {
+  // VM address [HEX string]
+  string address = 1;
+  // VM path [HEX string]
+  string path = 2;
+}
+
+// QueryDataResponse is response type for Query/Data RPC method.
+message QueryDataResponse {
+  // VMStorage value for address:path pair [HEX string]
+  string value = 1;
+}
+
+message QueryTxVmStatusRequest {
+  // Tx meta received from /cosmos/tx/v1beta1/txs/{hash}
+  cosmos.base.abci.v1beta1.TxResponse tx_meta = 1 [
+    (gogoproto.nullable) = false
+  ];
+}
+
+message QueryTxVmStatusResponse {
+  TxVmStatus vm_status = 1 [
+    (gogoproto.nullable) = false
+  ];
+}

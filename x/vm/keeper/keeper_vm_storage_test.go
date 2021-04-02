@@ -1,41 +1,33 @@
 package keeper_test
 
 import (
-	"testing"
-
-	"github.com/stretchr/testify/require"
-
 	"github.com/dfinance/dstation/pkg/mock"
-	"github.com/dfinance/dstation/pkg/tests"
 )
 
-func TestVM_VMStorage(t *testing.T) {
-	app := tests.SetupDSimApp(tests.WithMockVM())
-	defer app.TearDown()
-
-	ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+func (s *KeeperMockVmTestSuite) TestVMStorage() {
+	ctx, keeper := s.ctx, s.keeper
 	vmPath, writeSetData := mock.GetRandomVMAccessPath(), mock.GetRandomBytes(12)
 
 	// ok: HasValue, GetValue: non-existing
 	{
-		require.False(t, keeper.HasValue(ctx, vmPath))
-		require.Nil(t, keeper.GetValue(ctx, vmPath))
+		s.Require().False(keeper.HasValue(ctx, vmPath))
+		s.Require().Nil(keeper.GetValue(ctx, vmPath))
 	}
 
 	// ok: SetValue
 	{
 		keeper.SetValue(ctx, vmPath, writeSetData)
 
-		require.True(t, keeper.HasValue(ctx, vmPath))
-		require.NotNil(t, keeper.GetValue(ctx, vmPath))
-		require.Equal(t, writeSetData, keeper.GetValue(ctx, vmPath))
+		s.Require().True(keeper.HasValue(ctx, vmPath))
+		s.Require().NotNil(keeper.GetValue(ctx, vmPath))
+		s.Require().Equal(writeSetData, keeper.GetValue(ctx, vmPath))
 	}
 
 	// ok: DelValue
 	{
 		keeper.DelValue(ctx, vmPath)
 
-		require.False(t, keeper.HasValue(ctx, vmPath))
-		require.Nil(t, keeper.GetValue(ctx, vmPath))
+		s.Require().False(keeper.HasValue(ctx, vmPath))
+		s.Require().Nil(keeper.GetValue(ctx, vmPath))
 	}
 }

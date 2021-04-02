@@ -11,8 +11,8 @@ import (
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
-// ExecuteScript executes Move script and processes execution results (events, writeSets).
-func (k Keeper) ExecuteScript(ctx sdk.Context, msg types.MsgExecuteScript) error {
+// ExecuteContract executes Move script and processes execution results (events, writeSets).
+func (k Keeper) ExecuteContract(ctx sdk.Context, msg types.MsgExecuteScript) error {
 	req := types.NewVMExecuteScriptRequest(ctx, msg.Signer, msg.Script, msg.Args...)
 
 	exec, err := k.sendExecuteReq(ctx, nil, req)

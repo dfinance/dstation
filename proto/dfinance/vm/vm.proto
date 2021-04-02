@@ -58,3 +58,53 @@ message MsgDeployModule {
     (gogoproto.moretags) = "yaml:\"modules\""
   ];
 }
+
+// TxVmStatus keeps VM statuses and errors for Tx.
+message TxVmStatus {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Tx hash [HEX string]
+  string hash = 1 [
+    (gogoproto.moretags) = "yaml:\"hash\""
+  ];
+
+  // VM statuses for the Tx
+  repeated VmStatus vm_statuses = 2 [
+    (gogoproto.moretags) = "yaml:\"vm_statuses\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// VmStatus is a VM error response.
+message VmStatus {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Error Status: error / discard
+  string status = 1 [
+    (gogoproto.moretags) = "yaml:\"status\""
+  ];
+
+  // Major code
+  string major_code = 2 [
+    (gogoproto.moretags) = "yaml:\"major_code\""
+  ];
+
+  // Sub code
+  string sub_code = 3 [
+    (gogoproto.moretags) = "yaml:\"sub_code\""
+  ];
+
+  // Detailed explanation of major code
+  string str_code = 4 [
+    (gogoproto.moretags) = "yaml:\"str_code\""
+  ];
+
+  // Error message
+  string message = 5 [
+    (gogoproto.moretags) = "yaml:\"message\""
+  ];
+}

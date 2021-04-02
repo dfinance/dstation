@@ -2,11 +2,9 @@ package keeper_test
 
 import (
 	"encoding/hex"
-	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/dfinance/dvm-proto/go/vm_grpc"
-	"github.com/stretchr/testify/require"
 
 	"github.com/dfinance/dstation/pkg/mock"
 	"github.com/dfinance/dstation/pkg/tests"
@@ -14,11 +12,8 @@ import (
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
-func TestVM_DeployContract(t *testing.T) {
-	app := tests.SetupDSimApp(tests.WithMockVM())
-	defer app.TearDown()
-
-	ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+func (s *KeeperMockVmTestSuite) TestDeployContract() {
+	ctx, keeper, vmServer := s.ctx, s.keeper, s.vmServer
 
 	// Build msg
 	accAddr, _, _ := tests.GenAccAddress()
@@ -41,38 +36,35 @@ func TestVM_DeployContract(t *testing.T) {
 
 	// Request
 	{
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.DeployContract(ctx, msg))
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.DeployContract(ctx, msg))
 	}
 
 	// Check events
 	{
 		events := ctx.EventManager().Events()
-		require.Len(t, events, 2)
+		s.Require().Len(events, 2)
 
-		require.EqualValues(t, sdk.EventTypeMessage, events[0].Type)
-		require.Len(t, events[0].Attributes, 1)
-		require.EqualValues(t, sdk.AttributeKeyModule, events[0].Attributes[0].Key)
-		require.EqualValues(t, types.ModuleName, events[0].Attributes[0].Value)
+		s.Require().EqualValues(sdk.EventTypeMessage, events[0].Type)
+		s.Require().Len(events[0].Attributes, 1)
+		s.Require().EqualValues(sdk.AttributeKeyModule, events[0].Attributes[0].Key)
+		s.Require().EqualValues(types.ModuleName, events[0].Attributes[0].Value)
 
-		require.EqualValues(t, types.EventTypeContractStatus, events[1].Type)
-		require.Len(t, events[1].Attributes, 1)
-		require.EqualValues(t, types.AttributeStatus, events[1].Attributes[0].Key)
-		require.EqualValues(t, types.AttributeValueStatusKeep, events[1].Attributes[0].Value)
+		s.Require().EqualValues(types.EventTypeContractStatus, events[1].Type)
+		s.Require().Len(events[1].Attributes, 1)
+		s.Require().EqualValues(types.AttributeStatus, events[1].Attributes[0].Key)
+		s.Require().EqualValues(types.AttributeValueStatusKeep, events[1].Attributes[0].Value)
 	}
 
 	// Check writeSets
 	{
 		rcvValue := keeper.GetValue(ctx, vmResp.WriteSet[0].Path)
-		require.EqualValues(t, vmResp.WriteSet[0].Value, rcvValue)
+		s.Require().EqualValues(vmResp.WriteSet[0].Value, rcvValue)
 	}
 }
 
-func TestVM_ExecuteScript(t *testing.T) {
-	app := tests.SetupDSimApp(tests.WithMockVM())
-	defer app.TearDown()
-
-	ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+func (s *KeeperMockVmTestSuite) TestExecuteContract() {
+	ctx, keeper, vmServer := s.ctx, s.keeper, s.vmServer
 
 	// Build msg
 	accAddr, _, _ := tests.GenAccAddress()
@@ -112,67 +104,59 @@ func TestVM_ExecuteScript(t *testing.T) {
 	// Set writeSet for the next delete writeOp
 	{
 		keeper.SetValue(ctx, vmResp.WriteSet[1].Path, vmResp.WriteSet[1].Value)
-		require.True(t, keeper.HasValue(ctx, vmResp.WriteSet[1].Path))
+		s.Require().True(keeper.HasValue(ctx, vmResp.WriteSet[1].Path))
 	}
 
 	// Request
 	{
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.ExecuteScript(ctx, msg))
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.ExecuteContract(ctx, msg))
 	}
 
 	// Check events
 	{
 		events := ctx.EventManager().Events()
-		require.Len(t, events, 3)
+		s.Require().Len(events, 3)
 
 		// Module message
-		require.EqualValues(t, sdk.EventTypeMessage, events[0].Type)
-		require.Len(t, events[0].Attributes, 1)
-		require.EqualValues(t, sdk.AttributeKeyModule, events[0].Attributes[0].Key)
-		require.EqualValues(t, types.ModuleName, events[0].Attributes[0].Value)
+		s.Require().EqualValues(sdk.EventTypeMessage, events[0].Type)
+		s.Require().Len(events[0].Attributes, 1)
+		s.Require().EqualValues(sdk.AttributeKeyModule, events[0].Attributes[0].Key)
+		s.Require().EqualValues(types.ModuleName, events[0].Attributes[0].Value)
 
-		require.EqualValues(t, types.EventTypeContractStatus, events[1].Type)
-		require.Len(t, events[1].Attributes, 1)
-		require.EqualValues(t, types.AttributeStatus, events[1].Attributes[0].Key)
-		require.EqualValues(t, types.AttributeValueStatusKeep, events[1].Attributes[0].Value)
+		s.Require().EqualValues(types.EventTypeContractStatus, events[1].Type)
+		s.Require().Len(events[1].Attributes, 1)
+		s.Require().EqualValues(types.AttributeStatus, events[1].Attributes[0].Key)
+		s.Require().EqualValues(types.AttributeValueStatusKeep, events[1].Attributes[0].Value)
 
-		require.EqualValues(t, types.EventTypeMoveEvent, events[2].Type)
-		require.Len(t, events[2].Attributes, 4)
+		s.Require().EqualValues(types.EventTypeMoveEvent, events[2].Type)
+		s.Require().Len(events[2].Attributes, 4)
 
-		require.EqualValues(t,
-			types.AttributeVmEventSender,
+		s.Require().EqualValues(types.AttributeVmEventSender,
 			events[2].Attributes[0].Key,
 		)
-		require.EqualValues(t,
-			types.StdLibAddressShortStr,
+		s.Require().EqualValues(types.StdLibAddressShortStr,
 			events[2].Attributes[0].Value,
 		)
 
-		require.EqualValues(t,
-			types.AttributeVmEventSource,
+		s.Require().EqualValues(types.AttributeVmEventSource,
 			events[2].Attributes[1].Key,
 		)
-		require.EqualValues(t,
-			types.AttributeValueSourceScript,
+		s.Require().EqualValues(types.AttributeValueSourceScript,
 			events[2].Attributes[1].Value,
 		)
 
-		require.EqualValues(t,
-			types.AttributeVmEventType,
+		s.Require().EqualValues(types.AttributeVmEventType,
 			events[2].Attributes[2].Key,
 		)
-		require.EqualValues(t,
-			[]byte("u64"),
+		s.Require().EqualValues([]byte("u64"),
 			events[2].Attributes[2].Value,
 		)
 
-		require.EqualValues(t,
-			types.AttributeVmEventData,
+		s.Require().EqualValues(types.AttributeVmEventData,
 			events[2].Attributes[3].Key,
 		)
-		require.EqualValues(t,
-			hex.EncodeToString(vmResp.Events[0].EventData),
+		s.Require().EqualValues(hex.EncodeToString(vmResp.Events[0].EventData),
 			events[2].Attributes[3].Value,
 		)
 	}
@@ -180,17 +164,14 @@ func TestVM_ExecuteScript(t *testing.T) {
 	// Check writeSets
 	{
 		rcvValue := keeper.GetValue(ctx, vmResp.WriteSet[0].Path)
-		require.EqualValues(t, vmResp.WriteSet[0].Value, rcvValue)
+		s.Require().EqualValues(vmResp.WriteSet[0].Value, rcvValue)
 
-		require.False(t, keeper.HasValue(ctx, vmResp.WriteSet[1].Path))
+		s.Require().False(keeper.HasValue(ctx, vmResp.WriteSet[1].Path))
 	}
 }
 
-func TestVM_FailedExecution(t *testing.T) {
-	app := tests.SetupDSimApp(tests.WithMockVM())
-	defer app.TearDown()
-
-	ctx, keeper := app.GetContext(), app.DnApp.VmKeeper
+func (s *KeeperMockVmTestSuite) TestFailedExecution() {
+	ctx, keeper, vmServer := s.ctx, s.keeper, s.vmServer
 
 	// Status: nil
 	{
@@ -206,23 +187,23 @@ func TestVM_FailedExecution(t *testing.T) {
 
 		// Request
 		ctx := ctx.WithEventManager(sdk.NewEventManager())
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.ExecuteScript(ctx, msg))
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.ExecuteContract(ctx, msg))
 
 		// Check events
 		events := ctx.EventManager().Events()
-		require.Len(t, events, 2)
+		s.Require().Len(events, 2)
 
-		require.Equal(t, dnTypes.NewModuleNameEvent(types.ModuleName), events[0])
+		s.Require().Equal(dnTypes.NewModuleNameEvent(types.ModuleName), events[0])
 
-		require.Equal(t, types.EventTypeContractStatus, events[1].Type)
-		require.Len(t, events[1].Attributes, 1)
+		s.Require().Equal(types.EventTypeContractStatus, events[1].Type)
+		s.Require().Len(events[1].Attributes, 1)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeStatus),
 			events[1].Attributes[0].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeValueStatusKeep),
 			events[1].Attributes[0].Value,
 		)
@@ -251,50 +232,50 @@ func TestVM_FailedExecution(t *testing.T) {
 
 		// Request
 		ctx := ctx.WithEventManager(sdk.NewEventManager())
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.ExecuteScript(ctx, msg))
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.ExecuteContract(ctx, msg))
 
 		// Check events
 		events := ctx.EventManager().Events()
-		require.Len(t, events, 2)
+		s.Require().Len(events, 2)
 
-		require.Equal(t, dnTypes.NewModuleNameEvent(types.ModuleName), events[0])
+		s.Require().Equal(dnTypes.NewModuleNameEvent(types.ModuleName), events[0])
 
-		require.Equal(t, types.EventTypeContractStatus, events[1].Type)
-		require.Len(t, events[1].Attributes, 4)
+		s.Require().Equal(types.EventTypeContractStatus, events[1].Type)
+		s.Require().Len(events[1].Attributes, 4)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeStatus),
 			events[1].Attributes[0].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeValueStatusDiscard),
 			events[1].Attributes[0].Value,
 		)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeErrMajorStatus),
 			events[1].Attributes[1].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte("100"),
 			events[1].Attributes[1].Value,
 		)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeErrSubStatus),
 			events[1].Attributes[2].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte("0"),
 			events[1].Attributes[2].Value,
 		)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeErrMessage),
 			events[1].Attributes[3].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(vmResp.Status.Message.Text),
 			events[1].Attributes[3].Value,
 		)
@@ -320,41 +301,41 @@ func TestVM_FailedExecution(t *testing.T) {
 
 		// Request
 		ctx := ctx.WithEventManager(sdk.NewEventManager())
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.ExecuteScript(ctx, msg))
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.ExecuteContract(ctx, msg))
 
 		// Check events
 		events := ctx.EventManager().Events()
-		require.Len(t, events, 2)
+		s.Require().Len(events, 2)
 
-		require.Equal(t, dnTypes.NewModuleNameEvent(types.ModuleName), events[0])
+		s.Require().Equal(dnTypes.NewModuleNameEvent(types.ModuleName), events[0])
 
-		require.Equal(t, types.EventTypeContractStatus, events[1].Type)
-		require.Len(t, events[1].Attributes, 3)
+		s.Require().Equal(types.EventTypeContractStatus, events[1].Type)
+		s.Require().Len(events[1].Attributes, 3)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeStatus),
 			events[1].Attributes[0].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeValueStatusDiscard),
 			events[1].Attributes[0].Value,
 		)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeErrMajorStatus),
 			events[1].Attributes[1].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte("4016"),
 			events[1].Attributes[1].Value,
 		)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeErrSubStatus),
 			events[1].Attributes[2].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte("100"),
 			events[1].Attributes[2].Value,
 		)
@@ -380,41 +361,41 @@ func TestVM_FailedExecution(t *testing.T) {
 
 		// Request
 		ctx := ctx.WithEventManager(sdk.NewEventManager())
-		app.MockVMServer.SetResponse(vmResp)
-		require.NoError(t, keeper.ExecuteScript(ctx, msg))
+		vmServer.SetResponse(vmResp)
+		s.Require().NoError(keeper.ExecuteContract(ctx, msg))
 
 		// Check events
 		events := ctx.EventManager().Events()
-		require.Len(t, events, 2)
+		s.Require().Len(events, 2)
 
-		require.Equal(t, dnTypes.NewModuleNameEvent(types.ModuleName), events[0])
+		s.Require().Equal(dnTypes.NewModuleNameEvent(types.ModuleName), events[0])
 
-		require.Equal(t, types.EventTypeContractStatus, events[1].Type)
-		require.Len(t, events[1].Attributes, 3)
+		s.Require().Equal(types.EventTypeContractStatus, events[1].Type)
+		s.Require().Len(events[1].Attributes, 3)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeStatus),
 			events[1].Attributes[0].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeValueStatusDiscard),
 			events[1].Attributes[0].Value,
 		)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeErrMajorStatus),
 			events[1].Attributes[1].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte("100"),
 			events[1].Attributes[1].Value,
 		)
 
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte(types.AttributeErrSubStatus),
 			events[1].Attributes[2].Key,
 		)
-		require.Equal(t,
+		s.Require().Equal(
 			[]byte("0"),
 			events[1].Attributes[2].Value,
 		)

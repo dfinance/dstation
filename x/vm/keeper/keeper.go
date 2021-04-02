@@ -19,7 +19,7 @@ var _ types.VMStorage = (*Keeper)(nil)
 type Keeper struct {
 	storeKey sdk.StoreKey
 	cdc      codec.BinaryMarshaler
-	config   config.VMConfig
+	config   *config.VMConfig
 	// VM connection
 	vmClient VMClient
 	vmConn   *grpc.ClientConn
@@ -52,7 +52,7 @@ func (k Keeper) SetDSContext(ctx sdk.Context) {
 func NewKeeper(
 	cdc codec.BinaryMarshaler, storeKey sdk.StoreKey,
 	vmConn *grpc.ClientConn, dsListener net.Listener,
-	config config.VMConfig,
+	config *config.VMConfig,
 ) Keeper {
 
 	k := Keeper{
