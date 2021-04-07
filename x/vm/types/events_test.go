@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
-	"github.com/dfinance/dstation/pkg/types/dvm"
+	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 // Test event build when VM return status is "keep changes".
@@ -19,8 +19,8 @@ func TestVM_KeepEvent(t *testing.T) {
 
 	// "keep" no error
 	{
-		exec := &dvm.VMExecuteResponse{
-			Status: &dvm.VMStatus{},
+		exec := &dvmTypes.VMExecuteResponse{
+			Status: &dvmTypes.VMStatus{},
 		}
 		events := NewContractEvents(exec)
 
@@ -40,9 +40,9 @@ func TestVM_DiscardEvent(t *testing.T) {
 	// "panic" with empty VMStatus_Abort
 	{
 		func() {
-			exec := &dvm.VMExecuteResponse{
-				Status: &dvm.VMStatus{
-					Error: &dvm.VMStatus_Abort{},
+			exec := &dvmTypes.VMExecuteResponse{
+				Status: &dvmTypes.VMStatus{
+					Error: &dvmTypes.VMStatus_Abort{},
 				},
 			}
 
@@ -57,9 +57,9 @@ func TestVM_DiscardEvent(t *testing.T) {
 	// "panic" with empty VMStatus_ExecutionFailure
 	{
 		func() {
-			exec := &dvm.VMExecuteResponse{
-				Status: &dvm.VMStatus{
-					Error: &dvm.VMStatus_ExecutionFailure{},
+			exec := &dvmTypes.VMExecuteResponse{
+				Status: &dvmTypes.VMStatus{
+					Error: &dvmTypes.VMStatus_ExecutionFailure{},
 				},
 			}
 
@@ -74,9 +74,9 @@ func TestVM_DiscardEvent(t *testing.T) {
 	// "panic" with empty VMStatus_MoveError
 	{
 		func() {
-			exec := &dvm.VMExecuteResponse{
-				Status: &dvm.VMStatus{
-					Error: &dvm.VMStatus_MoveError{},
+			exec := &dvmTypes.VMExecuteResponse{
+				Status: &dvmTypes.VMStatus{
+					Error: &dvmTypes.VMStatus_MoveError{},
 				},
 			}
 
@@ -95,18 +95,18 @@ func TestVM_DiscardEvent(t *testing.T) {
 		abortLocationAddress := sdk.AccAddress(secp256k1.GenPrivKey().PubKey().Address())
 		errMessage := "this is error!!111"
 
-		exec := &dvm.VMExecuteResponse{
-			Status: &dvm.VMStatus{
-				Error: &dvm.VMStatus_Abort{
-					Abort: &dvm.Abort{
+		exec := &dvmTypes.VMExecuteResponse{
+			Status: &dvmTypes.VMStatus{
+				Error: &dvmTypes.VMStatus_Abort{
+					Abort: &dvmTypes.Abort{
 						AbortCode: abortCode,
-						AbortLocation: &dvm.AbortLocation{
+						AbortLocation: &dvmTypes.AbortLocation{
 							Module:  abortLocationModule,
 							Address: abortLocationAddress.Bytes(),
 						},
 					},
 				},
-				Message: &dvm.Message{Text: errMessage},
+				Message: &dvmTypes.Message{Text: errMessage},
 			},
 		}
 		events := NewContractEvents(exec)
@@ -138,14 +138,14 @@ func TestVM_DiscardEvent(t *testing.T) {
 	{
 		statusCode := uint64(500)
 		errMessage := "this is error!!111"
-		exec := &dvm.VMExecuteResponse{
-			Status: &dvm.VMStatus{
-				Error: &dvm.VMStatus_ExecutionFailure{
-					ExecutionFailure: &dvm.Failure{
+		exec := &dvmTypes.VMExecuteResponse{
+			Status: &dvmTypes.VMStatus{
+				Error: &dvmTypes.VMStatus_ExecutionFailure{
+					ExecutionFailure: &dvmTypes.Failure{
 						StatusCode: statusCode,
 					},
 				},
-				Message: &dvm.Message{
+				Message: &dvmTypes.Message{
 					Text: errMessage,
 				},
 			},
@@ -192,24 +192,24 @@ func TestVM_NewEventFromVM(t *testing.T) {
 	// seems Move using to_le_bytes
 	binary.LittleEndian.PutUint64(valBytes, value)
 
-	vmEvent := dvm.VMEvent{
+	vmEvent := dvmTypes.VMEvent{
 		SenderAddress: StdLibAddress,
-		SenderModule: &dvm.ModuleIdent{
+		SenderModule: &dvmTypes.ModuleIdent{
 			Name:    "testModule",
 			Address: Bech32ToLibra(moduleAddr),
 		},
-		EventType: &dvm.LcsTag{
-			TypeTag: dvm.LcsType_LcsU64,
-			StructIdent: &dvm.StructIdent{
+		EventType: &dvmTypes.LcsTag{
+			TypeTag: dvmTypes.LcsType_LcsU64,
+			StructIdent: &dvmTypes.StructIdent{
 				Address: []byte{1},
 				Module:  "Module_1",
 				Name:    "Struct_1",
-				TypeParams: []*dvm.LcsTag{
+				TypeParams: []*dvmTypes.LcsTag{
 					{
-						TypeTag: dvm.LcsType_LcsBool,
+						TypeTag: dvmTypes.LcsType_LcsBool,
 					},
 					{
-						TypeTag: dvm.LcsType_LcsU128,
+						TypeTag: dvmTypes.LcsType_LcsU128,
 					},
 				},
 			},
@@ -272,34 +272,34 @@ func TestVM_OutOfGasProcessEvent(t *testing.T) {
 	// seems Move using to_le_bytes
 	binary.LittleEndian.PutUint64(valBytes, value)
 
-	vmEvent := dvm.VMEvent{
+	vmEvent := dvmTypes.VMEvent{
 		SenderAddress: StdLibAddress,
-		SenderModule: &dvm.ModuleIdent{
+		SenderModule: &dvmTypes.ModuleIdent{
 			Name:    "testModule",
 			Address: Bech32ToLibra(moduleAddr),
 		},
-		EventType: &dvm.LcsTag{
-			TypeTag: dvm.LcsType_LcsU64,
-			StructIdent: &dvm.StructIdent{
+		EventType: &dvmTypes.LcsTag{
+			TypeTag: dvmTypes.LcsType_LcsU64,
+			StructIdent: &dvmTypes.StructIdent{
 				Address: []byte{1},
 				Module:  "Module_1",
 				Name:    "Struct_1",
-				TypeParams: []*dvm.LcsTag{
+				TypeParams: []*dvmTypes.LcsTag{
 					{
-						TypeTag: dvm.LcsType_LcsBool,
-						StructIdent: &dvm.StructIdent{
+						TypeTag: dvmTypes.LcsType_LcsBool,
+						StructIdent: &dvmTypes.StructIdent{
 							Address: []byte{2},
 							Module:  "Module_1",
 							Name:    "Struct_2",
-							TypeParams: []*dvm.LcsTag{
+							TypeParams: []*dvmTypes.LcsTag{
 								{
-									TypeTag: dvm.LcsType_LcsU8,
+									TypeTag: dvmTypes.LcsType_LcsU8,
 								},
 							},
 						},
 					},
 					{
-						TypeTag: dvm.LcsType_LcsU128,
+						TypeTag: dvmTypes.LcsType_LcsU128,
 					},
 				},
 			},

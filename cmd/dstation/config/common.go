@@ -19,7 +19,10 @@ import (
 
 // Chain defaults
 const (
-	MainDenom = "xfi" // 12 decimals
+	MainDenom = "xfi"  // 18 decimals
+	EthDenom  = "eth"  // 18 decimals
+	BtcDenom  = "btc"  // 8 decimals
+	UsdtDenom = "usdt" // 6 decimals
 
 	// Min TX fee
 	FeeAmount = "100000000000000" // 0.0001

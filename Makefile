@@ -87,7 +87,7 @@ lint:
 
 tests:
 	@echo "--> Running tests"
-	go test ./...
+	go test ./... -v
 
 proto-gen:
 	@echo "--> Generating DVM Protobuf files"

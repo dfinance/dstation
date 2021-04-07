@@ -5,8 +5,7 @@ go 1.15
 require (
 	github.com/OneOfOne/xxhash v1.2.2
 	github.com/cosmos/cosmos-sdk v0.42.2
-	github.com/dfinance/glav v0.0.0-20200814081332-c4701f6c12a6
-	github.com/dfinance/lcs v0.1.7-big
+	github.com/fsouza/go-dockerclient v1.7.2
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.4.3
 	github.com/gorilla/mux v1.8.0

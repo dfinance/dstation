@@ -92,6 +92,8 @@
     - [QueryCompileResponse](#dfinance.vm.v1beta1.QueryCompileResponse)
     - [QueryDataRequest](#dfinance.vm.v1beta1.QueryDataRequest)
     - [QueryDataResponse](#dfinance.vm.v1beta1.QueryDataResponse)
+    - [QueryDelegatedPoolSupplyRequest](#dfinance.vm.v1beta1.QueryDelegatedPoolSupplyRequest)
+    - [QueryDelegatedPoolSupplyResponse](#dfinance.vm.v1beta1.QueryDelegatedPoolSupplyResponse)
     - [QueryMetadataRequest](#dfinance.vm.v1beta1.QueryMetadataRequest)
     - [QueryMetadataResponse](#dfinance.vm.v1beta1.QueryMetadataResponse)
     - [QueryTxVmStatusRequest](#dfinance.vm.v1beta1.QueryTxVmStatusRequest)
@@ -1272,6 +1274,31 @@ QueryDataResponse is response type for Query/Data RPC method.
 
 
 
+<a name="dfinance.vm.v1beta1.QueryDelegatedPoolSupplyRequest"></a>
+
+### QueryDelegatedPoolSupplyRequest
+QueryDelegatedPoolSupplyRequest is request type for Query/DelegatedPoolSupply RPC method.
+
+
+
+
+
+
+<a name="dfinance.vm.v1beta1.QueryDelegatedPoolSupplyResponse"></a>
+
+### QueryDelegatedPoolSupplyResponse
+QueryDelegatedPoolSupplyResponse is response type for Query/DelegatedPoolSupply RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `coins` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
+
+
+
+
+
+
 <a name="dfinance.vm.v1beta1.QueryMetadataRequest"></a>
 
 ### QueryMetadataRequest
@@ -1349,6 +1376,7 @@ Query defines the gRPC querier service.
 | `TxVmStatus` | [QueryTxVmStatusRequest](#dfinance.vm.v1beta1.QueryTxVmStatusRequest) | [QueryTxVmStatusResponse](#dfinance.vm.v1beta1.QueryTxVmStatusResponse) | TxVmStatus queries VM status for Tx | GET|/dfinance/vm/v1beta1/tx_vm_status|
 | `Compile` | [QueryCompileRequest](#dfinance.vm.v1beta1.QueryCompileRequest) | [QueryCompileResponse](#dfinance.vm.v1beta1.QueryCompileResponse) | Compile compiles provided Move code and returns byte code. | GET|/dfinance/vm/v1beta1/compile|
 | `Metadata` | [QueryMetadataRequest](#dfinance.vm.v1beta1.QueryMetadataRequest) | [QueryMetadataResponse](#dfinance.vm.v1beta1.QueryMetadataResponse) | Metadata queries VM for byteCode metadata (metadata.proto/GetMetadata RPC wrapper). | |
+| `DelegatedPoolSupply` | [QueryDelegatedPoolSupplyRequest](#dfinance.vm.v1beta1.QueryDelegatedPoolSupplyRequest) | [QueryDelegatedPoolSupplyResponse](#dfinance.vm.v1beta1.QueryDelegatedPoolSupplyResponse) | DelegatedPoolSupply queries Delegated pool module balance. | |
 
  <!-- end services -->
 

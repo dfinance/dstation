@@ -4,15 +4,15 @@ import (
 	"encoding/hex"
 	"fmt"
 
-	"github.com/dfinance/dstation/pkg/types/dvm"
+	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 func (m GenesisState_WriteOp) String() string {
 	return fmt.Sprintf("%s::%s", m.Address, m.Path)
 }
 
-// ToBytes converts WriteOp to dvm.VMAccessPath and []byte representation for value.
-func (m GenesisState_WriteOp) ToBytes() (*dvm.VMAccessPath, []byte, error) {
+// ToBytes converts WriteOp to dvmTypes.VMAccessPath and []byte representation for value.
+func (m GenesisState_WriteOp) ToBytes() (*dvmTypes.VMAccessPath, []byte, error) {
 	bzAddr, err := hex.DecodeString(m.Address)
 	if err != nil {
 		return nil, nil, fmt.Errorf("address: hex decode: %w", err)
@@ -31,7 +31,7 @@ func (m GenesisState_WriteOp) ToBytes() (*dvm.VMAccessPath, []byte, error) {
 		return nil, nil, fmt.Errorf("value: hex decode: %w", err)
 	}
 
-	return &dvm.VMAccessPath{
+	return &dvmTypes.VMAccessPath{
 		Address: bzAddr,
 		Path:    bzPath,
 	}, bzValue, nil
@@ -39,17 +39,18 @@ func (m GenesisState_WriteOp) ToBytes() (*dvm.VMAccessPath, []byte, error) {
 
 // Validate checks that genesis state is valid.
 func (m GenesisState) Validate() error {
-	writeOpsSet := make(map[string]bool, len(m.WriteSet))
+	// VM writeSets
+	writeOpsSet := make(map[string]struct{}, len(m.WriteSet))
 	for woIdx, writeOp := range m.WriteSet {
 		if _, _, err := writeOp.ToBytes(); err != nil {
 			return fmt.Errorf("writeSet [%d]: %w", woIdx, err)
 		}
 
 		writeOpId := writeOp.String()
-		if writeOpsSet[writeOpId] {
+		if _, ok := writeOpsSet[writeOpId]; ok {
 			return fmt.Errorf("writeSet [%d]: duplicated (%s)", woIdx, writeOpId)
 		}
-		writeOpsSet[writeOpId] = true
+		writeOpsSet[writeOpId] = struct{}{}
 	}
 
 	return nil

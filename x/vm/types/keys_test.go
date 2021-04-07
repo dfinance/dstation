@@ -15,7 +15,6 @@ func TestVM_MustParsePathKey(t *testing.T) {
 	{
 		key := bytes.Join(
 			[][]byte{
-				VMKey,
 				address,
 				path,
 			}, KeyDelimiter)
@@ -29,7 +28,6 @@ func TestVM_MustParsePathKey(t *testing.T) {
 	{
 		key := bytes.Join(
 			[][]byte{
-				VMKey,
 				address[:len(address)-2],
 				path,
 			}, KeyDelimiter)
@@ -43,7 +41,6 @@ func TestVM_MustParsePathKey(t *testing.T) {
 	{
 		key := bytes.Join(
 			[][]byte{
-				VMKey,
 				address,
 				{},
 			}, KeyDelimiter)
@@ -57,7 +54,6 @@ func TestVM_MustParsePathKey(t *testing.T) {
 	{
 		key := bytes.Join(
 			[][]byte{
-				VMKey,
 				address,
 				{},
 			}, []byte("@"))

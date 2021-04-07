@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/dfinance/dstation/pkg/types/dvm"
+	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 const (
@@ -13,23 +13,24 @@ const (
 	RouterKey    = ModuleName
 	QuerierRoute = ModuleName
 	GovRouterKey = ModuleName
+	//
+	DelPoolName = "vm_delegation_pool"
 )
 
 var (
 	// Storage keys
-	KeyDelimiter = []byte(":")  // we should rely on this delimiter (for bytes.Split for example) as VM accessPath.Path might include symbols like: [':', '@',..]
-	VMKey        = []byte("vm") // storage key prefix for VMStorage data
+	KeyDelimiter = []byte(":")  // we should not rely on this delimiter for VMStorage (bytes.Split usage for instance) as VM accessPath.Path might include symbols like: [':', '@',..]
+	VMKeyPrefix  = []byte("vm") // storage key prefix for VMStorage data
 )
 
-// GetVMStorageKey returns VMStorage key for dvm.VMAccessPath.
-func GetVMStorageKey(path *dvm.VMAccessPath) []byte {
+// GetVMStorageKey returns VMStorage key for dvmTypes.VMAccessPath.
+func GetVMStorageKey(path *dvmTypes.VMAccessPath) []byte {
 	if path == nil {
 		return nil
 	}
 
 	return bytes.Join(
 		[][]byte{
-			VMKey,
 			path.Address,
 			path.Path,
 		},
@@ -37,52 +38,39 @@ func GetVMStorageKey(path *dvm.VMAccessPath) []byte {
 	)
 }
 
-// GetVMStorageKeyPrefix returns VMStorage keys prefix (used for iteration).
-func GetVMStorageKeyPrefix() []byte {
-	return append(VMKey, KeyDelimiter...)
-}
-
 // MustParseVMStorageKey parses VMStorage key and panics on failure.
-func MustParseVMStorageKey(key []byte) *dvm.VMAccessPath {
-	accessPath := dvm.VMAccessPath{}
-
-	// we expect key to be correct: vm:{address_20bytes}:{path_at_least_1byte}
-	expectedMinLen := len(VMKey) + len(KeyDelimiter) + VMAddressLength + len(KeyDelimiter) + 1
+func MustParseVMStorageKey(key []byte) *dvmTypes.VMAccessPath {
+	// Key length is expected to be correct: {address_20bytes}:{path_at_least_1byte}
+	expectedMinLen := VMAddressLength + len(KeyDelimiter) + 1
 	if len(key) < expectedMinLen {
-		panic(fmt.Errorf("key %q: invalid length: min expected: %d", string(key), expectedMinLen))
+		panic(fmt.Errorf("VMKey (%s): invalid key length: expected / actual: %d / %d", string(key), expectedMinLen, len(key)))
 	}
 
-	// calc indices (end index is the next one of the real end idx)
-	prefixStartIdx := 0
-	prefixEndIdx := prefixStartIdx + len(VMKey)
-	delimiterFirstStartIdx := prefixEndIdx
-	delimiterFirstEndIdx := delimiterFirstStartIdx + len(KeyDelimiter)
-	addressStartIdx := delimiterFirstEndIdx
+	// Calc indices
+	addressStartIdx := 0
 	addressEndIdx := addressStartIdx + VMAddressLength
-	delimiterSecondStartIdx := addressEndIdx
-	delimiterSecondEndIdx := delimiterSecondStartIdx + len(KeyDelimiter)
-	pathStartIdx := delimiterSecondEndIdx
+	delimiterStartIdx := addressEndIdx
+	delimiterEndIdx := delimiterStartIdx + len(KeyDelimiter)
+	pathStartIdx := delimiterEndIdx
 
-	// split key
-	prefixValue := key[prefixStartIdx:prefixEndIdx]
-	delimiterFirstValue := key[delimiterFirstStartIdx:delimiterFirstEndIdx]
+	// Split key
 	addressValue := key[addressStartIdx:addressEndIdx]
-	delimiterSecondValue := key[delimiterSecondStartIdx:delimiterSecondEndIdx]
+	delimiterValue := key[delimiterStartIdx:delimiterEndIdx]
 	pathValue := key[pathStartIdx:]
 
-	// validate
-	if !bytes.Equal(prefixValue, VMKey) {
-		panic(fmt.Errorf("key %q: prefix: invalid", string(key)))
+	// Validate
+	if !bytes.Equal(delimiterValue, KeyDelimiter) {
+		panic(fmt.Errorf("VMKey (%s): 1st delimiter value is invalid", string(key)))
 	}
-	if !bytes.Equal(delimiterFirstValue, KeyDelimiter) {
-		panic(fmt.Errorf("key %q: 1st delimiter: invalid", string(key)))
+	if len(addressValue) < VMAddressLength {
+		panic(fmt.Errorf("VMKey (%s): address length is invalid: expected / actual: %d / %d", string(key), VMAddressLength, len(addressValue)))
 	}
-	if !bytes.Equal(delimiterSecondValue, KeyDelimiter) {
-		panic(fmt.Errorf("key %q: 2nd delimiter: invalid", string(key)))
+	if len(pathValue) == 0 {
+		panic(fmt.Errorf("VMKey (%s): path length is invalid: expected / actual: GT 1 / %d", string(key), len(pathValue)))
 	}
 
-	accessPath.Address = addressValue
-	accessPath.Path = pathValue
-
-	return &accessPath
+	return &dvmTypes.VMAccessPath{
+		Address: addressValue,
+		Path:    pathValue,
+	}
 }

@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/dfinance/dstation/pkg/tests"
-	"github.com/dfinance/dstation/pkg/types/dvm"
+	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
@@ -26,7 +26,7 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(0, 0)
 
 		// Build msg
-		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		vmResp := &dvmTypes.VMExecuteResponse{GasUsed: 1, Status: &dvmTypes.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
@@ -42,7 +42,7 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(1, 5000)
 
 		// Build msg
-		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		vmResp := &dvmTypes.VMExecuteResponse{GasUsed: 1, Status: &dvmTypes.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
@@ -58,7 +58,7 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(1, 0)
 
 		// Build msg
-		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		vmResp := &dvmTypes.VMExecuteResponse{GasUsed: 1, Status: &dvmTypes.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
@@ -74,7 +74,7 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(10, 50)
 
 		// Build msg
-		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		vmResp := &dvmTypes.VMExecuteResponse{GasUsed: 1, Status: &dvmTypes.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
@@ -90,7 +90,7 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(10, 0)
 
 		// Build msg
-		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		vmResp := &dvmTypes.VMExecuteResponse{GasUsed: 1, Status: &dvmTypes.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
@@ -106,7 +106,7 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(0, 0)
 
 		// Build msg
-		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		vmResp := &dvmTypes.VMExecuteResponse{GasUsed: 1, Status: &dvmTypes.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
@@ -122,7 +122,7 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(5, 30)
 
 		// Build msg
-		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		vmResp := &dvmTypes.VMExecuteResponse{GasUsed: 1, Status: &dvmTypes.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request
@@ -143,7 +143,7 @@ func (s *KeeperMockVmTestSuite) TestRetryMechanism() {
 		s.app.SetCustomVMRetryParams(5, 0)
 
 		// Build msg
-		vmResp := &dvm.VMExecuteResponse{GasUsed: 1, Status: &dvm.VMStatus{}}
+		vmResp := &dvmTypes.VMExecuteResponse{GasUsed: 1, Status: &dvmTypes.VMStatus{}}
 		msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
 		// Request

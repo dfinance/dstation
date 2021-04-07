@@ -8,7 +8,7 @@ import (
 	sdkErrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/stretchr/testify/require"
 
-	"github.com/dfinance/dstation/pkg/types/dvm"
+	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 func TestVM_MsgDeployModule(t *testing.T) {
@@ -54,9 +54,9 @@ func TestVM_MsgExecuteScript(t *testing.T) {
 	code := make([]byte, 128)
 
 	args := []MsgExecuteScript_ScriptArg{
-		{Type: dvm.VMTypeTag_U64, Value: []byte{0x1, 0x2, 0x3, 0x4}},
-		{Type: dvm.VMTypeTag_Vector, Value: []byte{0x0}},
-		{Type: dvm.VMTypeTag_Address, Value: Bech32ToLibra(acc)},
+		{Type: dvmTypes.VMTypeTag_U64, Value: []byte{0x1, 0x2, 0x3, 0x4}},
+		{Type: dvmTypes.VMTypeTag_Vector, Value: []byte{0x0}},
+		{Type: dvmTypes.VMTypeTag_Address, Value: Bech32ToLibra(acc)},
 	}
 
 	// ok

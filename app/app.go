@@ -135,6 +135,7 @@ var (
 		stakingTypes.NotBondedPoolName: {authTypes.Burner, authTypes.Staking},
 		govTypes.ModuleName:            {authTypes.Burner},
 		ibcTransferTypes.ModuleName:    {authTypes.Minter, authTypes.Burner},
+		vmTypes.DelPoolName:            {authTypes.Staking},
 	}
 )
 
@@ -463,7 +464,7 @@ func NewDnApp(
 	)
 
 	app.VmKeeper = vmKeeper.NewKeeper(
-		appCodec, keys[vmTypes.StoreKey], app.vmConn, app.dsListener, app.vmConfig,
+		appCodec, keys[vmTypes.StoreKey], app.vmConn, app.dsListener, app.vmConfig, app.AccountKeeper, app.BankKeeper,
 	)
 
 	// Register the proposal types

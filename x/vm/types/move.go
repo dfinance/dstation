@@ -32,6 +32,15 @@ func MustBech32ToLibra(addrRaw string) []byte {
 	return Bech32ToLibra(addr)
 }
 
+// LibraToBech32 converts Libra bytes to sdk.AccAddress.
+func LibraToBech32(addrRaw []byte) (sdk.AccAddress, error) {
+	if len(addrRaw) != VMAddressLength {
+		return sdk.AccAddress{}, fmt.Errorf("invalid length (must be %d)", VMAddressLength)
+	}
+
+	return sdk.AccAddress(addrRaw), nil
+}
+
 func init() {
 	StdLibAddress[VMAddressLength-1] = 1
 }

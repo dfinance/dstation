@@ -8,7 +8,7 @@ import (
 	"github.com/dfinance/dstation/pkg/mock"
 	"github.com/dfinance/dstation/pkg/tests"
 	dnTypes "github.com/dfinance/dstation/pkg/types"
-	"github.com/dfinance/dstation/pkg/types/dvm"
+	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
@@ -17,11 +17,11 @@ func (s *KeeperMockVmTestSuite) TestDeployContract() {
 
 	// Build msg
 	accAddr, _, _ := tests.GenAccAddress()
-	vmResp := &dvm.VMExecuteResponse{
-		WriteSet: []*dvm.VMValue{
+	vmResp := &dvmTypes.VMExecuteResponse{
+		WriteSet: []*dvmTypes.VMValue{
 			{
-				Type: dvm.VmWriteOp_Value,
-				Path: &dvm.VMAccessPath{
+				Type: dvmTypes.VmWriteOp_Value,
+				Path: &dvmTypes.VMAccessPath{
 					Address: types.Bech32ToLibra(accAddr),
 					Path:    mock.GetRandomBytes(mock.VMAddressLength),
 				},
@@ -30,7 +30,7 @@ func (s *KeeperMockVmTestSuite) TestDeployContract() {
 		},
 		Events:  nil,
 		GasUsed: 10000,
-		Status:  &dvm.VMStatus{},
+		Status:  &dvmTypes.VMStatus{},
 	}
 	msg := types.NewMsgDeployModule(accAddr, []byte{0x1})
 
@@ -68,36 +68,36 @@ func (s *KeeperMockVmTestSuite) TestExecuteContract() {
 
 	// Build msg
 	accAddr, _, _ := tests.GenAccAddress()
-	vmResp := &dvm.VMExecuteResponse{
-		WriteSet: []*dvm.VMValue{
+	vmResp := &dvmTypes.VMExecuteResponse{
+		WriteSet: []*dvmTypes.VMValue{
 			{
-				Type: dvm.VmWriteOp_Value,
-				Path: &dvm.VMAccessPath{
+				Type: dvmTypes.VmWriteOp_Value,
+				Path: &dvmTypes.VMAccessPath{
 					Address: types.Bech32ToLibra(accAddr),
 					Path:    mock.GetRandomBytes(mock.VMAddressLength),
 				},
 				Value: mock.GetRandomBytes(512),
 			},
 			{
-				Type: dvm.VmWriteOp_Deletion,
-				Path: &dvm.VMAccessPath{
+				Type: dvmTypes.VmWriteOp_Deletion,
+				Path: &dvmTypes.VMAccessPath{
 					Address: types.Bech32ToLibra(accAddr),
 					Path:    mock.GetRandomBytes(mock.VMAddressLength),
 				},
 				Value: mock.GetRandomBytes(256),
 			},
 		},
-		Events: []*dvm.VMEvent{
+		Events: []*dvmTypes.VMEvent{
 			{
 				SenderAddress: mock.VMStdLibAddress,
-				EventType: &dvm.LcsTag{
-					TypeTag: dvm.LcsType_LcsU64,
+				EventType: &dvmTypes.LcsTag{
+					TypeTag: dvmTypes.LcsType_LcsU64,
 				},
 				EventData: []byte{0x10},
 			},
 		},
 		GasUsed: 10000,
-		Status:  &dvm.VMStatus{},
+		Status:  &dvmTypes.VMStatus{},
 	}
 	msg := types.NewMsgExecuteScript(accAddr, []byte{0x1})
 
@@ -177,11 +177,11 @@ func (s *KeeperMockVmTestSuite) TestFailedExecution() {
 	{
 		// Build msg
 		accAddr, _, _ := tests.GenAccAddress()
-		vmResp := &dvm.VMExecuteResponse{
+		vmResp := &dvmTypes.VMExecuteResponse{
 			WriteSet: nil,
 			Events:   nil,
 			GasUsed:  10000,
-			Status:   &dvm.VMStatus{},
+			Status:   &dvmTypes.VMStatus{},
 		}
 		msg := types.NewMsgExecuteScript(accAddr, []byte{0x1})
 
@@ -213,17 +213,17 @@ func (s *KeeperMockVmTestSuite) TestFailedExecution() {
 	{
 		// Build msg
 		accAddr, _, _ := tests.GenAccAddress()
-		vmResp := &dvm.VMExecuteResponse{
+		vmResp := &dvmTypes.VMExecuteResponse{
 			WriteSet: nil,
 			Events:   nil,
 			GasUsed:  10000,
-			Status: &dvm.VMStatus{
-				Error: &dvm.VMStatus_ExecutionFailure{
-					ExecutionFailure: &dvm.Failure{
+			Status: &dvmTypes.VMStatus{
+				Error: &dvmTypes.VMStatus_ExecutionFailure{
+					ExecutionFailure: &dvmTypes.Failure{
 						StatusCode: 100,
 					},
 				},
-				Message: &dvm.Message{
+				Message: &dvmTypes.Message{
 					Text: "something went wrong",
 				},
 			},
@@ -285,13 +285,13 @@ func (s *KeeperMockVmTestSuite) TestFailedExecution() {
 	{
 		// Build msg
 		accAddr, _, _ := tests.GenAccAddress()
-		vmResp := &dvm.VMExecuteResponse{
+		vmResp := &dvmTypes.VMExecuteResponse{
 			WriteSet: nil,
 			Events:   nil,
 			GasUsed:  10000,
-			Status: &dvm.VMStatus{
-				Error: &dvm.VMStatus_Abort{
-					Abort: &dvm.Abort{
+			Status: &dvmTypes.VMStatus{
+				Error: &dvmTypes.VMStatus_Abort{
+					Abort: &dvmTypes.Abort{
 						AbortCode: 100,
 					},
 				},
@@ -345,13 +345,13 @@ func (s *KeeperMockVmTestSuite) TestFailedExecution() {
 	{
 		// Build msg
 		accAddr, _, _ := tests.GenAccAddress()
-		vmResp := &dvm.VMExecuteResponse{
+		vmResp := &dvmTypes.VMExecuteResponse{
 			WriteSet: nil,
 			Events:   nil,
 			GasUsed:  10000,
-			Status: &dvm.VMStatus{
-				Error: &dvm.VMStatus_MoveError{
-					MoveError: &dvm.MoveError{
+			Status: &dvmTypes.VMStatus{
+				Error: &dvmTypes.VMStatus_MoveError{
+					MoveError: &dvmTypes.MoveError{
 						StatusCode: 100,
 					},
 				},

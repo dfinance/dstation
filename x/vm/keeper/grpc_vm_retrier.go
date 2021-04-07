@@ -7,15 +7,15 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/dfinance/dstation/pkg/types/dvm"
+	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 )
 
 // VMExecRetryReq contains VM "execution" request meta (request details and retry settings).
 type VMExecRetryReq struct {
 	// Request to retry (module publish).
-	RawModule *dvm.VMPublishModule
+	RawModule *dvmTypes.VMPublishModule
 	// Request to retry (script execution)
-	RawScript *dvm.VMExecuteScript
+	RawScript *dvmTypes.VMExecuteScript
 	// Max number of request attempts (0 - infinite)
 	MaxAttempts uint
 	// Request timeout per attempt (0 - infinite) [ms]
@@ -23,7 +23,7 @@ type VMExecRetryReq struct {
 }
 
 // sendExecuteReq sends request with retry mechanism.
-func (k Keeper) sendExecuteReq(ctx sdk.Context, moduleReq *dvm.VMPublishModule, scriptReq *dvm.VMExecuteScript) (*dvm.VMExecuteResponse, error) {
+func (k Keeper) sendExecuteReq(ctx sdk.Context, moduleReq *dvmTypes.VMPublishModule, scriptReq *dvmTypes.VMExecuteScript) (*dvmTypes.VMExecuteResponse, error) {
 	if moduleReq == nil && scriptReq == nil {
 		return nil, fmt.Errorf("request (module / script) not specified")
 	}
@@ -43,7 +43,7 @@ func (k Keeper) sendExecuteReq(ctx sdk.Context, moduleReq *dvm.VMPublishModule, 
 
 // retryExecReq sends request with retry mechanism and waits for connection and execution.
 // Contract: either RawModule or RawScript must be specified for RetryExecReq.
-func (k Keeper) retryExecReq(ctx sdk.Context, req VMExecRetryReq) (retResp *dvm.VMExecuteResponse, retErr error) {
+func (k Keeper) retryExecReq(ctx sdk.Context, req VMExecRetryReq) (retResp *dvmTypes.VMExecuteResponse, retErr error) {
 	const failedRetryLogPeriod = 100
 
 	doneCh := make(chan bool)
@@ -59,7 +59,7 @@ func (k Keeper) retryExecReq(ctx sdk.Context, req VMExecRetryReq) (retResp *dvm.
 		for {
 			var connCtx context.Context
 			var connCancel context.CancelFunc
-			var resp *dvm.VMExecuteResponse
+			var resp *dvmTypes.VMExecuteResponse
 			var err error
 
 			curAttempt++

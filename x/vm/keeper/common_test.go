@@ -11,7 +11,7 @@ import (
 
 	"github.com/dfinance/dstation/pkg/mock"
 	"github.com/dfinance/dstation/pkg/tests"
-	"github.com/dfinance/dstation/pkg/types/dvm"
+	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/keeper"
 	"github.com/dfinance/dstation/x/vm/types"
 )
@@ -27,11 +27,13 @@ type KeeperMockVmTestSuite struct {
 }
 
 func (s *KeeperMockVmTestSuite) SetupSuite() {
+	// Init the SimApp
 	s.app = tests.SetupDSimApp(tests.WithMockVM())
 	s.ctx = s.app.GetContext(false)
 	s.keeper = s.app.DnApp.VmKeeper
 	s.vmServer = s.app.MockVMServer
 
+	// Init the querier client
 	querier := keeper.Querier{Keeper: s.keeper}
 	queryHelper := baseapp.NewQueryServerTestHelper(s.ctx, s.app.DnApp.InterfaceRegistry())
 	types.RegisterQueryServer(queryHelper, querier)
@@ -46,15 +48,15 @@ func (s *KeeperMockVmTestSuite) SetupTest() {
 	s.ctx = s.ctx.WithEventManager(sdk.NewEventManager())
 }
 
-func (s *KeeperMockVmTestSuite) DoDSClientRequest(handler func(ctx context.Context, client dvm.DSServiceClient)) {
-	client := dvm.NewDSServiceClient(s.app.MockVMServer.GetDSClientConnection())
+func (s *KeeperMockVmTestSuite) DoDSClientRequest(handler func(ctx context.Context, client dvmTypes.DSServiceClient)) {
+	client := dvmTypes.NewDSServiceClient(s.app.MockVMServer.GetDSClientConnection())
 	ctx, ctxCancel := context.WithDeadline(context.Background(), time.Now().Add(100*time.Millisecond))
 	defer ctxCancel()
 
 	handler(ctx, client)
 }
 
-func TestVmKeeper_MockVM(t *testing.T) {
+func TestVMKeeper_MockVM(t *testing.T) {
 	t.Parallel()
 	suite.Run(t, new(KeeperMockVmTestSuite))
 }

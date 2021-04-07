@@ -5,6 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 
 import "cosmos/base/abci/v1beta1/abci.proto";
+import "cosmos/base/v1beta1/coin.proto";
 
 import "dfinance/vm/vm.proto";
 import "dfinance/dvm/metadata.proto";
@@ -30,6 +31,9 @@ service Query {
 
   // Metadata queries VM for byteCode metadata (metadata.proto/GetMetadata RPC wrapper).
   rpc Metadata(QueryMetadataRequest) returns (QueryMetadataResponse);
+
+  // DelegatedPoolSupply queries Delegated pool module balance.
+  rpc DelegatedPoolSupply(QueryDelegatedPoolSupplyRequest) returns (QueryDelegatedPoolSupplyResponse);
 }
 
 // QueryDataRequest is request type for Query/Data RPC method.
@@ -85,4 +89,15 @@ message QueryMetadataRequest {
 // QueryMetadataResponse is response type for Query/Metadata RPC method.
 message QueryMetadataResponse {
   dvm.Metadata metadata = 1;
+}
+
+// QueryDelegatedPoolSupplyRequest is request type for Query/DelegatedPoolSupply RPC method.
+message QueryDelegatedPoolSupplyRequest {}
+
+// QueryDelegatedPoolSupplyResponse is response type for Query/DelegatedPoolSupply RPC method.
+message QueryDelegatedPoolSupplyResponse {
+  repeated cosmos.base.v1beta1.Coin coins = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
 }

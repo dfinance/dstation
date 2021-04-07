@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/dfinance/dstation/pkg/types/dvm"
+	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 	"github.com/dfinance/dstation/x/vm/types"
 )
 
@@ -34,7 +34,7 @@ func (k Querier) Data(c context.Context, req *types.QueryDataRequest) (*types.Qu
 	}
 
 	ctx := sdk.UnwrapSDKContext(c)
-	value := k.GetValue(ctx, &dvm.VMAccessPath{Address: req.Address, Path: req.Path})
+	value := k.GetValue(ctx, &dvmTypes.VMAccessPath{Address: req.Address, Path: req.Path})
 
 	return &types.QueryDataResponse{Value: value}, nil
 }
@@ -60,8 +60,8 @@ func (k Querier) Compile(c context.Context, req *types.QueryCompileRequest) (*ty
 	}
 
 	// Build compile request
-	compReq := &dvm.SourceFiles{
-		Units: []*dvm.CompilationUnit{
+	compReq := &dvmTypes.SourceFiles{
+		Units: []*dvmTypes.CompilationUnit{
 			{
 				Text: string(req.Code),
 				Name: "CompilationUnit",
@@ -89,7 +89,7 @@ func (k Querier) Compile(c context.Context, req *types.QueryCompileRequest) (*ty
 			Name:     unit.Name,
 		}
 
-		meta, err := k.vmClient.GetMetadata(c, &dvm.Bytecode{Code: unit.Bytecode})
+		meta, err := k.vmClient.GetMetadata(c, &dvmTypes.Bytecode{Code: unit.Bytecode})
 		if err != nil {
 			return nil, status.Errorf(codes.Unavailable, "compilation failed: VM connection (getting meta information): %v", err)
 		}
@@ -116,7 +116,7 @@ func (k Querier) Metadata(c context.Context, req *types.QueryMetadataRequest) (*
 		return nil, status.Error(codes.InvalidArgument, "empty request")
 	}
 
-	res, err := k.vmClient.GetMetadata(c, &dvm.Bytecode{
+	res, err := k.vmClient.GetMetadata(c, &dvmTypes.Bytecode{
 		Code: req.Code,
 	})
 	if err != nil {
@@ -124,4 +124,16 @@ func (k Querier) Metadata(c context.Context, req *types.QueryMetadataRequest) (*
 	}
 
 	return &types.QueryMetadataResponse{Metadata: res}, nil
+}
+
+// DelegatedPoolSupply queries DelPool current supply.
+func (k Querier) DelegatedPoolSupply(c context.Context, req *types.QueryDelegatedPoolSupplyRequest) (*types.QueryDelegatedPoolSupplyResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+	coins := k.GetDelegatedPoolSupply(ctx)
+
+	return &types.QueryDelegatedPoolSupplyResponse{Coins: coins}, nil
 }
