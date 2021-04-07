@@ -13,6 +13,7 @@ import (
 	govTypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	mintTypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	tmProto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/dfinance/dstation/app"
 )
@@ -31,7 +32,8 @@ const (
 	// Crisis: invariants check TX fee
 	InvariantCheckAmount = "1000000000000000000000" // 1000.0
 
-	MaxGas = 10000000
+	CliGas = 500000   // Gas CLI flag default
+	MaxGas = 10000000 // Gas limit for block
 )
 
 var (
@@ -42,6 +44,20 @@ var (
 	GovMinDepositCoin  sdk.Coin
 	InvariantCheckCoin sdk.Coin
 )
+
+// SetConsensusDefaults takes default consensus params and overwrites Cosmos SDK.
+func SetConsensusDefaults(params *tmProto.ConsensusParams) (*tmProto.ConsensusParams, error) {
+	if params == nil {
+		return nil, fmt.Errorf("params: nil")
+	}
+
+	// Block
+	{
+		params.Block.MaxGas = MaxGas
+	}
+
+	return params, nil
+}
 
 // SetGenesisDefaults takes default app genesis state and overwrites Cosmos SDK / Dfinance params.
 func SetGenesisDefaults(cdc codec.Marshaler, genState app.GenesisState) (app.GenesisState, error) {

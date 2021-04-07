@@ -14,6 +14,7 @@ import (
 
 	"github.com/dfinance/dstation/app"
 	dnConfig "github.com/dfinance/dstation/cmd/dstation/config"
+	vmConfig "github.com/dfinance/dstation/x/vm/config"
 )
 
 // SetGenesisDefaultsCmd returns set-genesis-defaults cobra Command.
@@ -31,6 +32,12 @@ func SetGenesisDefaultsCmd(defaultNodeHome string) *cobra.Command {
 			if err != nil {
 				return fmt.Errorf("failed to read genesis doc from file: %w", err)
 			}
+
+			consParams, err := dnConfig.SetConsensusDefaults(genDoc.ConsensusParams)
+			if err != nil {
+				return fmt.Errorf("failed to set default consesnsus params:: %w", err)
+			}
+			genDoc.ConsensusParams = consParams
 
 			var genState app.GenesisState
 			if err := json.Unmarshal(genDoc.AppState, &genState); err != nil {
@@ -51,6 +58,8 @@ func SetGenesisDefaultsCmd(defaultNodeHome string) *cobra.Command {
 			if err = genutil.ExportGenesisFile(genDoc, genFile); err != nil {
 				return fmt.Errorf("failed to export gensis file: %w", err)
 			}
+
+			vmConfig.ReadVMConfig(serverCtx.Config.RootDir)
 
 			return clientCtx.PrintString(string(appStateBz))
 		},

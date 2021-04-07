@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
@@ -31,14 +33,14 @@ import (
 	tmDb "github.com/tendermint/tm-db"
 
 	"github.com/dfinance/dstation/app"
-	"github.com/dfinance/dstation/cmd/dstation/config"
+	dnConfig "github.com/dfinance/dstation/cmd/dstation/config"
 	vmConfig "github.com/dfinance/dstation/x/vm/config"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the main function.
 func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
 	sdkConfig := sdk.GetConfig()
-	config.SetConfigBech32Prefixes(sdkConfig)
+	dnConfig.SetConfigBech32Prefixes(sdkConfig)
 	sdkConfig.Seal()
 
 	encodingConfig := app.MakeEncodingConfig()
@@ -52,7 +54,7 @@ func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(config.DefaultNodeHome)
+		WithHomeDir(dnConfig.DefaultNodeHome)
 
 	rootCmd := &cobra.Command{
 		Use:   "dstation",
@@ -67,23 +69,23 @@ func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
 	}
 
 	rootCmd.AddCommand(
-		genutilCli.InitCmd(app.ModuleBasics, config.DefaultNodeHome),
-		genutilCli.CollectGenTxsCmd(bankTypes.GenesisBalancesIterator{}, config.DefaultNodeHome),
-		genutilCli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, bankTypes.GenesisBalancesIterator{}, config.DefaultNodeHome),
+		genutilCli.InitCmd(app.ModuleBasics, dnConfig.DefaultNodeHome),
+		genutilCli.CollectGenTxsCmd(bankTypes.GenesisBalancesIterator{}, dnConfig.DefaultNodeHome),
+		genutilCli.GenTxCmd(app.ModuleBasics, encodingConfig.TxConfig, bankTypes.GenesisBalancesIterator{}, dnConfig.DefaultNodeHome),
 		genutilCli.ValidateGenesisCmd(app.ModuleBasics),
 
-		SetGenesisDefaultsCmd(config.DefaultNodeHome),
-		AddGenesisAccountCmd(config.DefaultNodeHome),
+		SetGenesisDefaultsCmd(dnConfig.DefaultNodeHome),
+		AddGenesisAccountCmd(dnConfig.DefaultNodeHome),
 
 		rpc.StatusCommand(),
-		keys.Commands(config.DefaultNodeHome),
+		keys.Commands(dnConfig.DefaultNodeHome),
 		debug.Cmd(),
 		tmCli.NewCompletionCmd(rootCmd, true),
 
 		queryCommand(),
 		txCommand(),
 	)
-	server.AddCommands(rootCmd, config.DefaultNodeHome, newApp, appExporter, serverFlags)
+	server.AddCommands(rootCmd, dnConfig.DefaultNodeHome, newApp, appExporter, serverFlags)
 
 	return rootCmd, encodingConfig
 }
@@ -165,8 +167,35 @@ func txCommand() *cobra.Command {
 
 	app.ModuleBasics.AddTxCommands(cmd)
 	cmd.PersistentFlags().String(flags.FlagChainID, "", "The network chain ID")
+	setDefaultTxCmdFlags(cmd)
 
 	return cmd
+}
+
+// setDefaultTxCmdFlags overwrites tx command and it's sub-command flags.
+func setDefaultTxCmdFlags(cmd *cobra.Command) {
+	if feesFlag := cmd.Flag(flags.FlagFees); feesFlag != nil {
+		feesFlag.DefValue = dnConfig.FeeCoin.String()
+		feesFlag.Usage = "Fees to pay along with transaction"
+
+		if err := feesFlag.Value.Set(dnConfig.FeeCoin.String()); err != nil {
+			panic(fmt.Errorf("overwrite %s flag defaults for %s cmd: %w", flags.FlagFees, cmd.Name(), err))
+		}
+	}
+
+	if gasFlag := cmd.Flag(flags.FlagGas); gasFlag != nil {
+		defGasStr := strconv.Itoa(dnConfig.CliGas)
+		gasFlag.DefValue = defGasStr
+		gasFlag.Usage = fmt.Sprintf("gas limit to set per-transaction; set to %q to calculate sufficient gas automatically", flags.GasFlagAuto)
+
+		if err := gasFlag.Value.Set(defGasStr); err != nil {
+			panic(fmt.Errorf("overwrite %s flag defaults for %s cmd: %w", flags.FlagGas, cmd.Name(), err))
+		}
+	}
+
+	for _, child := range cmd.Commands() {
+		setDefaultTxCmdFlags(child)
+	}
 }
 
 // newApp returns an AppCreator.
