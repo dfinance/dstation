@@ -77,6 +77,10 @@
     - [GenesisState](#dfinance.vm.v1beta1.GenesisState)
     - [GenesisState.WriteOp](#dfinance.vm.v1beta1.GenesisState.WriteOp)
   
+- [dfinance/vm/gov.proto](#dfinance/vm/gov.proto)
+    - [PlannedProposal](#dfinance.vm.v1beta1.PlannedProposal)
+    - [StdLibUpdateProposal](#dfinance.vm.v1beta1.StdLibUpdateProposal)
+  
 - [dfinance/vm/vm.proto](#dfinance/vm/vm.proto)
     - [CompiledItem](#dfinance.vm.v1beta1.CompiledItem)
     - [MsgDeployModule](#dfinance.vm.v1beta1.MsgDeployModule)
@@ -1059,6 +1063,55 @@ GRPC service
 | `address` | [string](#string) |  | Move address (HEX string) |
 | `path` | [string](#string) |  | Move module path (HEX string) |
 | `value` | [string](#string) |  | Module code (HEX string) |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/vm/gov.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/vm/gov.proto
+
+
+
+<a name="dfinance.vm.v1beta1.PlannedProposal"></a>
+
+### PlannedProposal
+PlannedProposal defines VM Gov proposal with apply schedule and wrapped proposal content.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `height` | [int64](#int64) |  | Height is a block height proposal should be applied at |
+| `content` | [google.protobuf.Any](#google.protobuf.Any) |  | Content is a Gov proposal content |
+
+
+
+
+
+
+<a name="dfinance.vm.v1beta1.StdLibUpdateProposal"></a>
+
+### StdLibUpdateProposal
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `url` | [string](#string) |  | Url contains Stdlib update source code |
+| `update_description` | [string](#string) |  | UpdateDescription contains some update description |
+| `code` | [bytes](#bytes) | repeated | Code is a DVM byteCode of updated modules |
 
 
 

@@ -2,7 +2,10 @@ package types
 
 import (
 	"bytes"
+	"encoding/binary"
 	"fmt"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
 )
@@ -12,15 +15,16 @@ const (
 	StoreKey     = ModuleName
 	RouterKey    = ModuleName
 	QuerierRoute = ModuleName
-	GovRouterKey = ModuleName
 	//
 	DelPoolName = "vm_delegation_pool"
 )
 
 var (
 	// Storage keys
-	KeyDelimiter = []byte(":")  // we should not rely on this delimiter for VMStorage (bytes.Split usage for instance) as VM accessPath.Path might include symbols like: [':', '@',..]
-	VMKeyPrefix  = []byte("vm") // storage key prefix for VMStorage data
+	KeyDelimiter      = []byte(":")            // we should not rely on this delimiter for VMStorage (bytes.Split usage for instance) as VM accessPath.Path might include symbols like: [':', '@',..]
+	VMKeyPrefix       = []byte("vm")           // storage key prefix for VMStorage data
+	GovQueuePrefix    = []byte("govQueue")     // storage key prefix for GovQueue
+	GovQueueLastIdKey = []byte("gQueueLastId") // storage key used to store last GovQueue ID ("gQueue" prefix is used instead of "govQueue" as iterator would pick "LastId" that way)
 )
 
 // GetVMStorageKey returns VMStorage key for dvmTypes.VMAccessPath.
@@ -73,4 +77,14 @@ func MustParseVMStorageKey(key []byte) *dvmTypes.VMAccessPath {
 		Address: addressValue,
 		Path:    pathValue,
 	}
+}
+
+// GetGovQueueStorageKey returns gov proposal queue storage key.
+func GetGovQueueStorageKey(id uint64) []byte {
+	return sdk.Uint64ToBigEndian(id)
+}
+
+// ParseGovQueueStorageKey parses GovQueue key.
+func ParseGovQueueStorageKey(key []byte) uint64 {
+	return binary.BigEndian.Uint64(key)
 }

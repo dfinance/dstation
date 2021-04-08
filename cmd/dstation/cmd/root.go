@@ -25,6 +25,7 @@ import (
 	bankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilCli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
+	paramsCli "github.com/cosmos/cosmos-sdk/x/params/client/cli"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -163,6 +164,7 @@ func txCommand() *cobra.Command {
 		authCmd.GetBroadcastCommand(),
 		authCmd.GetEncodeCommand(),
 		authCmd.GetDecodeCommand(),
+		paramsCli.NewSubmitParamChangeProposalTxCmd(),
 	)
 
 	app.ModuleBasics.AddTxCommands(cmd)

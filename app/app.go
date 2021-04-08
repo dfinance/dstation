@@ -473,7 +473,8 @@ func NewDnApp(
 		AddRoute(paramsProposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
 		AddRoute(distrTypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradeTypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
-		AddRoute(ibcHost.RouterKey, ibcClient.NewClientUpdateProposalHandler(app.IBCKeeper.ClientKeeper))
+		AddRoute(ibcHost.RouterKey, ibcClient.NewClientUpdateProposalHandler(app.IBCKeeper.ClientKeeper)).
+		AddRoute(vmTypes.RouterKey, vm.NewGovHandler(app.VmKeeper))
 	app.GovKeeper = govKeeper.NewKeeper(
 		appCodec, keys[govTypes.StoreKey], app.GetSubspace(govTypes.ModuleName), app.AccountKeeper, app.BankKeeper,
 		&stakingKeeper, govRouter,

@@ -6,10 +6,10 @@ import (
 )
 
 const (
-	EnvDvmIntegUse            = "DN_DVM_INTEG_TESTS_USE"
-	EnvDvmIntegDockerRegistry = "DN_DVM_INTEG_TESTS_DOCKER_REGISTRY"
-	EnvDvmIntegDockerTag      = "DN_DVM_INTEG_TESTS_DOCKER_TAG"
-	EnvDvmIntegBinaryPath     = "DN_DVM_INTEG_TESTS_BINARY_PATH"
+	EnvDvmIntegUse            = "DN_DVM_INTEG_TESTS_USE"             // defines which DVM runner is used: "binary", "docker","" (not integ tests)
+	EnvDvmIntegDockerRegistry = "DN_DVM_INTEG_TESTS_DOCKER_REGISTRY" // Docker runner: registry
+	EnvDvmIntegDockerTag      = "DN_DVM_INTEG_TESTS_DOCKER_TAG"      // Docker runner: DVM tag
+	EnvDvmIntegBinaryPath     = "DN_DVM_INTEG_TESTS_BINARY_PATH"     // Binary runner: directory path containing DVM binary (dvm), if empty - $PATH is used
 	//
 	EnvDvmIntegUseDocker = "docker"
 	EnvDvmIntegUseBinary = "binary"

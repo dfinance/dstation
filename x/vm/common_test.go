@@ -115,7 +115,7 @@ func (s *ModuleDVVTestSuite) GetMoveFileContent(fileName string, templateValues 
 	s.Require().NoError(err, "VM contract file: read failed")
 
 	if len(templateValues) > 0 {
-		fmtArgs := make([]interface{}, 0 , len(templateValues))
+		fmtArgs := make([]interface{}, 0, len(templateValues))
 		for _, templateValue := range templateValues {
 			fmtArgs = append(fmtArgs, templateValue)
 		}
@@ -276,6 +276,10 @@ func (s *ModuleDVVTestSuite) getDiscardContractEvents(txRes *sdk.Result, txErr e
 }
 
 func TestVMModule_DVM(t *testing.T) {
+	if _, ok := os.LookupEnv(tests.EnvDvmIntegUse); !ok {
+		t.Skipf("Integration tests skipped as %q envVar not set (refer to pkg/tests/dvm.go)", tests.EnvDvmIntegUse)
+	}
+
 	t.Parallel()
 	suite.Run(t, new(ModuleDVVTestSuite))
 }

@@ -7,6 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
+	govCli "github.com/cosmos/cosmos-sdk/x/gov/client/cli"
+	govTypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/spf13/cobra"
 
 	"github.com/dfinance/dstation/pkg"
@@ -27,6 +29,7 @@ func GetTxCmd() *cobra.Command {
 	txCmd.AddCommand(
 		GetCmdTxExecuteScript(),
 		GetCmdTxDeployContract(),
+		GetCmdTxSendUpdateStdlibProposal(),
 	)
 
 	return txCmd
@@ -83,7 +86,7 @@ func GetCmdTxExecuteScript() *cobra.Command {
 	_ = cmd.MarkFlagRequired(flags.FlagFrom)
 
 	pkg.BuildCmdHelp(cmd, []string{
-		"path to compiled Move file containing byteCode",
+		"path to compiled Move file containing byteCode (one script)",
 		"space separated VM script arguments (optional)",
 	})
 
@@ -130,7 +133,86 @@ func GetCmdTxDeployContract() *cobra.Command {
 	_ = cmd.MarkFlagRequired(flags.FlagFrom)
 
 	pkg.BuildCmdHelp(cmd, []string{
-		"path to compiled Move file containing byteCode",
+		"path to compiled Move file containing byteCode (one / several modules)",
+	})
+
+	return cmd
+}
+
+// GetCmdTxSendUpdateStdlibProposal returns tx command that sends governance update stdlib VM module proposal.
+func GetCmdTxSendUpdateStdlibProposal() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "update-stdlib-proposal [moveFile] [plannedBlockHeight] [sourceUrl] [updateDescription]",
+		Short:   "Submit a DVM stdlib update proposal",
+		Example: "update-stdlib-proposal ./update.move.json 1000 http://github.com/repo 'fix for Foo module' --deposit 10000xfi --from my_account --fees 10000xfi",
+		Args:    cobra.ExactArgs(4),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			txf := tx.NewFactoryCLI(clientCtx, cmd.Flags()).WithTxConfig(clientCtx.TxConfig).WithAccountRetriever(clientCtx.AccountRetriever)
+
+			// Parse inputs
+			fromAddr, err := pkg.ParseFromFlag(clientCtx)
+			if err != nil {
+				return err
+			}
+
+			compItems, err := getCompiledItemFromFileArg("moveFile", args[0], false)
+			if err != nil {
+				return err
+			}
+
+			plannedBlockHeight, err := pkg.ParseInt64Param("plannedBlockHeight", args[1], pkg.ParamTypeCliArg)
+			if err != nil {
+				return err
+			}
+
+			sourceUrl, updateDesc := args[2], args[3]
+
+			deposit, err := pkg.ParseDepositFlag(cmd.Flags())
+			if err != nil {
+				return err
+			}
+
+			// Build and validate PlannedProposal
+			code := make([][]byte, 0, len(compItems.CompiledItems))
+			for _, compItem := range compItems.CompiledItems {
+				code = append(code, compItem.ByteCode)
+			}
+
+			pProposal, err := types.NewPlannedProposal(plannedBlockHeight, types.NewStdLibUpdateProposal(sourceUrl, updateDesc, code...))
+			if err != nil {
+				return fmt.Errorf("planned proposal: build: %w", err)
+			}
+			if err := pProposal.ValidateBasic(); err != nil {
+				return fmt.Errorf("planned proposal: validation: %w", err)
+			}
+
+			// Build and validate Gov proposal message
+			msg, err := govTypes.NewMsgSubmitProposal(pProposal, deposit, fromAddr)
+			if err != nil {
+				return fmt.Errorf("gov proposal message: build: %w", err)
+			}
+			if err := msg.ValidateBasic(); err != nil {
+				return fmt.Errorf("gov proposal message: validation: %w", err)
+			}
+
+			return tx.GenerateOrBroadcastTxWithFactory(clientCtx, txf, msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+	cmd.Flags().String(govCli.FlagDeposit, "", "deposit of proposal")
+	_ = cmd.MarkFlagRequired(flags.FlagFrom)
+	_ = cmd.MarkFlagRequired(govCli.FlagDeposit)
+
+	pkg.BuildCmdHelp(cmd, []string{
+		"path to compiled Move file containing byteCode (one / several modules)",
+		"blockHeight at which update should occur [int]",
+		"URL containing proposal source code",
+		"proposal description (version, short changelist)",
 	})
 
 	return cmd
