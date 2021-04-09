@@ -5,6 +5,7 @@ LEDGER_ENABLED := false
 
 # Common vars
 DOCKER := $(shell which docker)
+PROTOC := $(shell which protoc)
 
 # Build version
 
@@ -84,6 +85,22 @@ lint:
 	@echo "--> Running Golang linter (unused variable / function warning are skipped)"
 	@golangci-lint run --exclude 'unused'
 
+tests:
+	@echo "--> Running tests"
+	go test ./... -v
+
 proto-gen:
+	@echo "--> Generating DVM Protobuf files"
+	@#mkdir -p $(CURDIR)/pkg/types/dvm_proto/types_grpc
+	@#mkdir -p $(CURDIR)/pkg/types/dvm_proto/compiler_grpc
+	@#mkdir -p $(CURDIR)/pkg/types/dvm_proto/ds_grpc
+	@#mkdir -p $(CURDIR)/pkg/types/dvm_proto/metadata_grpc
+	@#mkdir -p $(CURDIR)/pkg/types/dvm_proto/vm_grpc
+	@#$(PROTOC) --proto_path=$(CURDIR)/third_party/proto/dvm_proto --go_out=plugins=grpc:$(CURDIR)/pkg/types/dvm_proto/types_grpc --go_opt=paths=source_relative $(CURDIR)/third_party/proto/dvm_proto/common-types.proto
+	@#$(PROTOC) --proto_path=$(CURDIR)/third_party/proto/dvm_proto --go_out=plugins=grpc:$(CURDIR)/pkg/types/dvm_proto/compiler_grpc --go_opt=paths=source_relative $(CURDIR)/third_party/proto/dvm_proto/compiler.proto
+	@#$(PROTOC) --proto_path=$(CURDIR)/third_party/proto/dvm_proto --go_out=plugins=grpc:$(CURDIR)/pkg/types/dvm_proto/ds_grpc --go_opt=paths=source_relative $(CURDIR)/third_party/proto/dvm_proto/data-source.proto
+	@#$(PROTOC) --proto_path=$(CURDIR)/third_party/proto/dvm_proto --go_out=plugins=grpc:$(CURDIR)/pkg/types/dvm_proto/metadata_grpc --go_opt=paths=source_relative $(CURDIR)/third_party/proto/dvm_proto/metadata.proto
+	@#$(PROTOC) --proto_path=$(CURDIR)/third_party/proto/dvm_proto --go_out=plugins=grpc:$(CURDIR)/pkg/types/dvm_proto/vm_grpc --go_opt=paths=source_relative $(CURDIR)/third_party/proto/dvm_proto/vm.proto
+
 	@echo "--> Generating Protobuf files"
 	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen sh ./scripts/protocgen.sh

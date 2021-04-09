@@ -1,0 +1,45 @@
+syntax = "proto3";
+package dfinance.vm.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/dfinance/dstation/x/vm/types";
+
+// PlannedProposal defines VM Gov proposal with apply schedule and wrapped proposal content.
+message PlannedProposal {
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Height is a block height proposal should be applied at
+  int64 height = 1 [
+    (gogoproto.moretags) = "yaml:\"height\""
+  ];
+
+  // Content is a Gov proposal content
+  google.protobuf.Any content = 2 [
+    (gogoproto.moretags) = "yaml:\"content\"",
+    (cosmos_proto.accepts_interface) = "Content"
+  ];
+}
+
+message StdLibUpdateProposal {
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Url contains Stdlib update source code
+  string url = 2 [
+    (gogoproto.moretags) = "yaml:\"url\""
+  ];
+
+  // UpdateDescription contains some update description
+  string update_description = 3 [
+    (gogoproto.moretags) = "yaml:\"update_description\""
+  ];
+
+  // Code is a DVM byteCode of updated modules
+  repeated bytes code = 4 [
+    (gogoproto.moretags) = "yaml:\"code\""
+  ];
+}

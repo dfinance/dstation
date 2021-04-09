@@ -1,0 +1,126 @@
+syntax = "proto3";
+package dfinance.vm.v1beta1;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+import "gogoproto/gogo.proto";
+
+import "cosmos_proto/cosmos.proto";
+
+import "dfinance/dvm/common-types.proto";
+import "dfinance/dvm/metadata.proto";
+
+option go_package = "github.com/dfinance/dstation/x/vm/types";
+
+// MsgExecuteScript defines a SDK message to execute a script with args to VM.
+message MsgExecuteScript {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  message ScriptArg {
+    option (gogoproto.equal) = false;
+    option (gogoproto.goproto_getters) = false;
+
+    dvm.VMTypeTag type = 1 [
+      (gogoproto.moretags) = "yaml:\"type\""
+    ];
+    bytes value = 2 [
+      (gogoproto.moretags) = "yaml:\"value\""
+    ];
+  }
+
+  // Script sender address
+  string signer = 1 [
+    (gogoproto.moretags) = "yaml:\"signer\""
+  ];
+
+  // Script code
+  bytes script = 2 [
+    (gogoproto.moretags) = "yaml:\"script\""
+  ];
+
+  repeated ScriptArg args = 3 [
+    (gogoproto.moretags) = "yaml:\"args\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// MsgDeployModule defines a SDK message to deploy a module (contract) to VM.
+message MsgDeployModule {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // Script sender address
+  string signer = 1 [
+    (gogoproto.moretags) = "yaml:\"signer\""
+  ];
+
+  // Module code
+  repeated bytes modules = 2 [
+    (gogoproto.moretags) = "yaml:\"modules\""
+  ];
+}
+
+// TxVmStatus keeps VM statuses and errors for Tx.
+message TxVmStatus {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Tx hash [HEX string]
+  string hash = 1 [
+    (gogoproto.moretags) = "yaml:\"hash\""
+  ];
+
+  // VM statuses for the Tx
+  repeated VmStatus vm_statuses = 2 [
+    (gogoproto.moretags) = "yaml:\"vm_statuses\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// VmStatus is a VM error response.
+message VmStatus {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+  option (gogoproto.goproto_stringer) = false;
+
+  // Error Status: error / discard
+  string status = 1 [
+    (gogoproto.moretags) = "yaml:\"status\""
+  ];
+
+  // Major code
+  string major_code = 2 [
+    (gogoproto.moretags) = "yaml:\"major_code\""
+  ];
+
+  // Sub code
+  string sub_code = 3 [
+    (gogoproto.moretags) = "yaml:\"sub_code\""
+  ];
+
+  // Detailed explanation of major code
+  string str_code = 4 [
+    (gogoproto.moretags) = "yaml:\"str_code\""
+  ];
+
+  // Error message
+  string message = 5 [
+    (gogoproto.moretags) = "yaml:\"message\""
+  ];
+}
+
+// CompiledItem contains VM compilation result.
+message CompiledItem {
+  enum CodeType {
+    MODULE = 0;
+    SCRIPT = 1;
+  }
+
+  bytes                 byte_code = 1;
+  string                name      = 2;
+  repeated dvm.Function methods   = 3;
+  repeated dvm.Struct   types     = 4;
+  CodeType              code_type = 5;
+}

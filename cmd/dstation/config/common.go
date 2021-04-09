@@ -1,7 +1,6 @@
 package config
 
 import (
-	"encoding/json"
 	"fmt"
 	stdlog "log"
 	"os"
@@ -14,13 +13,17 @@ import (
 	govTypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	mintTypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	stakingTypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	tmProto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	"github.com/dfinance/dstation/app"
 )
 
 // Chain defaults
 const (
-	MainDenom = "xfi" // 12 decimals
+	MainDenom = "xfi"  // 18 decimals
+	EthDenom  = "eth"  // 18 decimals
+	BtcDenom  = "btc"  // 8 decimals
+	UsdtDenom = "usdt" // 6 decimals
 
 	// Min TX fee
 	FeeAmount = "100000000000000" // 0.0001
@@ -29,7 +32,8 @@ const (
 	// Crisis: invariants check TX fee
 	InvariantCheckAmount = "1000000000000000000000" // 1000.0
 
-	MaxGas = 10000000
+	CliGas = 500000   // Gas CLI flag default
+	MaxGas = 10000000 // Gas limit for block
 )
 
 var (
@@ -41,13 +45,22 @@ var (
 	InvariantCheckCoin sdk.Coin
 )
 
-// SetGenesisDefaults takes default app genesis state and overwrites Cosmos SDK / Dfinance params.
-func SetGenesisDefaults(cdc codec.Marshaler, appStateBz json.RawMessage) (json.RawMessage, error) {
-	var genState app.GenesisState
-	if err := json.Unmarshal(appStateBz, &genState); err != nil {
-		return nil, fmt.Errorf("appStateBz json unmarshal: %w", err)
+// SetConsensusDefaults takes default consensus params and overwrites Cosmos SDK.
+func SetConsensusDefaults(params *tmProto.ConsensusParams) (*tmProto.ConsensusParams, error) {
+	if params == nil {
+		return nil, fmt.Errorf("params: nil")
 	}
 
+	// Block
+	{
+		params.Block.MaxGas = MaxGas
+	}
+
+	return params, nil
+}
+
+// SetGenesisDefaults takes default app genesis state and overwrites Cosmos SDK / Dfinance params.
+func SetGenesisDefaults(cdc codec.Marshaler, genState app.GenesisState) (app.GenesisState, error) {
 	// Bank module genesis
 	{
 		moduleName, moduleState := bankTypes.ModuleName, bankTypes.GenesisState{}
@@ -324,12 +337,7 @@ func SetGenesisDefaults(cdc codec.Marshaler, appStateBz json.RawMessage) (json.R
 		}
 	}
 
-	genStateBz, err := json.MarshalIndent(genState, "", " ")
-	if err != nil {
-		return nil, fmt.Errorf("genState json marshal: %w", err)
-	}
-
-	return genStateBz, nil
+	return genState, nil
 }
 
 func init() {
