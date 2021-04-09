@@ -1,0 +1,44 @@
+name: Tests & CrossBuild & DockerBuild
+
+on: [push]
+
+jobs:
+  lint:
+    name: Linter checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.32
+          args: --exclude 'unused' --timeout=10m
+
+  test:
+    name: Unit tests & Integration tests
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        go:
+          - 1.15.11
+        os:
+          - ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Install Go toolchain
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Get dependencies
+        run: |
+          go mod download
+
+      - name: Run tests
+        run: |
+          go test -v ./...
