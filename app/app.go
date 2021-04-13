@@ -11,6 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/dfinance/dstation/x/oracle"
+	oracleTypes "github.com/dfinance/dstation/x/oracle/types"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
@@ -89,11 +91,11 @@ import (
 	upgradeTypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/dfinance/dstation/pkg"
+	oracleKeeper "github.com/dfinance/dstation/x/oracle/keeper"
 	"github.com/dfinance/dstation/x/vm"
 	vmConfig "github.com/dfinance/dstation/x/vm/config"
 	vmKeeper "github.com/dfinance/dstation/x/vm/keeper"
 	vmTypes "github.com/dfinance/dstation/x/vm/types"
-
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
 )
@@ -123,6 +125,8 @@ var (
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		// DN modules
+		oracle.AppModuleBasic{},
 		vm.AppModuleBasic{},
 	)
 
@@ -175,7 +179,9 @@ type DnApp struct { // nolint: golint
 	IBCKeeper        *ibcKeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper   evidenceKeeper.Keeper
 	TransferKeeper   ibcTransferKeeper.Keeper
-	VmKeeper         vmKeeper.Keeper
+	// DN keepers
+	OracleKeeper oracleKeeper.Keeper
+	VmKeeper     vmKeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilityKeeper.ScopedKeeper
@@ -392,6 +398,7 @@ func NewDnApp(
 		mintTypes.StoreKey, distrTypes.StoreKey, slashingTypes.StoreKey,
 		govTypes.StoreKey, paramsTypes.StoreKey, ibcHost.StoreKey, upgradeTypes.StoreKey,
 		evidenceTypes.StoreKey, ibcTransferTypes.StoreKey, capabilityTypes.StoreKey,
+		oracleTypes.StoreKey,
 		vmTypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramsTypes.TStoreKey)
@@ -463,8 +470,15 @@ func NewDnApp(
 		appCodec, keys[ibcHost.StoreKey], app.GetSubspace(ibcHost.ModuleName), app.StakingKeeper, scopedIBCKeeper,
 	)
 
+	// DN keepers
+	app.OracleKeeper = oracleKeeper.NewKeeper(
+		appCodec, keys[oracleTypes.StoreKey], app.GetSubspace(oracleTypes.ModuleName),
+	)
+
 	app.VmKeeper = vmKeeper.NewKeeper(
-		appCodec, keys[vmTypes.StoreKey], app.vmConn, app.dsListener, app.vmConfig, app.AccountKeeper, app.BankKeeper,
+		appCodec, keys[vmTypes.StoreKey],
+		app.vmConn, app.dsListener, app.vmConfig,
+		app.AccountKeeper, app.BankKeeper, app.OracleKeeper,
 	)
 
 	// Register the proposal types
@@ -530,6 +544,8 @@ func NewDnApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
+		// DN modules
+		oracle.NewAppModule(appCodec, app.OracleKeeper),
 		vm.NewAppModule(appCodec, app.VmKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
@@ -545,12 +561,16 @@ func NewDnApp(
 		evidenceTypes.ModuleName,
 		stakingTypes.ModuleName,
 		ibcHost.ModuleName,
+		// DN modules
+		oracleTypes.ModuleName,
 		vmTypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
 		crisisTypes.ModuleName,
 		govTypes.ModuleName,
 		stakingTypes.ModuleName,
+		// DN modules
+		oracleTypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -572,6 +592,8 @@ func NewDnApp(
 		genutilTypes.ModuleName,
 		evidenceTypes.ModuleName,
 		ibcTransferTypes.ModuleName,
+		// DN modules
+		oracleTypes.ModuleName,
 		vmTypes.ModuleName,
 	)
 
@@ -674,6 +696,8 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(crisisTypes.ModuleName)
 	paramsKeeper.Subspace(ibcTransferTypes.ModuleName)
 	paramsKeeper.Subspace(ibcHost.ModuleName)
+	//
+	paramsKeeper.Subspace(oracleTypes.ModuleName)
 
 	return paramsKeeper
 }

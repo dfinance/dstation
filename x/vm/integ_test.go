@@ -8,6 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkErrors "github.com/cosmos/cosmos-sdk/types/errors"
+	oracleTypes "github.com/dfinance/dstation/x/oracle/types"
 
 	dnConfig "github.com/dfinance/dstation/cmd/dstation/config"
 	"github.com/dfinance/dstation/pkg/tests"
@@ -297,13 +298,56 @@ func (s *ModuleDVVTestSuite) TestNativeOracleRes() {
 	ctx := s.ctx
 	acc, accPrivKey := s.app.AddAccount(ctx, sdk.NewCoin(dnConfig.MainDenom, sdk.NewInt(1000)))
 
-	// TODO: mock test without direct/reverse
-	s.CheckContractExecuted(
-		s.ExecuteScript(acc.GetAddress(), accPrivKey,
-			"scripts/oracle_price_direct.move", nil,
-			s.BuildScriptArg("100", client.NewU128ScriptArg),
-		),
-	)
+	oracleKeeper, oracle, asset := s.app.DnApp.OracleKeeper, s.oracles[0], s.assets[0]
+	oraclePrice := sdk.NewInt(100000)
+
+	// fail: no current price for "eth_usdt" ATM: NO_DATA error
+	{
+		_, scriptEvents := s.CheckContractFailed(
+			s.ExecuteScript(acc.GetAddress(), accPrivKey,
+				"scripts/oracle_price_direct.move", nil,
+				s.BuildScriptArg(oraclePrice.String(), client.NewU128ScriptArg),
+			),
+		)
+
+		s.CheckABCIEventsContain(scriptEvents, []sdk.Event{
+			sdk.NewEvent(
+				types.EventTypeContractStatus,
+				sdk.NewAttribute(types.AttributeStatus, types.AttributeValueStatusDiscard),
+				sdk.NewAttribute(types.AttributeErrLocationAddress, string(types.StdLibAddress)),
+				sdk.NewAttribute(types.AttributeErrLocationModule, "Coins"),
+				sdk.NewAttribute(types.AttributeErrMajorStatus, "4008"),
+				sdk.NewAttribute(types.AttributeErrSubStatus, "0"),
+			),
+		})
+	}
+
+	// Post Oracle prices to set CurrentPrice
+	{
+		_, curBlockTime := s.app.GetCurrentBlockHeightTime()
+		oracleAddr, _ := sdk.AccAddressFromBech32(oracle.AccAddress)
+
+		s.Require().NoError(
+			oracleKeeper.PostPrice(ctx, oracleTypes.NewMsgPostPrice(
+				asset.AssetCode,
+				oracleAddr,
+				oraclePrice,
+				oraclePrice.SubRaw(1),
+				curBlockTime,
+			)),
+		)
+		oracleKeeper.UpdateCurrentPrices(ctx)
+	}
+
+	// ok
+	{
+		s.CheckContractExecuted(
+			s.ExecuteScript(acc.GetAddress(), accPrivKey,
+				"scripts/oracle_price_direct.move", nil,
+				s.BuildScriptArg(oraclePrice.String(), client.NewU128ScriptArg),
+			),
+		)
+	}
 }
 
 func (s *ModuleDVVTestSuite) TestCurrencyInfoRes() {

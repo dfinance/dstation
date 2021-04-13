@@ -1,0 +1,79 @@
+syntax = "proto3";
+package dfinance.oracle.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+import "dfinance/oracle/oracle.proto";
+
+option go_package = "github.com/dfinance/dstation/x/oracle/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // Oracles queries registered Oracle source list
+  rpc Oracles(QueryOraclesRequest) returns (QueryOraclesResponse) {
+    option (google.api.http).get = "/dfinance/oracle/v1beta1/oracles";
+  }
+
+  // Assets queries registered Asset list
+  rpc Assets(QueryAssetsRequest) returns (QueryAssetsResponse) {
+    option (google.api.http).get = "/dfinance/oracle/v1beta1/assets";
+  }
+
+  // CurrentPrice queries current price for an Asset
+  rpc CurrentPrice(QueryCurrentPriceRequest) returns (QueryCurrentPriceResponse) {
+    option (google.api.http).get = "/dfinance/oracle/v1beta1/current_price";
+  }
+
+  // CurrentPrices queries current prices for all registered Assets
+  rpc CurrentPrices(QueryCurrentPricesRequest) returns (QueryCurrentPricesResponse) {
+    option (google.api.http).get = "/dfinance/oracle/v1beta1/current_prices";
+  }
+}
+
+// QueryOraclesRequest is request type for Query/Oracles RPC method.
+message QueryOraclesRequest {}
+
+// QueryOraclesResponse is response type for Query/Oracles RPC method.
+message QueryOraclesResponse {
+  repeated Oracle oracles = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"oracles\""
+  ];
+}
+
+// QueryAssetsRequest is request type for Query/Assets RPC method.
+message QueryAssetsRequest {}
+
+// QueryAssetsResponse is response type for Query/Assets RPC method.
+message QueryAssetsResponse {
+  repeated Asset assets = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"assets\""
+  ];
+}
+
+// QueryAssetsRequest is request type for Query/CurrentPrice RPC method.
+message QueryCurrentPriceRequest {
+  string left_denom = 1;
+  string right_denom = 2;
+}
+
+// QueryAssetsResponse is response type for Query/CurrentPrice RPC method.
+message QueryCurrentPriceResponse {
+  CurrentPrice price = 1 [
+    (gogoproto.moretags) = "yaml:\"price\""
+  ];
+}
+
+// QueryCurrentPricesRequest is request type for Query/CurrentPrices RPC method.
+message QueryCurrentPricesRequest {}
+
+// QueryCurrentPricesResponse is response type for Query/CurrentPrices RPC method.
+message QueryCurrentPricesResponse {
+  repeated CurrentPrice prices = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"prices\""
+  ];
+}

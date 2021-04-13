@@ -73,6 +73,39 @@
     - [VMModulePublisher](#dfinance.dvm.VMModulePublisher)
     - [VMScriptExecutor](#dfinance.dvm.VMScriptExecutor)
   
+- [dfinance/oracle/oracle.proto](#dfinance/oracle/oracle.proto)
+    - [Asset](#dfinance.oracle.v1beta1.Asset)
+    - [CurrentPrice](#dfinance.oracle.v1beta1.CurrentPrice)
+    - [Oracle](#dfinance.oracle.v1beta1.Oracle)
+    - [RawPrice](#dfinance.oracle.v1beta1.RawPrice)
+  
+- [dfinance/oracle/genesis.proto](#dfinance/oracle/genesis.proto)
+    - [GenesisState](#dfinance.oracle.v1beta1.GenesisState)
+    - [Params](#dfinance.oracle.v1beta1.Params)
+    - [Params.PostPriceParams](#dfinance.oracle.v1beta1.Params.PostPriceParams)
+  
+- [dfinance/oracle/query.proto](#dfinance/oracle/query.proto)
+    - [QueryAssetsRequest](#dfinance.oracle.v1beta1.QueryAssetsRequest)
+    - [QueryAssetsResponse](#dfinance.oracle.v1beta1.QueryAssetsResponse)
+    - [QueryCurrentPriceRequest](#dfinance.oracle.v1beta1.QueryCurrentPriceRequest)
+    - [QueryCurrentPriceResponse](#dfinance.oracle.v1beta1.QueryCurrentPriceResponse)
+    - [QueryCurrentPricesRequest](#dfinance.oracle.v1beta1.QueryCurrentPricesRequest)
+    - [QueryCurrentPricesResponse](#dfinance.oracle.v1beta1.QueryCurrentPricesResponse)
+    - [QueryOraclesRequest](#dfinance.oracle.v1beta1.QueryOraclesRequest)
+    - [QueryOraclesResponse](#dfinance.oracle.v1beta1.QueryOraclesResponse)
+  
+    - [Query](#dfinance.oracle.v1beta1.Query)
+  
+- [dfinance/oracle/tx.proto](#dfinance/oracle/tx.proto)
+    - [MsgPostPrice](#dfinance.oracle.v1beta1.MsgPostPrice)
+    - [MsgPostPriceResponse](#dfinance.oracle.v1beta1.MsgPostPriceResponse)
+    - [MsgSetAsset](#dfinance.oracle.v1beta1.MsgSetAsset)
+    - [MsgSetAssetResponse](#dfinance.oracle.v1beta1.MsgSetAssetResponse)
+    - [MsgSetOracle](#dfinance.oracle.v1beta1.MsgSetOracle)
+    - [MsgSetOracleResponse](#dfinance.oracle.v1beta1.MsgSetOracleResponse)
+  
+    - [Msg](#dfinance.oracle.v1beta1.Msg)
+  
 - [dfinance/vm/genesis.proto](#dfinance/vm/genesis.proto)
     - [GenesisState](#dfinance.vm.v1beta1.GenesisState)
     - [GenesisState.WriteOp](#dfinance.vm.v1beta1.GenesisState.WriteOp)
@@ -83,9 +116,6 @@
   
 - [dfinance/vm/vm.proto](#dfinance/vm/vm.proto)
     - [CompiledItem](#dfinance.vm.v1beta1.CompiledItem)
-    - [MsgDeployModule](#dfinance.vm.v1beta1.MsgDeployModule)
-    - [MsgExecuteScript](#dfinance.vm.v1beta1.MsgExecuteScript)
-    - [MsgExecuteScript.ScriptArg](#dfinance.vm.v1beta1.MsgExecuteScript.ScriptArg)
     - [TxVmStatus](#dfinance.vm.v1beta1.TxVmStatus)
     - [VmStatus](#dfinance.vm.v1beta1.VmStatus)
   
@@ -106,7 +136,10 @@
     - [Query](#dfinance.vm.v1beta1.Query)
   
 - [dfinance/vm/tx.proto](#dfinance/vm/tx.proto)
+    - [MsgDeployModule](#dfinance.vm.v1beta1.MsgDeployModule)
     - [MsgDeployModuleResponse](#dfinance.vm.v1beta1.MsgDeployModuleResponse)
+    - [MsgExecuteScript](#dfinance.vm.v1beta1.MsgExecuteScript)
+    - [MsgExecuteScript.ScriptArg](#dfinance.vm.v1beta1.MsgExecuteScript.ScriptArg)
     - [MsgExecuteScriptResponse](#dfinance.vm.v1beta1.MsgExecuteScriptResponse)
   
     - [Msg](#dfinance.vm.v1beta1.Msg)
@@ -1030,6 +1063,402 @@ GRPC service
 
 
 
+<a name="dfinance/oracle/oracle.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/oracle/oracle.proto
+
+
+
+<a name="dfinance.oracle.v1beta1.Asset"></a>
+
+### Asset
+Asset represents an Oracle asset.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `asset_code` | [string](#string) |  | Asset code (for ex.: btc_usdt) |
+| `oracles` | [string](#string) | repeated | List of registered RawPrice sources (Oracle addresses) If none - asset is essentially disabled |
+| `decimals` | [uint32](#uint32) |  | Number of decimals for Asset's CurrentPrice values |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.CurrentPrice"></a>
+
+### CurrentPrice
+CurrentPrice contains meta of the current price for a particular asset (aggregated from multiple sources).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `asset_code` | [string](#string) |  | Asset code (for ex.: btc_usdt) |
+| `ask_price` | [string](#string) |  | The latest lowest seller price |
+| `bid_price` | [string](#string) |  | The latest highest buyer price |
+| `received_at` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | The latest price update timestamp |
+| `is_reversed` | [bool](#bool) |  | CurrentPrice is reversed flag: price is not received from Oracle sources, exchange rates were reversed programmatically |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.Oracle"></a>
+
+### Oracle
+Oracle contains Oracle source info.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `acc_address` | [string](#string) |  | Oracle account address |
+| `description` | [string](#string) |  | Optional Oracle description |
+| `price_max_bytes` | [uint32](#uint32) |  | Maximum number of bytes for PostPrice values |
+| `price_decimals` | [uint32](#uint32) |  | Number of decimals for PostPrice values |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.RawPrice"></a>
+
+### RawPrice
+RawPrice is used to store normalized asset prices per Oracle.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ask_price` | [string](#string) |  |  |
+| `bid_price` | [string](#string) |  |  |
+| `received_at` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/oracle/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/oracle/genesis.proto
+
+
+
+<a name="dfinance.oracle.v1beta1.GenesisState"></a>
+
+### GenesisState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#dfinance.oracle.v1beta1.Params) |  |  |
+| `oracles` | [Oracle](#dfinance.oracle.v1beta1.Oracle) | repeated |  |
+| `assets` | [Asset](#dfinance.oracle.v1beta1.Asset) | repeated |  |
+| `current_prices` | [CurrentPrice](#dfinance.oracle.v1beta1.CurrentPrice) | repeated |  |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.Params"></a>
+
+### Params
+Params keeps keeper parameters (which might be changed via Gov).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nominees` | [string](#string) | repeated | Admin account addresses |
+| `post_price` | [Params.PostPriceParams](#dfinance.oracle.v1beta1.Params.PostPriceParams) |  |  |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.Params.PostPriceParams"></a>
+
+### Params.PostPriceParams
+PostPriceParams keeps price posting parameters.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `received_at_diff_in_s` | [uint32](#uint32) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/oracle/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/oracle/query.proto
+
+
+
+<a name="dfinance.oracle.v1beta1.QueryAssetsRequest"></a>
+
+### QueryAssetsRequest
+QueryAssetsRequest is request type for Query/Assets RPC method.
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.QueryAssetsResponse"></a>
+
+### QueryAssetsResponse
+QueryAssetsResponse is response type for Query/Assets RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `assets` | [Asset](#dfinance.oracle.v1beta1.Asset) | repeated |  |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.QueryCurrentPriceRequest"></a>
+
+### QueryCurrentPriceRequest
+QueryAssetsRequest is request type for Query/CurrentPrice RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `left_denom` | [string](#string) |  |  |
+| `right_denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.QueryCurrentPriceResponse"></a>
+
+### QueryCurrentPriceResponse
+QueryAssetsResponse is response type for Query/CurrentPrice RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `price` | [CurrentPrice](#dfinance.oracle.v1beta1.CurrentPrice) |  |  |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.QueryCurrentPricesRequest"></a>
+
+### QueryCurrentPricesRequest
+QueryCurrentPricesRequest is request type for Query/CurrentPrices RPC method.
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.QueryCurrentPricesResponse"></a>
+
+### QueryCurrentPricesResponse
+QueryCurrentPricesResponse is response type for Query/CurrentPrices RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `prices` | [CurrentPrice](#dfinance.oracle.v1beta1.CurrentPrice) | repeated |  |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.QueryOraclesRequest"></a>
+
+### QueryOraclesRequest
+QueryOraclesRequest is request type for Query/Oracles RPC method.
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.QueryOraclesResponse"></a>
+
+### QueryOraclesResponse
+QueryOraclesResponse is response type for Query/Oracles RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `oracles` | [Oracle](#dfinance.oracle.v1beta1.Oracle) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="dfinance.oracle.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Oracles` | [QueryOraclesRequest](#dfinance.oracle.v1beta1.QueryOraclesRequest) | [QueryOraclesResponse](#dfinance.oracle.v1beta1.QueryOraclesResponse) | Oracles queries registered Oracle source list | GET|/dfinance/oracle/v1beta1/oracles|
+| `Assets` | [QueryAssetsRequest](#dfinance.oracle.v1beta1.QueryAssetsRequest) | [QueryAssetsResponse](#dfinance.oracle.v1beta1.QueryAssetsResponse) | Assets queries registered Asset list | GET|/dfinance/oracle/v1beta1/assets|
+| `CurrentPrice` | [QueryCurrentPriceRequest](#dfinance.oracle.v1beta1.QueryCurrentPriceRequest) | [QueryCurrentPriceResponse](#dfinance.oracle.v1beta1.QueryCurrentPriceResponse) | CurrentPrice queries current price for an Asset | GET|/dfinance/oracle/v1beta1/current_price|
+| `CurrentPrices` | [QueryCurrentPricesRequest](#dfinance.oracle.v1beta1.QueryCurrentPricesRequest) | [QueryCurrentPricesResponse](#dfinance.oracle.v1beta1.QueryCurrentPricesResponse) | CurrentPrices queries current prices for all registered Assets | GET|/dfinance/oracle/v1beta1/current_prices|
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/oracle/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/oracle/tx.proto
+
+
+
+<a name="dfinance.oracle.v1beta1.MsgPostPrice"></a>
+
+### MsgPostPrice
+MsgPostPrice defines a SDK message to post a raw price from source (Oracle).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `asset_code` | [string](#string) |  | Asset code (for ex.: btc_usdt) |
+| `oracle_address` | [string](#string) |  | Price source (Oracle address) |
+| `ask_price` | [string](#string) |  | The lowest seller price |
+| `bid_price` | [string](#string) |  | The highest buyer price |
+| `received_at` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Price timestamp |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.MsgPostPriceResponse"></a>
+
+### MsgPostPriceResponse
+
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.MsgSetAsset"></a>
+
+### MsgSetAsset
+MsgSetAsset defines a SDK message to create/update an Asset.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nominee` | [string](#string) |  | Nominee account address |
+| `asset` | [Asset](#dfinance.oracle.v1beta1.Asset) |  | Target Asset to create/update |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.MsgSetAssetResponse"></a>
+
+### MsgSetAssetResponse
+
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.MsgSetOracle"></a>
+
+### MsgSetOracle
+MsgSetOracle defines a SDK message to create/update an Oracle.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nominee` | [string](#string) |  | Nominee account address |
+| `oracle` | [Oracle](#dfinance.oracle.v1beta1.Oracle) |  | Target Oracle to create/update |
+
+
+
+
+
+
+<a name="dfinance.oracle.v1beta1.MsgSetOracleResponse"></a>
+
+### MsgSetOracleResponse
+
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="dfinance.oracle.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the Oracle module Msg service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `SetOracle` | [MsgSetOracle](#dfinance.oracle.v1beta1.MsgSetOracle) | [MsgSetOracleResponse](#dfinance.oracle.v1beta1.MsgSetOracleResponse) | SetOracle creates/updates an Oracle source (nominee authorized). | |
+| `SetAsset` | [MsgSetAsset](#dfinance.oracle.v1beta1.MsgSetAsset) | [MsgSetAssetResponse](#dfinance.oracle.v1beta1.MsgSetAssetResponse) | SetAsset creates/updates an Asset (nominee authorized). | |
+| `PostPrice` | [MsgPostPrice](#dfinance.oracle.v1beta1.MsgPostPrice) | [MsgPostPriceResponse](#dfinance.oracle.v1beta1.MsgPostPriceResponse) | PostPrice posts a raw price from a source (Oracle) | |
+
+ <!-- end services -->
+
+
+
 <a name="dfinance/vm/genesis.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -1147,55 +1576,6 @@ CompiledItem contains VM compilation result.
 | `methods` | [dfinance.dvm.Function](#dfinance.dvm.Function) | repeated |  |
 | `types` | [dfinance.dvm.Struct](#dfinance.dvm.Struct) | repeated |  |
 | `code_type` | [CompiledItem.CodeType](#dfinance.vm.v1beta1.CompiledItem.CodeType) |  |  |
-
-
-
-
-
-
-<a name="dfinance.vm.v1beta1.MsgDeployModule"></a>
-
-### MsgDeployModule
-MsgDeployModule defines a SDK message to deploy a module (contract) to VM.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `signer` | [string](#string) |  | Script sender address |
-| `modules` | [bytes](#bytes) | repeated | Module code |
-
-
-
-
-
-
-<a name="dfinance.vm.v1beta1.MsgExecuteScript"></a>
-
-### MsgExecuteScript
-MsgExecuteScript defines a SDK message to execute a script with args to VM.
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `signer` | [string](#string) |  | Script sender address |
-| `script` | [bytes](#bytes) |  | Script code |
-| `args` | [MsgExecuteScript.ScriptArg](#dfinance.vm.v1beta1.MsgExecuteScript.ScriptArg) | repeated |  |
-
-
-
-
-
-
-<a name="dfinance.vm.v1beta1.MsgExecuteScript.ScriptArg"></a>
-
-### MsgExecuteScript.ScriptArg
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `type` | [dfinance.dvm.VMTypeTag](#dfinance.dvm.VMTypeTag) |  |  |
-| `value` | [bytes](#bytes) |  |  |
 
 
 
@@ -1442,10 +1822,59 @@ Query defines the gRPC querier service.
 
 
 
+<a name="dfinance.vm.v1beta1.MsgDeployModule"></a>
+
+### MsgDeployModule
+MsgDeployModule defines a SDK message to deploy a module (contract) to VM.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `signer` | [string](#string) |  | Script sender address |
+| `modules` | [bytes](#bytes) | repeated | Module code |
+
+
+
+
+
+
 <a name="dfinance.vm.v1beta1.MsgDeployModuleResponse"></a>
 
 ### MsgDeployModuleResponse
 
+
+
+
+
+
+
+<a name="dfinance.vm.v1beta1.MsgExecuteScript"></a>
+
+### MsgExecuteScript
+MsgExecuteScript defines a SDK message to execute a script with args to VM.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `signer` | [string](#string) |  | Script sender address |
+| `script` | [bytes](#bytes) |  | Script code |
+| `args` | [MsgExecuteScript.ScriptArg](#dfinance.vm.v1beta1.MsgExecuteScript.ScriptArg) | repeated |  |
+
+
+
+
+
+
+<a name="dfinance.vm.v1beta1.MsgExecuteScript.ScriptArg"></a>
+
+### MsgExecuteScript.ScriptArg
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `type` | [dfinance.dvm.VMTypeTag](#dfinance.dvm.VMTypeTag) |  |  |
+| `value` | [bytes](#bytes) |  |  |
 
 
 

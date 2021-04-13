@@ -176,6 +176,9 @@ func (s *KeeperMockVmTestSuite) TestDSServer_GetNativeBalance() {
 	}
 }
 
+// That one is covered by integ tests
+//func (s *KeeperMockVmTestSuite) TestDSServer_GetOraclePrice()
+
 func (s *KeeperMockVmTestSuite) checkVmU128Value(expected sdk.Int, received *dvmTypes.U128) {
 	s.Require().NotNil(received)
 	s.Require().Len(received.Buf, 16)

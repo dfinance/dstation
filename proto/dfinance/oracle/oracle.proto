@@ -1,0 +1,110 @@
+syntax = "proto3";
+package dfinance.oracle.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/timestamp.proto";
+
+import "cosmos_proto/cosmos.proto";
+
+option go_package = "github.com/dfinance/dstation/x/oracle/types";
+
+// Asset represents an Oracle asset.
+message Asset {
+  // Asset code (for ex.: btc_usdt)
+  string asset_code = 1 [
+    (gogoproto.customtype) = "github.com/dfinance/dstation/pkg/types.AssetCode",
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"asset_code\""
+  ];
+
+  // List of registered RawPrice sources (Oracle addresses)
+  // If none - asset is essentially disabled
+  repeated string oracles = 2 [
+    (gogoproto.moretags) = "yaml:\"oracles\""
+  ];
+
+  // Number of decimals for Asset's CurrentPrice values
+  uint32 decimals = 3 [
+    (gogoproto.moretags) = "yaml:\"decimals\""
+  ];
+}
+
+// Oracle contains Oracle source info.
+message Oracle {
+  // Oracle account address
+  string acc_address = 1 [
+    (gogoproto.moretags) = "yaml:\"acc_address\""
+  ];
+
+  // Optional Oracle description
+  string description = 2 [
+    (gogoproto.moretags) = "yaml:\"description\""
+  ];
+
+  // Maximum number of bytes for PostPrice values
+  uint32 price_max_bytes = 3 [
+    (gogoproto.moretags) = "yaml:\"price_max_bytes\""
+  ];
+
+  // Number of decimals for PostPrice values
+  uint32 price_decimals = 4 [
+    (gogoproto.moretags) = "yaml:\"price_decimals\""
+  ];
+}
+
+// CurrentPrice contains meta of the current price for a particular asset (aggregated from multiple sources).
+message CurrentPrice {
+  // Asset code (for ex.: btc_usdt)
+  string asset_code = 1 [
+    (gogoproto.customtype) = "github.com/dfinance/dstation/pkg/types.AssetCode",
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"asset_code\""
+  ];
+
+  // The latest lowest seller price
+  string ask_price = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.moretags) = "yaml:\"ask_price\""
+  ];
+
+  // The latest highest buyer price
+  string bid_price = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.moretags) = "yaml:\"bid_price\""
+  ];
+
+  // The latest price update timestamp
+  google.protobuf.Timestamp received_at = 4 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"received_at\""
+  ];
+
+  // CurrentPrice is reversed flag: price is not received from Oracle sources, exchange rates were reversed programmatically
+  bool is_reversed = 5 [
+    (gogoproto.moretags) = "yaml:\"is_reversed\""
+  ];
+}
+
+// RawPrice is used to store normalized asset prices per Oracle.
+message RawPrice {
+  string ask_price = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.moretags) = "yaml:\"ask_price\""
+  ];
+
+  string bid_price = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
+    (gogoproto.moretags) = "yaml:\"bid_price\""
+  ];
+
+  google.protobuf.Timestamp received_at = 3 [
+    (gogoproto.stdtime) = true,
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"received_at\""
+  ];
+}

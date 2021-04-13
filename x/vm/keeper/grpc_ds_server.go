@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	dnTypes "github.com/dfinance/dstation/pkg/types"
 	"google.golang.org/grpc"
 
 	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
@@ -30,6 +31,7 @@ type DSServer struct {
 	storage          types.VMStorage
 	ccInfoProvider   types.CurrencyInfoResProvider
 	nBalanceProvider types.AccountBalanceResProvider
+	oPriceProvider   types.OracleKeeper
 	// Data middleware handlers
 	dataMiddlewares []types.DSDataMiddleware
 	// Started gRPC server instance
@@ -101,25 +103,27 @@ func (srv *DSServer) GetOraclePrice(_ context.Context, req *dvmTypes.OraclePrice
 	}
 
 	// Input check
-	denomLeft, denomRight := strings.ToLower(req.Currency_1), strings.ToLower(req.Currency_2)
-	if err := sdk.ValidateDenom(denomLeft); err != nil {
+	assetCode, err := dnTypes.NewAssetCodeByDenoms(strings.ToLower(req.Currency_1), strings.ToLower(req.Currency_2))
+	if err != nil {
 		return &dvmTypes.OraclePriceResponse{
 			ErrorCode:    dvmTypes.ErrorCode_BAD_REQUEST,
-			ErrorMessage: fmt.Sprintf("currency_1: %v", err),
-		}, nil
-	}
-	if err := sdk.ValidateDenom(denomRight); err != nil {
-		return &dvmTypes.OraclePriceResponse{
-			ErrorCode:    dvmTypes.ErrorCode_BAD_REQUEST,
-			ErrorMessage: fmt.Sprintf("currency_2: %v", err),
+			ErrorMessage: fmt.Sprintf("assetCode: %v", err),
 		}, nil
 	}
 
-	// Mock response
-	exchangeRate := sdk.NewUint(100)
-	exchangeRateU128, err := types.SdkUintToVmU128(exchangeRate)
+	// Get price
+	price := srv.oPriceProvider.GetCurrentPrice(srv.ctx, assetCode)
+	if price == nil {
+		return &dvmTypes.OraclePriceResponse{
+			ErrorCode:    dvmTypes.ErrorCode_NO_DATA,
+			ErrorMessage: fmt.Sprintf("current price for assetCode (%s): not found", assetCode),
+		}, nil
+	}
+
+	// Build response
+	exchangeRateU128, err := types.SdkIntToVmU128(price.AskPrice)
 	if err != nil {
-		panic(fmt.Errorf("converting exchangeRate (%s) to U128: %w", exchangeRate, err))
+		panic(fmt.Errorf("converting askPrice (%s) to U128: %w", price.AskPrice, err))
 	}
 
 	return &dvmTypes.OraclePriceResponse{Price: exchangeRateU128}, nil
@@ -245,10 +249,17 @@ func (srv *DSServer) processMiddlewares(path *dvmTypes.VMAccessPath) (data []byt
 }
 
 // NewDSServer creates a new DS server.
-func NewDSServer(storage types.VMStorage, ccInfoProvider types.CurrencyInfoResProvider, nBalanceProvider types.AccountBalanceResProvider) *DSServer {
+func NewDSServer(
+	storage types.VMStorage,
+	ccInfoProvider types.CurrencyInfoResProvider,
+	nBalanceProvider types.AccountBalanceResProvider,
+	oraclePriceProvider types.OracleKeeper,
+) *DSServer {
+
 	return &DSServer{
 		storage:          storage,
 		ccInfoProvider:   ccInfoProvider,
 		nBalanceProvider: nBalanceProvider,
+		oPriceProvider:   oraclePriceProvider,
 	}
 }
