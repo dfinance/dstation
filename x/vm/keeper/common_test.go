@@ -45,7 +45,7 @@ func (s *KeeperMockVmTestSuite) TearDownSuite() {
 }
 
 func (s *KeeperMockVmTestSuite) SetupTest() {
-	s.ctx = s.ctx.WithEventManager(sdk.NewEventManager())
+	s.ctx = s.app.GetContext(false)
 }
 
 func (s *KeeperMockVmTestSuite) DoDSClientRequest(handler func(ctx context.Context, client dvmTypes.DSServiceClient)) {

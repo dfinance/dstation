@@ -38,7 +38,7 @@ func GetTxCmd() *cobra.Command {
 // GetCmdTxExecuteScript returns tx command that implement keeper handler.
 func GetCmdTxExecuteScript() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "execute [moveFile] [arg1,arg2,arg3,..]",
+		Use:     "execute [moveFile] [arg1...]",
 		Short:   "Execute Move script",
 		Example: "execute ./script.move.json wallet1jk4ld0uu6wdrj9t8u3gghm9jt583hxx7xp7he8 100 true \"my string\" \"68656c6c6f2c20776f726c6421\" #\"XFI_ETH\" --from my_account --fees 10000xfi --gas 500000",
 		Args:    cobra.MinimumNArgs(1),

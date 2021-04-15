@@ -3,6 +3,7 @@ package vm_test
 import (
 	"context"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path"
@@ -14,6 +15,7 @@ import (
 	cryptoTypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	oracleTypes "github.com/dfinance/dstation/x/oracle/types"
 	"github.com/stretchr/testify/suite"
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -32,10 +34,45 @@ type ModuleDVVTestSuite struct {
 	keeper      keeper.Keeper
 	queryClient types.QueryClient
 	//
+	nominee sdk.AccAddress
+	oracles []oracleTypes.Oracle
+	assets  []oracleTypes.Asset
+	//
 	dvmStop func() error
 }
 
 func (s *ModuleDVVTestSuite) SetupSuite() {
+	// Oracle genesis state params and values
+	nomineeAddr, _, _ := tests.GenAccAddress()
+	oracle1Addr, _, _ := tests.GenAccAddress()
+	oracles := []oracleTypes.Oracle{
+		{
+			AccAddress:    oracle1Addr.String(),
+			Description:   "mock_oracle1",
+			PriceMaxBytes: 8,
+			PriceDecimals: 8,
+		},
+	}
+	assets := []oracleTypes.Asset{
+		{
+			AssetCode: "eth_usdt",
+			Oracles:   []string{oracle1Addr.String()},
+			Decimals:  8,
+		},
+	}
+	oracleGenStateSetter := func(prevStateBz json.RawMessage) json.RawMessage {
+		var curState oracleTypes.GenesisState
+		types.ModuleCdc.MustUnmarshalJSON(prevStateBz, &curState)
+
+		curState.Params.Nominees = append(curState.Params.Nominees, nomineeAddr.String())
+		curState.Oracles = oracles
+		curState.Assets = assets
+
+		curStateBz := types.ModuleCdc.MustMarshalJSON(&curState)
+
+		return curStateBz
+	}
+
 	// Init DVM connections and config
 	_, dsPort, err := server.FreeTCPAddr()
 	if err != nil {
@@ -65,9 +102,15 @@ func (s *ModuleDVVTestSuite) SetupSuite() {
 	s.dvmStop = dvmStop
 
 	// Init the SimApp
-	s.app = tests.SetupDSimApp(tests.WithDVMConfig(vmConfig))
+	s.app = tests.SetupDSimApp(
+		tests.WithDVMConfig(vmConfig),
+		tests.WithCustomGenesisState(oracleTypes.ModuleName, oracleGenStateSetter),
+	)
 	s.ctx = s.app.GetContext(false)
 	s.keeper = s.app.DnApp.VmKeeper
+	s.nominee = nomineeAddr
+	s.oracles = oracles
+	s.assets = assets
 
 	// Init the querier client
 	querier := keeper.Querier{Keeper: s.keeper}
@@ -85,7 +128,7 @@ func (s *ModuleDVVTestSuite) TearDownSuite() {
 }
 
 func (s *ModuleDVVTestSuite) SetupTest() {
-	s.ctx = s.ctx.WithEventManager(sdk.NewEventManager())
+	s.ctx = s.app.GetContext(false)
 }
 
 // GetProjectPath returns project root dir ("dfinance" base path).

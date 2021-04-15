@@ -24,8 +24,9 @@ type Keeper struct {
 	cdc      codec.BinaryMarshaler
 	config   *config.VMConfig
 	// Dependency keepers
-	accKeeper  types.AccountKeeper
-	bankKeeper types.BankKeeper
+	accKeeper    types.AccountKeeper
+	bankKeeper   types.BankKeeper
+	oracleKeeper types.OracleKeeper
 	// VM connection
 	vmClient VMClient
 	vmConn   *grpc.ClientConn
@@ -66,24 +67,25 @@ func NewKeeper(
 	cdc codec.BinaryMarshaler, storeKey sdk.StoreKey,
 	vmConn *grpc.ClientConn, dsListener net.Listener,
 	config *config.VMConfig,
-	accKeeper types.AccountKeeper, bankKeeper types.BankKeeper,
+	accKeeper types.AccountKeeper, bankKeeper types.BankKeeper, oracleKeeper types.OracleKeeper,
 ) Keeper {
 
 	k := Keeper{
-		cdc:        cdc,
-		storeKey:   storeKey,
-		accKeeper:  accKeeper,
-		bankKeeper: bankKeeper,
-		vmConn:     vmConn,
-		vmClient:   NewVMClient(vmConn),
-		dsListener: dsListener,
-		config:     config,
+		cdc:          cdc,
+		storeKey:     storeKey,
+		accKeeper:    accKeeper,
+		bankKeeper:   bankKeeper,
+		oracleKeeper: oracleKeeper,
+		vmConn:       vmConn,
+		vmClient:     NewVMClient(vmConn),
+		dsListener:   dsListener,
+		config:       config,
 		cache: &keeperCache{
 			currencyInfo: make(map[string]dvmTypes.CurrencyInfo),
 		},
 	}
 
-	k.dsServer = NewDSServer(&k, &k, &k)
+	k.dsServer = NewDSServer(&k, &k, &k, k.oracleKeeper)
 
 	return k
 }

@@ -176,13 +176,28 @@ func ParseSdkAddressParam(argName, argValue string, paramType ParamType) (retAdd
 	return
 }
 
-// ParseSdkAddressesParams parses sdk.AccAddress comma separated slice.
-func ParseSdkAddressesParams(argName, argValue string, paramType ParamType) (retAddrs []sdk.AccAddress, retErr error) {
+// ParseCommaSepSdkAddressesParams parses sdk.AccAddress comma separated slice.
+func ParseCommaSepSdkAddressesParams(argName, argValue string, paramType ParamType) (retAddrs []sdk.AccAddress, retErr error) {
 	for i, addressStr := range strings.Split(argValue, ",") {
 		addressStr = strings.TrimSpace(addressStr)
 		addr, err := ParseSdkAddressParam(fmt.Sprintf("address[%d]", i), addressStr, paramType)
 		if err != nil {
 			retErr = fmt.Errorf("%s %s %q: %w", argName, paramType, argValue, err)
+			return
+		}
+		retAddrs = append(retAddrs, addr)
+	}
+
+	return
+}
+
+// ParseSpaceSepSdkAddressesParams parses sdk.AccAddress space separated slice.
+func ParseSpaceSepSdkAddressesParams(argName string, argValues []string, paramType ParamType) (retAddrs []sdk.AccAddress, retErr error) {
+	for i, addressStr := range argValues {
+		addressStr = strings.TrimSpace(addressStr)
+		addr, err := ParseSdkAddressParam(fmt.Sprintf("address[%d]", i), addressStr, paramType)
+		if err != nil {
+			retErr = fmt.Errorf("%s %s %v: %w", argName, paramType, argValues, err)
 			return
 		}
 		retAddrs = append(retAddrs, addr)
@@ -212,7 +227,7 @@ func ParseDnIDParam(argName, argValue string, paramType ParamType) (dnTypes.ID, 
 
 // ValidateDenomParam validates currency denomination symbol.
 func ValidateDenomParam(argName, argValue string, paramType ParamType) error {
-	if err := dnTypes.DenomFilter(argValue); err != nil {
+	if err := sdk.ValidateDenom(argValue); err != nil {
 		return fmt.Errorf("%s %s %q: %v", argName, paramType, argValue, err)
 	}
 
@@ -253,7 +268,7 @@ func ParseCoinParam(argName, argValue string, paramType ParamType) (retCoin sdk.
 		return sdk.Coin{}, fmt.Errorf("%s %s %q: parsing coin: %v", argName, paramType, argValue, err)
 	}
 
-	if err := dnTypes.DenomFilter(coin.Denom); err != nil {
+	if err := sdk.ValidateDenom(coin.Denom); err != nil {
 		return sdk.Coin{}, fmt.Errorf("%s %s %q: validating denom: %v", argName, paramType, argValue, err)
 	}
 

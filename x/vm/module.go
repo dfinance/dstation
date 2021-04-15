@@ -1,4 +1,4 @@
-// Module provides DVM integration with Move script/module execution/deployment.
+// Package vm defines module for DVM integration with Move script/module execution/deployment.
 // VMStorage is used for writeSets (VM execution results, Move resources) storage.
 // DataSource server is a gRPC server for dnode-dvm async communication (DS context is updated during the BeginBlock).
 // Module support DVM stdlib update proposal updates corresponding writeSets.
@@ -157,8 +157,7 @@ func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 	BeginBlocker(ctx, am.keeper)
 }
 
-// EndBlock returns the end blocker for the staking module. It returns no validator
-// updates.
+// EndBlock returns the end blocker for the staking module. It returns no validator updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }

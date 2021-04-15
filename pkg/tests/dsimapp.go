@@ -17,9 +17,6 @@ import (
 	vmConfig "github.com/dfinance/dstation/x/vm/config"
 )
 
-// DSimAppOption defines functional arguments for DSimApp constructor.
-type DSimAppOption func(app *DSimApp)
-
 // DSimApp wraps DnApp, provides VM environment and helper functions.
 type DSimApp struct {
 	DnApp  *dnApp.DnApp

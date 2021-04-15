@@ -12,55 +12,6 @@ import "dfinance/dvm/metadata.proto";
 
 option go_package = "github.com/dfinance/dstation/x/vm/types";
 
-// MsgExecuteScript defines a SDK message to execute a script with args to VM.
-message MsgExecuteScript {
-  option (gogoproto.equal) = false;
-  option (gogoproto.goproto_getters) = false;
-
-  message ScriptArg {
-    option (gogoproto.equal) = false;
-    option (gogoproto.goproto_getters) = false;
-
-    dvm.VMTypeTag type = 1 [
-      (gogoproto.moretags) = "yaml:\"type\""
-    ];
-    bytes value = 2 [
-      (gogoproto.moretags) = "yaml:\"value\""
-    ];
-  }
-
-  // Script sender address
-  string signer = 1 [
-    (gogoproto.moretags) = "yaml:\"signer\""
-  ];
-
-  // Script code
-  bytes script = 2 [
-    (gogoproto.moretags) = "yaml:\"script\""
-  ];
-
-  repeated ScriptArg args = 3 [
-    (gogoproto.moretags) = "yaml:\"args\"",
-    (gogoproto.nullable) = false
-  ];
-}
-
-// MsgDeployModule defines a SDK message to deploy a module (contract) to VM.
-message MsgDeployModule {
-  option (gogoproto.equal) = false;
-  option (gogoproto.goproto_getters) = false;
-
-  // Script sender address
-  string signer = 1 [
-    (gogoproto.moretags) = "yaml:\"signer\""
-  ];
-
-  // Module code
-  repeated bytes modules = 2 [
-    (gogoproto.moretags) = "yaml:\"modules\""
-  ];
-}
-
 // TxVmStatus keeps VM statuses and errors for Tx.
 message TxVmStatus {
   option (gogoproto.equal) = false;

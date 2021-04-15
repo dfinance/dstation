@@ -5,6 +5,8 @@ import (
 	authTypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankExported "github.com/cosmos/cosmos-sdk/x/bank/exported"
 	bankTypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	dnTypes "github.com/dfinance/dstation/pkg/types"
+	oracleTypes "github.com/dfinance/dstation/x/oracle/types"
 )
 
 // AccountKeeper defines the expected account keeper.
@@ -27,4 +29,9 @@ type BankKeeper interface {
 	DelegateCoinsFromAccountToModule(ctx sdk.Context, senderAddr sdk.AccAddress, recipientModule string, amt sdk.Coins) error
 
 	IterateAllDenomMetaData(ctx sdk.Context, cb func(bankTypes.Metadata) bool)
+}
+
+// OracleKeeper defines the expected interface needed to retrieve exchange rates.
+type OracleKeeper interface {
+	GetCurrentPrice(ctx sdk.Context, assetCode dnTypes.AssetCode) *oracleTypes.CurrentPrice
 }
