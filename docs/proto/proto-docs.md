@@ -144,6 +144,108 @@
   
     - [Msg](#dfinance.vm.v1beta1.Msg)
   
+- [gravity/v1/attestation.proto](#gravity/v1/attestation.proto)
+    - [Attestation](#gravity.v1.Attestation)
+    - [ERC20Token](#gravity.v1.ERC20Token)
+  
+    - [ClaimType](#gravity.v1.ClaimType)
+  
+- [gravity/v1/batch.proto](#gravity/v1/batch.proto)
+    - [OutgoingLogicCall](#gravity.v1.OutgoingLogicCall)
+    - [OutgoingTransferTx](#gravity.v1.OutgoingTransferTx)
+    - [OutgoingTxBatch](#gravity.v1.OutgoingTxBatch)
+  
+- [gravity/v1/ethereum_signer.proto](#gravity/v1/ethereum_signer.proto)
+    - [SignType](#gravity.v1.SignType)
+  
+- [gravity/v1/types.proto](#gravity/v1/types.proto)
+    - [BridgeValidator](#gravity.v1.BridgeValidator)
+    - [ERC20ToDenom](#gravity.v1.ERC20ToDenom)
+    - [LastObservedEthereumBlockHeight](#gravity.v1.LastObservedEthereumBlockHeight)
+    - [Valset](#gravity.v1.Valset)
+  
+- [gravity/v1/msgs.proto](#gravity/v1/msgs.proto)
+    - [MsgCancelSendToEth](#gravity.v1.MsgCancelSendToEth)
+    - [MsgCancelSendToEthResponse](#gravity.v1.MsgCancelSendToEthResponse)
+    - [MsgConfirmBatch](#gravity.v1.MsgConfirmBatch)
+    - [MsgConfirmBatchResponse](#gravity.v1.MsgConfirmBatchResponse)
+    - [MsgConfirmLogicCall](#gravity.v1.MsgConfirmLogicCall)
+    - [MsgConfirmLogicCallResponse](#gravity.v1.MsgConfirmLogicCallResponse)
+    - [MsgDepositClaim](#gravity.v1.MsgDepositClaim)
+    - [MsgDepositClaimResponse](#gravity.v1.MsgDepositClaimResponse)
+    - [MsgERC20DeployedClaim](#gravity.v1.MsgERC20DeployedClaim)
+    - [MsgERC20DeployedClaimResponse](#gravity.v1.MsgERC20DeployedClaimResponse)
+    - [MsgLogicCallExecutedClaim](#gravity.v1.MsgLogicCallExecutedClaim)
+    - [MsgLogicCallExecutedClaimResponse](#gravity.v1.MsgLogicCallExecutedClaimResponse)
+    - [MsgRequestBatch](#gravity.v1.MsgRequestBatch)
+    - [MsgRequestBatchResponse](#gravity.v1.MsgRequestBatchResponse)
+    - [MsgSendToEth](#gravity.v1.MsgSendToEth)
+    - [MsgSendToEthResponse](#gravity.v1.MsgSendToEthResponse)
+    - [MsgSetOrchestratorAddress](#gravity.v1.MsgSetOrchestratorAddress)
+    - [MsgSetOrchestratorAddressResponse](#gravity.v1.MsgSetOrchestratorAddressResponse)
+    - [MsgValsetConfirm](#gravity.v1.MsgValsetConfirm)
+    - [MsgValsetConfirmResponse](#gravity.v1.MsgValsetConfirmResponse)
+    - [MsgWithdrawClaim](#gravity.v1.MsgWithdrawClaim)
+    - [MsgWithdrawClaimResponse](#gravity.v1.MsgWithdrawClaimResponse)
+  
+    - [Msg](#gravity.v1.Msg)
+  
+- [gravity/v1/genesis.proto](#gravity/v1/genesis.proto)
+    - [GenesisState](#gravity.v1.GenesisState)
+    - [Params](#gravity.v1.Params)
+  
+- [gravity/v1/pool.proto](#gravity/v1/pool.proto)
+    - [BatchFees](#gravity.v1.BatchFees)
+    - [IDSet](#gravity.v1.IDSet)
+  
+- [gravity/v1/query.proto](#gravity/v1/query.proto)
+    - [QueryBatchConfirmsRequest](#gravity.v1.QueryBatchConfirmsRequest)
+    - [QueryBatchConfirmsResponse](#gravity.v1.QueryBatchConfirmsResponse)
+    - [QueryBatchFeeRequest](#gravity.v1.QueryBatchFeeRequest)
+    - [QueryBatchFeeResponse](#gravity.v1.QueryBatchFeeResponse)
+    - [QueryBatchRequestByNonceRequest](#gravity.v1.QueryBatchRequestByNonceRequest)
+    - [QueryBatchRequestByNonceResponse](#gravity.v1.QueryBatchRequestByNonceResponse)
+    - [QueryCurrentValsetRequest](#gravity.v1.QueryCurrentValsetRequest)
+    - [QueryCurrentValsetResponse](#gravity.v1.QueryCurrentValsetResponse)
+    - [QueryDelegateKeysByEthAddress](#gravity.v1.QueryDelegateKeysByEthAddress)
+    - [QueryDelegateKeysByEthAddressResponse](#gravity.v1.QueryDelegateKeysByEthAddressResponse)
+    - [QueryDelegateKeysByOrchestratorAddress](#gravity.v1.QueryDelegateKeysByOrchestratorAddress)
+    - [QueryDelegateKeysByOrchestratorAddressResponse](#gravity.v1.QueryDelegateKeysByOrchestratorAddressResponse)
+    - [QueryDelegateKeysByValidatorAddress](#gravity.v1.QueryDelegateKeysByValidatorAddress)
+    - [QueryDelegateKeysByValidatorAddressResponse](#gravity.v1.QueryDelegateKeysByValidatorAddressResponse)
+    - [QueryDenomToERC20Request](#gravity.v1.QueryDenomToERC20Request)
+    - [QueryDenomToERC20Response](#gravity.v1.QueryDenomToERC20Response)
+    - [QueryERC20ToDenomRequest](#gravity.v1.QueryERC20ToDenomRequest)
+    - [QueryERC20ToDenomResponse](#gravity.v1.QueryERC20ToDenomResponse)
+    - [QueryLastEventNonceByAddrRequest](#gravity.v1.QueryLastEventNonceByAddrRequest)
+    - [QueryLastEventNonceByAddrResponse](#gravity.v1.QueryLastEventNonceByAddrResponse)
+    - [QueryLastPendingBatchRequestByAddrRequest](#gravity.v1.QueryLastPendingBatchRequestByAddrRequest)
+    - [QueryLastPendingBatchRequestByAddrResponse](#gravity.v1.QueryLastPendingBatchRequestByAddrResponse)
+    - [QueryLastPendingLogicCallByAddrRequest](#gravity.v1.QueryLastPendingLogicCallByAddrRequest)
+    - [QueryLastPendingLogicCallByAddrResponse](#gravity.v1.QueryLastPendingLogicCallByAddrResponse)
+    - [QueryLastPendingValsetRequestByAddrRequest](#gravity.v1.QueryLastPendingValsetRequestByAddrRequest)
+    - [QueryLastPendingValsetRequestByAddrResponse](#gravity.v1.QueryLastPendingValsetRequestByAddrResponse)
+    - [QueryLastValsetRequestsRequest](#gravity.v1.QueryLastValsetRequestsRequest)
+    - [QueryLastValsetRequestsResponse](#gravity.v1.QueryLastValsetRequestsResponse)
+    - [QueryLogicConfirmsRequest](#gravity.v1.QueryLogicConfirmsRequest)
+    - [QueryLogicConfirmsResponse](#gravity.v1.QueryLogicConfirmsResponse)
+    - [QueryOutgoingLogicCallsRequest](#gravity.v1.QueryOutgoingLogicCallsRequest)
+    - [QueryOutgoingLogicCallsResponse](#gravity.v1.QueryOutgoingLogicCallsResponse)
+    - [QueryOutgoingTxBatchesRequest](#gravity.v1.QueryOutgoingTxBatchesRequest)
+    - [QueryOutgoingTxBatchesResponse](#gravity.v1.QueryOutgoingTxBatchesResponse)
+    - [QueryParamsRequest](#gravity.v1.QueryParamsRequest)
+    - [QueryParamsResponse](#gravity.v1.QueryParamsResponse)
+    - [QueryPendingSendToEth](#gravity.v1.QueryPendingSendToEth)
+    - [QueryPendingSendToEthResponse](#gravity.v1.QueryPendingSendToEthResponse)
+    - [QueryValsetConfirmRequest](#gravity.v1.QueryValsetConfirmRequest)
+    - [QueryValsetConfirmResponse](#gravity.v1.QueryValsetConfirmResponse)
+    - [QueryValsetConfirmsByNonceRequest](#gravity.v1.QueryValsetConfirmsByNonceRequest)
+    - [QueryValsetConfirmsByNonceResponse](#gravity.v1.QueryValsetConfirmsByNonceResponse)
+    - [QueryValsetRequestRequest](#gravity.v1.QueryValsetRequestRequest)
+    - [QueryValsetRequestResponse](#gravity.v1.QueryValsetRequestResponse)
+  
+    - [Query](#gravity.v1.Query)
+  
 - [Scalar Value Types](#scalar-value-types)
 
 
@@ -1906,6 +2008,1565 @@ Msg defines the VM module Msg service.
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 | `DeployModule` | [MsgDeployModule](#dfinance.vm.v1beta1.MsgDeployModule) | [MsgDeployModuleResponse](#dfinance.vm.v1beta1.MsgDeployModuleResponse) | DeployModule deploys Move module/modules to VMStorage. | |
 | `ExecuteScript` | [MsgExecuteScript](#dfinance.vm.v1beta1.MsgExecuteScript) | [MsgExecuteScriptResponse](#dfinance.vm.v1beta1.MsgExecuteScriptResponse) | ExecuteScript executes provided Move script. | |
+
+ <!-- end services -->
+
+
+
+<a name="gravity/v1/attestation.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## gravity/v1/attestation.proto
+
+
+
+<a name="gravity.v1.Attestation"></a>
+
+### Attestation
+Attestation is an aggregate of `claims` that eventually becomes `observed` by
+all orchestrators
+EVENT_NONCE:
+EventNonce a nonce provided by the gravity contract that is unique per event fired
+These event nonces must be relayed in order. This is a correctness issue,
+if relaying out of order transaction replay attacks become possible
+OBSERVED:
+Observed indicates that >67% of validators have attested to the event,
+and that the event should be executed by the gravity state machine
+
+The actual content of the claims is passed in with the transaction making the claim
+and then passed through the call stack alongside the attestation while it is processed
+the key in which the attestation is stored is keyed on the exact details of the claim
+but there is no reason to store those exact details becuause the next message sender
+will kindly provide you with them.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `observed` | [bool](#bool) |  |  |
+| `votes` | [string](#string) | repeated |  |
+| `height` | [uint64](#uint64) |  |  |
+| `claim` | [google.protobuf.Any](#google.protobuf.Any) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.ERC20Token"></a>
+
+### ERC20Token
+ERC20Token unique identifier for an Ethereum ERC20 token.
+CONTRACT:
+The contract address on ETH of the token, this could be a Cosmos
+originated token, if so it will be the ERC20 address of the representation
+(note: developers should look up the token symbol using the address on ETH to display for UI)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `contract` | [string](#string) |  |  |
+| `amount` | [string](#string) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="gravity.v1.ClaimType"></a>
+
+### ClaimType
+ClaimType is the cosmos type of an event from the counterpart chain that can
+be handled
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| CLAIM_TYPE_UNSPECIFIED | 0 |  |
+| CLAIM_TYPE_DEPOSIT | 1 |  |
+| CLAIM_TYPE_WITHDRAW | 2 |  |
+| CLAIM_TYPE_ERC20_DEPLOYED | 3 |  |
+| CLAIM_TYPE_LOGIC_CALL_EXECUTED | 4 |  |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="gravity/v1/batch.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## gravity/v1/batch.proto
+
+
+
+<a name="gravity.v1.OutgoingLogicCall"></a>
+
+### OutgoingLogicCall
+OutgoingLogicCall represents an individual logic call from gravity to ETH
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `transfers` | [ERC20Token](#gravity.v1.ERC20Token) | repeated |  |
+| `fees` | [ERC20Token](#gravity.v1.ERC20Token) | repeated |  |
+| `logic_contract_address` | [string](#string) |  |  |
+| `payload` | [bytes](#bytes) |  |  |
+| `timeout` | [uint64](#uint64) |  |  |
+| `invalidation_id` | [bytes](#bytes) |  |  |
+| `invalidation_nonce` | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.OutgoingTransferTx"></a>
+
+### OutgoingTransferTx
+OutgoingTransferTx represents an individual send from gravity to ETH
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [uint64](#uint64) |  |  |
+| `sender` | [string](#string) |  |  |
+| `dest_address` | [string](#string) |  |  |
+| `erc20_token` | [ERC20Token](#gravity.v1.ERC20Token) |  |  |
+| `erc20_fee` | [ERC20Token](#gravity.v1.ERC20Token) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.OutgoingTxBatch"></a>
+
+### OutgoingTxBatch
+OutgoingTxBatch represents a batch of transactions going from gravity to ETH
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `batch_nonce` | [uint64](#uint64) |  |  |
+| `batch_timeout` | [uint64](#uint64) |  |  |
+| `transactions` | [OutgoingTransferTx](#gravity.v1.OutgoingTransferTx) | repeated |  |
+| `token_contract` | [string](#string) |  |  |
+| `block` | [uint64](#uint64) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="gravity/v1/ethereum_signer.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## gravity/v1/ethereum_signer.proto
+
+
+ <!-- end messages -->
+
+
+<a name="gravity.v1.SignType"></a>
+
+### SignType
+SignType defines messages that have been signed by an orchestrator
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| SIGN_TYPE_UNSPECIFIED | 0 |  |
+| SIGN_TYPE_ORCHESTRATOR_SIGNED_MULTI_SIG_UPDATE | 1 |  |
+| SIGN_TYPE_ORCHESTRATOR_SIGNED_WITHDRAW_BATCH | 2 |  |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="gravity/v1/types.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## gravity/v1/types.proto
+
+
+
+<a name="gravity.v1.BridgeValidator"></a>
+
+### BridgeValidator
+BridgeValidator represents a validator's ETH address and its power
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `power` | [uint64](#uint64) |  |  |
+| `ethereum_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.ERC20ToDenom"></a>
+
+### ERC20ToDenom
+This records the relationship between an ERC20 token and the denom
+of the corresponding Cosmos originated asset
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `erc20` | [string](#string) |  |  |
+| `denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.LastObservedEthereumBlockHeight"></a>
+
+### LastObservedEthereumBlockHeight
+LastObservedEthereumBlockHeight stores the last observed
+Ethereum block height along with the Cosmos block height that
+it was observed at. These two numbers can be used to project
+outward and always produce batches with timeouts in the future
+even if no Ethereum block height has been relayed for a long time
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `cosmos_block_height` | [uint64](#uint64) |  |  |
+| `ethereum_block_height` | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.Valset"></a>
+
+### Valset
+Valset is the Ethereum Bridge Multsig Set, each gravity validator also
+maintains an ETH key to sign messages, these are used to check signatures on
+ETH because of the significant gas savings
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nonce` | [uint64](#uint64) |  |  |
+| `members` | [BridgeValidator](#gravity.v1.BridgeValidator) | repeated |  |
+| `height` | [uint64](#uint64) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="gravity/v1/msgs.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## gravity/v1/msgs.proto
+
+
+
+<a name="gravity.v1.MsgCancelSendToEth"></a>
+
+### MsgCancelSendToEth
+This call allows the sender (and only the sender)
+to cancel a given MsgSendToEth and recieve a refund
+of the tokens
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `transaction_id` | [uint64](#uint64) |  |  |
+| `sender` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgCancelSendToEthResponse"></a>
+
+### MsgCancelSendToEthResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgConfirmBatch"></a>
+
+### MsgConfirmBatch
+MsgConfirmBatch
+When validators observe a MsgRequestBatch they form a batch by ordering
+transactions currently in the txqueue in order of highest to lowest fee,
+cutting off when the batch either reaches a hardcoded maximum size (to be
+decided, probably around 100) or when transactions stop being profitable
+(TODO determine this without nondeterminism) This message includes the batch
+as well as an Ethereum signature over this batch by the validator
+-------------
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nonce` | [uint64](#uint64) |  |  |
+| `token_contract` | [string](#string) |  |  |
+| `eth_signer` | [string](#string) |  |  |
+| `orchestrator` | [string](#string) |  |  |
+| `signature` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgConfirmBatchResponse"></a>
+
+### MsgConfirmBatchResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgConfirmLogicCall"></a>
+
+### MsgConfirmLogicCall
+MsgConfirmLogicCall
+When validators observe a MsgRequestBatch they form a batch by ordering
+transactions currently in the txqueue in order of highest to lowest fee,
+cutting off when the batch either reaches a hardcoded maximum size (to be
+decided, probably around 100) or when transactions stop being profitable
+(TODO determine this without nondeterminism) This message includes the batch
+as well as an Ethereum signature over this batch by the validator
+-------------
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `invalidation_id` | [string](#string) |  |  |
+| `invalidation_nonce` | [uint64](#uint64) |  |  |
+| `eth_signer` | [string](#string) |  |  |
+| `orchestrator` | [string](#string) |  |  |
+| `signature` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgConfirmLogicCallResponse"></a>
+
+### MsgConfirmLogicCallResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgDepositClaim"></a>
+
+### MsgDepositClaim
+EthereumBridgeDepositClaim
+When more than 66% of the active validator set has
+claimed to have seen the deposit enter the ethereum blockchain coins are
+issued to the Cosmos address in question
+-------------
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `event_nonce` | [uint64](#uint64) |  |  |
+| `block_height` | [uint64](#uint64) |  |  |
+| `token_contract` | [string](#string) |  |  |
+| `amount` | [string](#string) |  |  |
+| `ethereum_sender` | [string](#string) |  |  |
+| `cosmos_receiver` | [string](#string) |  |  |
+| `orchestrator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgDepositClaimResponse"></a>
+
+### MsgDepositClaimResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgERC20DeployedClaim"></a>
+
+### MsgERC20DeployedClaim
+ERC20DeployedClaim allows the Cosmos module
+to learn about an ERC20 that someone deployed
+to represent a Cosmos asset
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `event_nonce` | [uint64](#uint64) |  |  |
+| `block_height` | [uint64](#uint64) |  |  |
+| `cosmos_denom` | [string](#string) |  |  |
+| `token_contract` | [string](#string) |  |  |
+| `name` | [string](#string) |  |  |
+| `symbol` | [string](#string) |  |  |
+| `decimals` | [uint64](#uint64) |  |  |
+| `orchestrator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgERC20DeployedClaimResponse"></a>
+
+### MsgERC20DeployedClaimResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgLogicCallExecutedClaim"></a>
+
+### MsgLogicCallExecutedClaim
+This informs the Cosmos module that a logic
+call has been executed
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `event_nonce` | [uint64](#uint64) |  |  |
+| `block_height` | [uint64](#uint64) |  |  |
+| `invalidation_id` | [bytes](#bytes) |  |  |
+| `invalidation_nonce` | [uint64](#uint64) |  |  |
+| `orchestrator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgLogicCallExecutedClaimResponse"></a>
+
+### MsgLogicCallExecutedClaimResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgRequestBatch"></a>
+
+### MsgRequestBatch
+MsgRequestBatch
+this is a message anyone can send that requests a batch of transactions to
+send across the bridge be created for whatever block height this message is
+included in. This acts as a coordination point, the handler for this message
+looks at the AddToOutgoingPool tx's in the store and generates a batch, also
+available in the store tied to this message. The validators then grab this
+batch, sign it, submit the signatures with a MsgConfirmBatch before a relayer
+can finally submit the batch
+-------------
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `sender` | [string](#string) |  |  |
+| `denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgRequestBatchResponse"></a>
+
+### MsgRequestBatchResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgSendToEth"></a>
+
+### MsgSendToEth
+MsgSendToEth
+This is the message that a user calls when they want to bridge an asset
+it will later be removed when it is included in a batch and successfully
+submitted tokens are removed from the users balance immediately
+-------------
+AMOUNT:
+the coin to send across the bridge, note the restriction that this is a
+single coin not a set of coins that is normal in other Cosmos messages
+FEE:
+the fee paid for the bridge, distinct from the fee paid to the chain to
+actually send this message in the first place. So a successful send has
+two layers of fees for the user
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `sender` | [string](#string) |  |  |
+| `eth_dest` | [string](#string) |  |  |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+| `bridge_fee` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgSendToEthResponse"></a>
+
+### MsgSendToEthResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgSetOrchestratorAddress"></a>
+
+### MsgSetOrchestratorAddress
+MsgSetOrchestratorAddress
+this message allows validators to delegate their voting responsibilities
+to a given key. This key is then used as an optional authentication method
+for sigining oracle claims
+VALIDATOR
+The validator field is a cosmosvaloper1... string (i.e. sdk.ValAddress)
+that references a validator in the active set
+ORCHESTRATOR
+The orchestrator field is a cosmos1... string  (i.e. sdk.AccAddress) that
+references the key that is being delegated to
+ETH_ADDRESS
+This is a hex encoded 0x Ethereum public key that will be used by this validator
+on Ethereum
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `validator` | [string](#string) |  |  |
+| `orchestrator` | [string](#string) |  |  |
+| `eth_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgSetOrchestratorAddressResponse"></a>
+
+### MsgSetOrchestratorAddressResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgValsetConfirm"></a>
+
+### MsgValsetConfirm
+MsgValsetConfirm
+this is the message sent by the validators when they wish to submit their
+signatures over the validator set at a given block height. A validator must
+first call MsgSetEthAddress to set their Ethereum address to be used for
+signing. Then someone (anyone) must make a ValsetRequest, the request is
+essentially a messaging mechanism to determine which block all validators
+should submit signatures over. Finally validators sign the validator set,
+powers, and Ethereum addresses of the entire validator set at the height of a
+ValsetRequest and submit that signature with this message.
+
+If a sufficient number of validators (66% of voting power) (A) have set
+Ethereum addresses and (B) submit ValsetConfirm messages with their
+signatures it is then possible for anyone to view these signatures in the
+chain store and submit them to Ethereum to update the validator set
+-------------
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nonce` | [uint64](#uint64) |  |  |
+| `orchestrator` | [string](#string) |  |  |
+| `eth_address` | [string](#string) |  |  |
+| `signature` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgValsetConfirmResponse"></a>
+
+### MsgValsetConfirmResponse
+
+
+
+
+
+
+
+<a name="gravity.v1.MsgWithdrawClaim"></a>
+
+### MsgWithdrawClaim
+WithdrawClaim claims that a batch of withdrawal
+operations on the bridge contract was executed.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `event_nonce` | [uint64](#uint64) |  |  |
+| `block_height` | [uint64](#uint64) |  |  |
+| `batch_nonce` | [uint64](#uint64) |  |  |
+| `token_contract` | [string](#string) |  |  |
+| `orchestrator` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.MsgWithdrawClaimResponse"></a>
+
+### MsgWithdrawClaimResponse
+
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="gravity.v1.Msg"></a>
+
+### Msg
+Msg defines the state transitions possible within gravity
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `ValsetConfirm` | [MsgValsetConfirm](#gravity.v1.MsgValsetConfirm) | [MsgValsetConfirmResponse](#gravity.v1.MsgValsetConfirmResponse) |  | POST|/gravity/v1/valset_confirm|
+| `SendToEth` | [MsgSendToEth](#gravity.v1.MsgSendToEth) | [MsgSendToEthResponse](#gravity.v1.MsgSendToEthResponse) |  | POST|/gravity/v1/send_to_eth|
+| `RequestBatch` | [MsgRequestBatch](#gravity.v1.MsgRequestBatch) | [MsgRequestBatchResponse](#gravity.v1.MsgRequestBatchResponse) |  | POST|/gravity/v1/request_batch|
+| `ConfirmBatch` | [MsgConfirmBatch](#gravity.v1.MsgConfirmBatch) | [MsgConfirmBatchResponse](#gravity.v1.MsgConfirmBatchResponse) |  | POST|/gravity/v1/confirm_batch|
+| `ConfirmLogicCall` | [MsgConfirmLogicCall](#gravity.v1.MsgConfirmLogicCall) | [MsgConfirmLogicCallResponse](#gravity.v1.MsgConfirmLogicCallResponse) |  | POST|/gravity/v1/confim_logic|
+| `DepositClaim` | [MsgDepositClaim](#gravity.v1.MsgDepositClaim) | [MsgDepositClaimResponse](#gravity.v1.MsgDepositClaimResponse) |  | POST|/gravity/v1/deposit_claim|
+| `WithdrawClaim` | [MsgWithdrawClaim](#gravity.v1.MsgWithdrawClaim) | [MsgWithdrawClaimResponse](#gravity.v1.MsgWithdrawClaimResponse) |  | POST|/gravity/v1/withdraw_claim|
+| `ERC20DeployedClaim` | [MsgERC20DeployedClaim](#gravity.v1.MsgERC20DeployedClaim) | [MsgERC20DeployedClaimResponse](#gravity.v1.MsgERC20DeployedClaimResponse) |  | POST|/gravity/v1/erc20_deployed_claim|
+| `LogicCallExecutedClaim` | [MsgLogicCallExecutedClaim](#gravity.v1.MsgLogicCallExecutedClaim) | [MsgLogicCallExecutedClaimResponse](#gravity.v1.MsgLogicCallExecutedClaimResponse) |  | POST|/gravity/v1/logic_call_executed_claim|
+| `SetOrchestratorAddress` | [MsgSetOrchestratorAddress](#gravity.v1.MsgSetOrchestratorAddress) | [MsgSetOrchestratorAddressResponse](#gravity.v1.MsgSetOrchestratorAddressResponse) |  | POST|/gravity/v1/set_orchestrator_address|
+| `CancelSendToEth` | [MsgCancelSendToEth](#gravity.v1.MsgCancelSendToEth) | [MsgCancelSendToEthResponse](#gravity.v1.MsgCancelSendToEthResponse) |  | POST|/gravity/v1/cancel_send_to_eth|
+
+ <!-- end services -->
+
+
+
+<a name="gravity/v1/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## gravity/v1/genesis.proto
+
+
+
+<a name="gravity.v1.GenesisState"></a>
+
+### GenesisState
+GenesisState struct
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#gravity.v1.Params) |  |  |
+| `last_observed_nonce` | [uint64](#uint64) |  |  |
+| `valsets` | [Valset](#gravity.v1.Valset) | repeated |  |
+| `valset_confirms` | [MsgValsetConfirm](#gravity.v1.MsgValsetConfirm) | repeated |  |
+| `batches` | [OutgoingTxBatch](#gravity.v1.OutgoingTxBatch) | repeated |  |
+| `batch_confirms` | [MsgConfirmBatch](#gravity.v1.MsgConfirmBatch) | repeated |  |
+| `logic_calls` | [OutgoingLogicCall](#gravity.v1.OutgoingLogicCall) | repeated |  |
+| `logic_call_confirms` | [MsgConfirmLogicCall](#gravity.v1.MsgConfirmLogicCall) | repeated |  |
+| `attestations` | [Attestation](#gravity.v1.Attestation) | repeated |  |
+| `delegate_keys` | [MsgSetOrchestratorAddress](#gravity.v1.MsgSetOrchestratorAddress) | repeated |  |
+| `erc20_to_denoms` | [ERC20ToDenom](#gravity.v1.ERC20ToDenom) | repeated |  |
+| `unbatched_transfers` | [OutgoingTransferTx](#gravity.v1.OutgoingTransferTx) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.Params"></a>
+
+### Params
+Params represent the Gravity genesis and store parameters
+gravity_id:
+a random 32 byte value to prevent signature reuse, for example if the
+cosmos validators decided to use the same Ethereum keys for another chain
+also running Gravity we would not want it to be possible to play a deposit
+from chain A back on chain B's Gravity. This value IS USED ON ETHEREUM so
+it must be set in your genesis.json before launch and not changed after
+deploying Gravity
+
+contract_hash:
+the code hash of a known good version of the Gravity contract
+solidity code. This can be used to verify the correct version
+of the contract has been deployed. This is a reference value for
+goernance action only it is never read by any Gravity code
+
+bridge_ethereum_address:
+is address of the bridge contract on the Ethereum side, this is a
+reference value for governance only and is not actually used by any
+Gravity code
+
+bridge_chain_id:
+the unique identifier of the Ethereum chain, this is a reference value
+only and is not actually used by any Gravity code
+
+These reference values may be used by future Gravity client implemetnations
+to allow for saftey features or convenience features like the Gravity address
+in your relayer. A relayer would require a configured Gravity address if
+governance had not set the address on the chain it was relaying for.
+
+signed_valsets_window
+signed_batches_window
+signed_claims_window
+
+These values represent the time in blocks that a validator has to submit
+a signature for a batch or valset, or to submit a claim for a particular
+attestation nonce. In the case of attestations this clock starts when the
+attestation is created, but only allows for slashing once the event has passed
+
+target_batch_timeout:
+
+This is the 'target' value for when batches time out, this is a target becuase
+Ethereum is a probabalistic chain and you can't say for sure what the block
+frequency is ahead of time.
+
+average_block_time
+average_ethereum_block_time
+
+These values are the average Cosmos block time and Ethereum block time repsectively
+and they are used to copute what the target batch timeout is. It is important that
+governance updates these in case of any major, prolonged change in the time it takes
+to produce a block
+
+slash_fraction_valset
+slash_fraction_batch
+slash_fraction_claim
+slash_fraction_conflicting_claim
+
+The slashing fractions for the various gravity related slashing conditions. The first three
+refer to not submitting a particular message, the third for submitting a different claim
+for the same Ethereum event
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `gravity_id` | [string](#string) |  |  |
+| `contract_source_hash` | [string](#string) |  |  |
+| `bridge_ethereum_address` | [string](#string) |  |  |
+| `bridge_chain_id` | [uint64](#uint64) |  |  |
+| `signed_valsets_window` | [uint64](#uint64) |  |  |
+| `signed_batches_window` | [uint64](#uint64) |  |  |
+| `signed_claims_window` | [uint64](#uint64) |  |  |
+| `target_batch_timeout` | [uint64](#uint64) |  |  |
+| `average_block_time` | [uint64](#uint64) |  |  |
+| `average_ethereum_block_time` | [uint64](#uint64) |  |  |
+| `slash_fraction_valset` | [bytes](#bytes) |  |  |
+| `slash_fraction_batch` | [bytes](#bytes) |  |  |
+| `slash_fraction_claim` | [bytes](#bytes) |  |  |
+| `slash_fraction_conflicting_claim` | [bytes](#bytes) |  |  |
+| `unbond_slashing_valsets_window` | [uint64](#uint64) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="gravity/v1/pool.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## gravity/v1/pool.proto
+
+
+
+<a name="gravity.v1.BatchFees"></a>
+
+### BatchFees
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `token` | [string](#string) |  |  |
+| `total_fees` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.IDSet"></a>
+
+### IDSet
+IDSet represents a set of IDs
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [uint64](#uint64) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="gravity/v1/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## gravity/v1/query.proto
+
+
+
+<a name="gravity.v1.QueryBatchConfirmsRequest"></a>
+
+### QueryBatchConfirmsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nonce` | [uint64](#uint64) |  |  |
+| `contract_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryBatchConfirmsResponse"></a>
+
+### QueryBatchConfirmsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `confirms` | [MsgConfirmBatch](#gravity.v1.MsgConfirmBatch) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryBatchFeeRequest"></a>
+
+### QueryBatchFeeRequest
+
+
+
+
+
+
+
+<a name="gravity.v1.QueryBatchFeeResponse"></a>
+
+### QueryBatchFeeResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `batch_fees` | [BatchFees](#gravity.v1.BatchFees) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryBatchRequestByNonceRequest"></a>
+
+### QueryBatchRequestByNonceRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nonce` | [uint64](#uint64) |  |  |
+| `contract_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryBatchRequestByNonceResponse"></a>
+
+### QueryBatchRequestByNonceResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `batch` | [OutgoingTxBatch](#gravity.v1.OutgoingTxBatch) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryCurrentValsetRequest"></a>
+
+### QueryCurrentValsetRequest
+
+
+
+
+
+
+
+<a name="gravity.v1.QueryCurrentValsetResponse"></a>
+
+### QueryCurrentValsetResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `valset` | [Valset](#gravity.v1.Valset) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryDelegateKeysByEthAddress"></a>
+
+### QueryDelegateKeysByEthAddress
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `eth_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryDelegateKeysByEthAddressResponse"></a>
+
+### QueryDelegateKeysByEthAddressResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `validator_address` | [string](#string) |  |  |
+| `orchestrator_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryDelegateKeysByOrchestratorAddress"></a>
+
+### QueryDelegateKeysByOrchestratorAddress
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `orchestrator_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryDelegateKeysByOrchestratorAddressResponse"></a>
+
+### QueryDelegateKeysByOrchestratorAddressResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `validator_address` | [string](#string) |  |  |
+| `eth_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryDelegateKeysByValidatorAddress"></a>
+
+### QueryDelegateKeysByValidatorAddress
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `validator_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryDelegateKeysByValidatorAddressResponse"></a>
+
+### QueryDelegateKeysByValidatorAddressResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `eth_address` | [string](#string) |  |  |
+| `orchestrator_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryDenomToERC20Request"></a>
+
+### QueryDenomToERC20Request
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `denom` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryDenomToERC20Response"></a>
+
+### QueryDenomToERC20Response
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `erc20` | [string](#string) |  |  |
+| `cosmos_originated` | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryERC20ToDenomRequest"></a>
+
+### QueryERC20ToDenomRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `erc20` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryERC20ToDenomResponse"></a>
+
+### QueryERC20ToDenomResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `denom` | [string](#string) |  |  |
+| `cosmos_originated` | [bool](#bool) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastEventNonceByAddrRequest"></a>
+
+### QueryLastEventNonceByAddrRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastEventNonceByAddrResponse"></a>
+
+### QueryLastEventNonceByAddrResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `event_nonce` | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastPendingBatchRequestByAddrRequest"></a>
+
+### QueryLastPendingBatchRequestByAddrRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastPendingBatchRequestByAddrResponse"></a>
+
+### QueryLastPendingBatchRequestByAddrResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `batch` | [OutgoingTxBatch](#gravity.v1.OutgoingTxBatch) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastPendingLogicCallByAddrRequest"></a>
+
+### QueryLastPendingLogicCallByAddrRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastPendingLogicCallByAddrResponse"></a>
+
+### QueryLastPendingLogicCallByAddrResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `call` | [OutgoingLogicCall](#gravity.v1.OutgoingLogicCall) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastPendingValsetRequestByAddrRequest"></a>
+
+### QueryLastPendingValsetRequestByAddrRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastPendingValsetRequestByAddrResponse"></a>
+
+### QueryLastPendingValsetRequestByAddrResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `valsets` | [Valset](#gravity.v1.Valset) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastValsetRequestsRequest"></a>
+
+### QueryLastValsetRequestsRequest
+
+
+
+
+
+
+
+<a name="gravity.v1.QueryLastValsetRequestsResponse"></a>
+
+### QueryLastValsetRequestsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `valsets` | [Valset](#gravity.v1.Valset) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLogicConfirmsRequest"></a>
+
+### QueryLogicConfirmsRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `invalidation_id` | [bytes](#bytes) |  |  |
+| `invalidation_nonce` | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryLogicConfirmsResponse"></a>
+
+### QueryLogicConfirmsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `confirms` | [MsgConfirmLogicCall](#gravity.v1.MsgConfirmLogicCall) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryOutgoingLogicCallsRequest"></a>
+
+### QueryOutgoingLogicCallsRequest
+
+
+
+
+
+
+
+<a name="gravity.v1.QueryOutgoingLogicCallsResponse"></a>
+
+### QueryOutgoingLogicCallsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `calls` | [OutgoingLogicCall](#gravity.v1.OutgoingLogicCall) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryOutgoingTxBatchesRequest"></a>
+
+### QueryOutgoingTxBatchesRequest
+
+
+
+
+
+
+
+<a name="gravity.v1.QueryOutgoingTxBatchesResponse"></a>
+
+### QueryOutgoingTxBatchesResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `batches` | [OutgoingTxBatch](#gravity.v1.OutgoingTxBatch) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+
+
+
+
+
+
+
+<a name="gravity.v1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#gravity.v1.Params) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryPendingSendToEth"></a>
+
+### QueryPendingSendToEth
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `sender_address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryPendingSendToEthResponse"></a>
+
+### QueryPendingSendToEthResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `transfers_in_batches` | [OutgoingTransferTx](#gravity.v1.OutgoingTransferTx) | repeated |  |
+| `unbatched_transfers` | [OutgoingTransferTx](#gravity.v1.OutgoingTransferTx) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryValsetConfirmRequest"></a>
+
+### QueryValsetConfirmRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nonce` | [uint64](#uint64) |  |  |
+| `address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryValsetConfirmResponse"></a>
+
+### QueryValsetConfirmResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `confirm` | [MsgValsetConfirm](#gravity.v1.MsgValsetConfirm) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryValsetConfirmsByNonceRequest"></a>
+
+### QueryValsetConfirmsByNonceRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nonce` | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryValsetConfirmsByNonceResponse"></a>
+
+### QueryValsetConfirmsByNonceResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `confirms` | [MsgValsetConfirm](#gravity.v1.MsgValsetConfirm) | repeated |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryValsetRequestRequest"></a>
+
+### QueryValsetRequestRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nonce` | [uint64](#uint64) |  |  |
+
+
+
+
+
+
+<a name="gravity.v1.QueryValsetRequestResponse"></a>
+
+### QueryValsetRequestResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `valset` | [Valset](#gravity.v1.Valset) |  |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="gravity.v1.Query"></a>
+
+### Query
+Query defines the gRPC querier service
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Params` | [QueryParamsRequest](#gravity.v1.QueryParamsRequest) | [QueryParamsResponse](#gravity.v1.QueryParamsResponse) | Deployments queries deployments | GET|/gravity/v1beta/params|
+| `CurrentValset` | [QueryCurrentValsetRequest](#gravity.v1.QueryCurrentValsetRequest) | [QueryCurrentValsetResponse](#gravity.v1.QueryCurrentValsetResponse) |  | GET|/gravity/v1beta/valset/current|
+| `ValsetRequest` | [QueryValsetRequestRequest](#gravity.v1.QueryValsetRequestRequest) | [QueryValsetRequestResponse](#gravity.v1.QueryValsetRequestResponse) |  | GET|/gravity/v1beta/valset|
+| `ValsetConfirm` | [QueryValsetConfirmRequest](#gravity.v1.QueryValsetConfirmRequest) | [QueryValsetConfirmResponse](#gravity.v1.QueryValsetConfirmResponse) |  | GET|/gravity/v1beta/valset/confirm|
+| `ValsetConfirmsByNonce` | [QueryValsetConfirmsByNonceRequest](#gravity.v1.QueryValsetConfirmsByNonceRequest) | [QueryValsetConfirmsByNonceResponse](#gravity.v1.QueryValsetConfirmsByNonceResponse) |  | GET|/gravity/v1beta/confirms/{nonce}|
+| `LastValsetRequests` | [QueryLastValsetRequestsRequest](#gravity.v1.QueryLastValsetRequestsRequest) | [QueryLastValsetRequestsResponse](#gravity.v1.QueryLastValsetRequestsResponse) |  | GET|/gravity/v1beta/valset/requests|
+| `LastPendingValsetRequestByAddr` | [QueryLastPendingValsetRequestByAddrRequest](#gravity.v1.QueryLastPendingValsetRequestByAddrRequest) | [QueryLastPendingValsetRequestByAddrResponse](#gravity.v1.QueryLastPendingValsetRequestByAddrResponse) |  | GET|/gravity/v1beta/valset/last|
+| `LastPendingBatchRequestByAddr` | [QueryLastPendingBatchRequestByAddrRequest](#gravity.v1.QueryLastPendingBatchRequestByAddrRequest) | [QueryLastPendingBatchRequestByAddrResponse](#gravity.v1.QueryLastPendingBatchRequestByAddrResponse) |  | GET|/gravity/v1beta/batch/{address}|
+| `LastPendingLogicCallByAddr` | [QueryLastPendingLogicCallByAddrRequest](#gravity.v1.QueryLastPendingLogicCallByAddrRequest) | [QueryLastPendingLogicCallByAddrResponse](#gravity.v1.QueryLastPendingLogicCallByAddrResponse) |  | GET|/gravity/v1beta/logic/{address}|
+| `LastEventNonceByAddr` | [QueryLastEventNonceByAddrRequest](#gravity.v1.QueryLastEventNonceByAddrRequest) | [QueryLastEventNonceByAddrResponse](#gravity.v1.QueryLastEventNonceByAddrResponse) |  | GET|/gravity/v1beta/oracle/eventnonce/{address}|
+| `BatchFees` | [QueryBatchFeeRequest](#gravity.v1.QueryBatchFeeRequest) | [QueryBatchFeeResponse](#gravity.v1.QueryBatchFeeResponse) |  | GET|/gravity/v1beta/batchfees|
+| `OutgoingTxBatches` | [QueryOutgoingTxBatchesRequest](#gravity.v1.QueryOutgoingTxBatchesRequest) | [QueryOutgoingTxBatchesResponse](#gravity.v1.QueryOutgoingTxBatchesResponse) |  | GET|/gravity/v1beta/batch/outgoingtx|
+| `OutgoingLogicCalls` | [QueryOutgoingLogicCallsRequest](#gravity.v1.QueryOutgoingLogicCallsRequest) | [QueryOutgoingLogicCallsResponse](#gravity.v1.QueryOutgoingLogicCallsResponse) |  | GET|/gravity/v1beta/batch/outgoinglogic|
+| `BatchRequestByNonce` | [QueryBatchRequestByNonceRequest](#gravity.v1.QueryBatchRequestByNonceRequest) | [QueryBatchRequestByNonceResponse](#gravity.v1.QueryBatchRequestByNonceResponse) |  | GET|/gravity/v1beta/batch/{nonce}|
+| `BatchConfirms` | [QueryBatchConfirmsRequest](#gravity.v1.QueryBatchConfirmsRequest) | [QueryBatchConfirmsResponse](#gravity.v1.QueryBatchConfirmsResponse) |  | GET|/gravity/v1beta/batch/confirms|
+| `LogicConfirms` | [QueryLogicConfirmsRequest](#gravity.v1.QueryLogicConfirmsRequest) | [QueryLogicConfirmsResponse](#gravity.v1.QueryLogicConfirmsResponse) |  | GET|/gravity/v1beta/logic/confirms|
+| `ERC20ToDenom` | [QueryERC20ToDenomRequest](#gravity.v1.QueryERC20ToDenomRequest) | [QueryERC20ToDenomResponse](#gravity.v1.QueryERC20ToDenomResponse) |  | GET|/gravity/v1beta/cosmos_originated/erc20_to_denom|
+| `DenomToERC20` | [QueryDenomToERC20Request](#gravity.v1.QueryDenomToERC20Request) | [QueryDenomToERC20Response](#gravity.v1.QueryDenomToERC20Response) |  | GET|/gravity/v1beta/cosmos_originated/denom_to_erc20|
+| `GetDelegateKeyByValidator` | [QueryDelegateKeysByValidatorAddress](#gravity.v1.QueryDelegateKeysByValidatorAddress) | [QueryDelegateKeysByValidatorAddressResponse](#gravity.v1.QueryDelegateKeysByValidatorAddressResponse) |  | GET|/gravity/v1beta/query_delegate_keys_by_validator|
+| `GetDelegateKeyByEth` | [QueryDelegateKeysByEthAddress](#gravity.v1.QueryDelegateKeysByEthAddress) | [QueryDelegateKeysByEthAddressResponse](#gravity.v1.QueryDelegateKeysByEthAddressResponse) |  | GET|/gravity/v1beta/query_delegate_keys_by_eth|
+| `GetDelegateKeyByOrchestrator` | [QueryDelegateKeysByOrchestratorAddress](#gravity.v1.QueryDelegateKeysByOrchestratorAddress) | [QueryDelegateKeysByOrchestratorAddressResponse](#gravity.v1.QueryDelegateKeysByOrchestratorAddressResponse) |  | GET|/gravity/v1beta/query_delegate_keys_by_orchestrator|
+| `GetPendingSendToEth` | [QueryPendingSendToEth](#gravity.v1.QueryPendingSendToEth) | [QueryPendingSendToEthResponse](#gravity.v1.QueryPendingSendToEthResponse) |  | GET|/gravity/v1beta/query_pending_send_to_eth|
 
  <!-- end services -->
 

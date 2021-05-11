@@ -258,6 +258,28 @@ func SetGenesisDefaults(cdc codec.Marshaler, genState app.GenesisState) (app.Gen
 					},
 				},
 			},
+			{
+				Base:        "gravity",
+				Display:     "erc20",
+				Description: "Gravity-bridge Ethereum ERC20 token",
+				DenomUnits: []*bankTypes.DenomUnit{
+					{
+						Denom:    "gravity",
+						Exponent: 0,
+						Aliases: []string{
+							"gravity",
+							"aerc20",
+						},
+					},
+					{
+						Denom:    "erc20",
+						Exponent: 18,
+						Aliases: []string{
+							"erc20",
+						},
+					},
+				},
+			},
 		}
 		moduleState.Params.SendEnabled = []*bankTypes.SendEnabled{
 			{

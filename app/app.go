@@ -11,6 +11,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/dfinance/dstation/x/gravity"
+	gravityTypes "github.com/dfinance/dstation/x/gravity/types"
 	"github.com/dfinance/dstation/x/oracle"
 	oracleTypes "github.com/dfinance/dstation/x/oracle/types"
 	"github.com/gorilla/mux"
@@ -91,6 +93,7 @@ import (
 	upgradeTypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/dfinance/dstation/pkg"
+	gravityKeeper "github.com/dfinance/dstation/x/gravity/keeper"
 	oracleKeeper "github.com/dfinance/dstation/x/oracle/keeper"
 	"github.com/dfinance/dstation/x/vm"
 	vmConfig "github.com/dfinance/dstation/x/vm/config"
@@ -128,6 +131,7 @@ var (
 		// DN modules
 		oracle.AppModuleBasic{},
 		vm.AppModuleBasic{},
+		gravity.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -140,6 +144,7 @@ var (
 		govTypes.ModuleName:            {authTypes.Burner},
 		ibcTransferTypes.ModuleName:    {authTypes.Minter, authTypes.Burner},
 		vmTypes.DelPoolName:            {authTypes.Staking},
+		gravityTypes.ModuleName:        {authTypes.Minter, authTypes.Burner},
 	}
 )
 
@@ -180,8 +185,9 @@ type DnApp struct { // nolint: golint
 	EvidenceKeeper   evidenceKeeper.Keeper
 	TransferKeeper   ibcTransferKeeper.Keeper
 	// DN keepers
-	OracleKeeper oracleKeeper.Keeper
-	VmKeeper     vmKeeper.Keeper
+	OracleKeeper  oracleKeeper.Keeper
+	VmKeeper      vmKeeper.Keeper
+	GravityKeeper gravityKeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilityKeeper.ScopedKeeper
@@ -398,8 +404,8 @@ func NewDnApp(
 		mintTypes.StoreKey, distrTypes.StoreKey, slashingTypes.StoreKey,
 		govTypes.StoreKey, paramsTypes.StoreKey, ibcHost.StoreKey, upgradeTypes.StoreKey,
 		evidenceTypes.StoreKey, ibcTransferTypes.StoreKey, capabilityTypes.StoreKey,
-		oracleTypes.StoreKey,
-		vmTypes.StoreKey,
+		oracleTypes.StoreKey, vmTypes.StoreKey,
+		gravityTypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramsTypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilityTypes.MemStoreKey)
@@ -462,7 +468,11 @@ func NewDnApp(
 	// Register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks
 	app.StakingKeeper = *stakingKeeper.SetHooks(
-		stakingTypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
+		stakingTypes.NewMultiStakingHooks(
+			app.DistrKeeper.Hooks(),
+			app.SlashingKeeper.Hooks(),
+			app.GravityKeeper.Hooks(),
+		),
 	)
 
 	// Create IBC Keeper
@@ -479,6 +489,15 @@ func NewDnApp(
 		appCodec, keys[vmTypes.StoreKey],
 		app.vmConn, app.dsListener, app.vmConfig,
 		app.AccountKeeper, app.BankKeeper, app.OracleKeeper,
+	)
+
+	app.GravityKeeper = gravityKeeper.NewKeeper(
+		appCodec,
+		keys[gravityTypes.StoreKey],
+		app.GetSubspace(gravityTypes.ModuleName),
+		stakingKeeper,
+		app.BankKeeper,
+		app.SlashingKeeper,
 	)
 
 	// Register the proposal types
@@ -547,6 +566,8 @@ func NewDnApp(
 		// DN modules
 		oracle.NewAppModule(appCodec, app.OracleKeeper),
 		vm.NewAppModule(appCodec, app.VmKeeper, app.AccountKeeper, app.BankKeeper),
+		// Gravity bridge
+		gravity.NewAppModule(app.GravityKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -571,6 +592,8 @@ func NewDnApp(
 		stakingTypes.ModuleName,
 		// DN modules
 		oracleTypes.ModuleName,
+		// Gravity bridge
+		gravityTypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -595,6 +618,8 @@ func NewDnApp(
 		// DN modules
 		oracleTypes.ModuleName,
 		vmTypes.ModuleName,
+		// Gravity bridge
+		gravityTypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -698,6 +723,8 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibcHost.ModuleName)
 	//
 	paramsKeeper.Subspace(oracleTypes.ModuleName)
+	//
+	paramsKeeper.Subspace(gravityTypes.ModuleName)
 
 	return paramsKeeper
 }
