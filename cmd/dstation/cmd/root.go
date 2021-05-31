@@ -36,6 +36,8 @@ import (
 	"github.com/dfinance/dstation/app"
 	dnConfig "github.com/dfinance/dstation/cmd/dstation/config"
 	vmConfig "github.com/dfinance/dstation/x/vm/config"
+
+	migrationCli "github.com/dfinance/dstation/x/migration/client"
 )
 
 // NewRootCmd creates a new root command for simd. It is called once in the main function.
@@ -85,6 +87,8 @@ func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
 
 		queryCommand(),
 		txCommand(),
+
+		migrationCli.MigrateGenesisCmd(),
 	)
 	server.AddCommands(rootCmd, dnConfig.DefaultNodeHome, newApp, appExporter, serverFlags)
 

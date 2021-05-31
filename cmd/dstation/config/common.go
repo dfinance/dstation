@@ -52,11 +52,12 @@ func SetConsensusDefaults(params *tmProto.ConsensusParams) (*tmProto.ConsensusPa
 	}
 
 	// Block
+	ret := *params
 	{
-		params.Block.MaxGas = MaxGas
+		ret.Block.MaxGas = MaxGas
 	}
 
-	return params, nil
+	return &ret, nil
 }
 
 // SetGenesisDefaults takes default app genesis state and overwrites Cosmos SDK / Dfinance params.
