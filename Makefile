@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 # Options
-LEDGER_ENABLED := false
+LEDGER_ENABLED := true
 
 # Common vars
 DOCKER := $(shell which docker)
@@ -10,6 +10,9 @@ PROTOC := $(shell which protoc)
 # Build version
 
 git_tag := $(shell git describe --tags --abbrev=0)
+ifeq ($(git_tag),)
+  git_tag := v0.0.0
+endif
 git_commit := $(shell git rev-list -1 HEAD)
 app_version := $(git_tag)-$(git_commit)
 cosmos_version := $(shell awk '/github.com\/cosmos\/cosmos-sdk/ {print $$NF}' go.mod)
@@ -54,7 +57,7 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=dnode \
 		  -X github.com/cosmos/cosmos-sdk/version.AppName=dstation \
-		  -X github.com/cosmos/cosmos-sdk/version.Version=$(version) \
+		  -X github.com/cosmos/cosmos-sdk/version.Version=$(git_tag) \
 		  -X github.com/cosmos/cosmos-sdk/version.Commit=$(git_commit) \
 		  -X "github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)" \
 		  -X github.com/tendermint/tendermint/version.TMCoreSemVer=$(tm_version)
@@ -75,10 +78,9 @@ go.sum: go.mod
 
 install-dstation:
 	@echo "--> dstation app build / install"
-	@echo "  App version: $(version)"
+	@echo "  App version: $(app_version)"
 	@echo "  SDK version: $(cosmos_version)"
 	@echo "  TM version:  $(tm_version)"
-
 	@go install -ldflags "$(ldflags)" -tags "$(build_tags)" ./cmd/dstation
 
 lint:
@@ -104,3 +106,13 @@ proto-gen:
 
 	@echo "--> Generating Protobuf files"
 	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen sh ./scripts/protocgen.sh
+
+## Binaries build using xgo (https://github.com/karalabe/xgo) fork as xgo seems abandoned
+build-binaries: go.sum
+	@echo "--> dstation app cross-build (windows/amd64, linux/amd64, darwin/amd64)"
+	@echo "  App version: $(app_version)"
+	@echo "  SDK version: $(cosmos_version)"
+	@echo "  TM version:  $(tm_version)"
+	@mkdir -p ./builds
+	@go get github.com/crazy-max/xgo
+	xgo -go 1.15.11 --ldflags='$(ldflags)' --tags='$(build_tags)' --out='./builds/dstation-${app_version}' -targets='windows/amd64,linux/amd64,darwin/amd64' ./cmd/dstation
