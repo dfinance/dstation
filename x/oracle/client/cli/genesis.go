@@ -1,13 +1,6 @@
 package cli
 
 import (
-	"encoding/json"
-	"fmt"
-
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/dfinance/dstation/pkg"
 	"github.com/dfinance/dstation/x/oracle/types"
 	"github.com/spf13/cobra"
@@ -17,7 +10,7 @@ import (
 func GetCmdTxGenAddNominee() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "gen-add-nominee [accAddress]",
-		Short:   "Add nominee account to genesis.json (no validation)",
+		Short:   "Add x/oracle module nominee account to genesis.json (no validation)",
 		Example: "gen-add-nominee wallet1jk4ld0uu6wdrj9t8u3gghm9jt583hxx7xp7he8",
 		Args:    cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -27,8 +20,10 @@ func GetCmdTxGenAddNominee() *cobra.Command {
 				return err
 			}
 
-			return updateModuleGenesis(cmd, func(genState *types.GenesisState) error {
-				genState.Params.Nominees = append(genState.Params.Nominees, nomineeAddr.String())
+			genState := &types.GenesisState{}
+			return pkg.UpdateModuleGenesis(cmd, types.ModuleName, genState, func(handlerState interface{}) error {
+				moduleState := handlerState.(*types.GenesisState)
+				moduleState.Params.Nominees = append(moduleState.Params.Nominees, nomineeAddr.String())
 				return nil
 			})
 		},
@@ -70,8 +65,10 @@ func GetCmdTxGenAddOracle() *cobra.Command {
 				oracleDesc = args[3]
 			}
 
-			return updateModuleGenesis(cmd, func(genState *types.GenesisState) error {
-				genState.Oracles = append(genState.Oracles, types.Oracle{
+			genState := &types.GenesisState{}
+			return pkg.UpdateModuleGenesis(cmd, types.ModuleName, genState, func(handlerState interface{}) error {
+				moduleState := handlerState.(*types.GenesisState)
+				moduleState.Oracles = append(moduleState.Oracles, types.Oracle{
 					AccAddress:    oracleAddr.String(),
 					Description:   oracleDesc,
 					PriceMaxBytes: uint32(priceMaxBytes),
@@ -122,8 +119,10 @@ func GetCmdTxGenAddAsset() *cobra.Command {
 				}
 			}
 
-			return updateModuleGenesis(cmd, func(genState *types.GenesisState) error {
-				genState.Assets = append(genState.Assets, types.Asset{
+			genState := &types.GenesisState{}
+			return pkg.UpdateModuleGenesis(cmd, types.ModuleName, genState, func(handlerState interface{}) error {
+				moduleState := handlerState.(*types.GenesisState)
+				moduleState.Assets = append(moduleState.Assets, types.Asset{
 					AssetCode: assetCode,
 					Oracles:   oracles,
 					Decimals:  uint32(decimals),
@@ -140,45 +139,4 @@ func GetCmdTxGenAddAsset() *cobra.Command {
 	})
 
 	return cmd
-}
-
-// updateModuleGenesis read, updates module state and saves application genesis state to default genesis.json location.
-func updateModuleGenesis(cmd *cobra.Command, stateUpdater func(genState *types.GenesisState) error) error {
-	serverCtx := server.GetServerContextFromCmd(cmd)
-	clientCtx, err := client.GetClientTxContext(cmd)
-	if err != nil {
-		return err
-	}
-
-	config := serverCtx.Config
-	config.SetRoot(clientCtx.HomeDir)
-
-	genFile := config.GenesisFile()
-	appState, genDoc, err := genutiltypes.GenesisStateFromGenFile(genFile)
-	if err != nil {
-		return fmt.Errorf("application genesis state: unmarshal failed (%s): %w", genFile, err)
-	}
-
-	genesisState := types.GenesisState{}
-	if err := json.Unmarshal(appState[types.ModuleName], &genesisState); err != nil {
-		return fmt.Errorf("module genesis state (%s): unmarshal failed: %w", types.ModuleName, err)
-	}
-
-	if err := stateUpdater(&genesisState); err != nil {
-		return fmt.Errorf("module genesis state (%s): update failed: %w", types.ModuleName, err)
-	}
-
-	genesisStateBz, err := json.Marshal(genesisState)
-	if err != nil {
-		return fmt.Errorf("module genesis state (%s): marshal failed: %w", types.ModuleName, err)
-	}
-	appState[types.ModuleName] = genesisStateBz
-
-	appStateBz, err := json.Marshal(appState)
-	if err != nil {
-		return fmt.Errorf("application genesis state: marshal failed: %w", err)
-	}
-	genDoc.AppState = appStateBz
-
-	return genutil.ExportGenesisFile(genDoc, genFile)
 }

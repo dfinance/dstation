@@ -1,0 +1,57 @@
+syntax = "proto3";
+package dfinance.staker.v1beta1;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+
+import "cosmos_proto/cosmos.proto";
+
+import "dfinance/staker/staker.proto";
+
+option go_package = "github.com/dfinance/dstation/x/staker/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  // CallById returns an existing historical call info by its unique ID
+  rpc CallById(QueryCallByIdRequest) returns (QueryCallByIdResponse) {
+    option (google.api.http).get = "/dfinance/staker/v1beta1/call";
+  }
+
+  // CallsByAccount returns an existing historical calls info for a target account
+  rpc CallsByAccount(QueryCallsByAccountRequest) returns (QueryCallsByAccountResponse) {
+    option (google.api.http).get = "/dfinance/staker/v1beta1/calls";
+  }
+}
+
+// QueryCallByIdRequest is request type for Query/CallById RPC method.
+message QueryCallByIdRequest {
+  // Unique call ID
+  string id = 1 [
+    (gogoproto.moretags) = "yaml:\"id\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint"
+  ];
+}
+
+// QueryCallByIdResponse is response type for Query/CallById RPC method.
+message QueryCallByIdResponse {
+  Call call = 1 [
+    (gogoproto.moretags) = "yaml:\"call\""
+  ];
+}
+
+// QueryCallByIdRequest is request type for Query/CallsByAccount RPC method.
+message QueryCallsByAccountRequest {
+  // Target account address
+  string address = 1 [
+    (gogoproto.moretags) = "yaml:\"address\""
+  ];
+}
+
+// QueryCallByIdResponse is response type for Query/CallsByAccount RPC method.
+message QueryCallsByAccountResponse {
+  repeated Call calls = 1 [
+    (gogoproto.moretags) = "yaml:\"calls\"",
+    (gogoproto.nullable) = false
+  ];
+}

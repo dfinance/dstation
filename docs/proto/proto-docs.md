@@ -106,6 +106,31 @@
   
     - [Msg](#dfinance.oracle.v1beta1.Msg)
   
+- [dfinance/staker/staker.proto](#dfinance/staker/staker.proto)
+    - [Call](#dfinance.staker.v1beta1.Call)
+  
+    - [Call.CallType](#dfinance.staker.v1beta1.Call.CallType)
+  
+- [dfinance/staker/genesis.proto](#dfinance/staker/genesis.proto)
+    - [GenesisState](#dfinance.staker.v1beta1.GenesisState)
+    - [Params](#dfinance.staker.v1beta1.Params)
+  
+- [dfinance/staker/query.proto](#dfinance/staker/query.proto)
+    - [QueryCallByIdRequest](#dfinance.staker.v1beta1.QueryCallByIdRequest)
+    - [QueryCallByIdResponse](#dfinance.staker.v1beta1.QueryCallByIdResponse)
+    - [QueryCallsByAccountRequest](#dfinance.staker.v1beta1.QueryCallsByAccountRequest)
+    - [QueryCallsByAccountResponse](#dfinance.staker.v1beta1.QueryCallsByAccountResponse)
+  
+    - [Query](#dfinance.staker.v1beta1.Query)
+  
+- [dfinance/staker/tx.proto](#dfinance/staker/tx.proto)
+    - [MsgDepositCall](#dfinance.staker.v1beta1.MsgDepositCall)
+    - [MsgDepositCallResponse](#dfinance.staker.v1beta1.MsgDepositCallResponse)
+    - [MsgWithdrawCall](#dfinance.staker.v1beta1.MsgWithdrawCall)
+    - [MsgWithdrawCallResponse](#dfinance.staker.v1beta1.MsgWithdrawCallResponse)
+  
+    - [Msg](#dfinance.staker.v1beta1.Msg)
+  
 - [dfinance/vm/genesis.proto](#dfinance/vm/genesis.proto)
     - [GenesisState](#dfinance.vm.v1beta1.GenesisState)
     - [GenesisState.WriteOp](#dfinance.vm.v1beta1.GenesisState.WriteOp)
@@ -1454,6 +1479,280 @@ Msg defines the Oracle module Msg service.
 | `SetOracle` | [MsgSetOracle](#dfinance.oracle.v1beta1.MsgSetOracle) | [MsgSetOracleResponse](#dfinance.oracle.v1beta1.MsgSetOracleResponse) | SetOracle creates/updates an Oracle source (nominee authorized). | |
 | `SetAsset` | [MsgSetAsset](#dfinance.oracle.v1beta1.MsgSetAsset) | [MsgSetAssetResponse](#dfinance.oracle.v1beta1.MsgSetAssetResponse) | SetAsset creates/updates an Asset (nominee authorized). | |
 | `PostPrice` | [MsgPostPrice](#dfinance.oracle.v1beta1.MsgPostPrice) | [MsgPostPriceResponse](#dfinance.oracle.v1beta1.MsgPostPriceResponse) | PostPrice posts a raw price from a source (Oracle) | |
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/staker/staker.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/staker/staker.proto
+
+
+
+<a name="dfinance.staker.v1beta1.Call"></a>
+
+### Call
+Call keeps Staker operation data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  | Unique call ID |
+| `nominee` | [string](#string) |  | Operation authorized by address |
+| `address` | [string](#string) |  | Operation target account address |
+| `type` | [Call.CallType](#dfinance.staker.v1beta1.Call.CallType) |  | Operation direction (mint / destroy) |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Operation coins |
+| `timestamp` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Operation createdAt |
+
+
+
+
+
+ <!-- end messages -->
+
+
+<a name="dfinance.staker.v1beta1.Call.CallType"></a>
+
+### Call.CallType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DEPOSIT | 0 |  |
+| WITHDRAW | 1 |  |
+
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/staker/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/staker/genesis.proto
+
+
+
+<a name="dfinance.staker.v1beta1.GenesisState"></a>
+
+### GenesisState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#dfinance.staker.v1beta1.Params) |  | Keeper param values |
+| `last_call_id` | [string](#string) |  | The latest unique call ID |
+| `calls` | [Call](#dfinance.staker.v1beta1.Call) | repeated | Historical call entries |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.Params"></a>
+
+### Params
+Params keeps keeper parameters (which might be changed via Gov).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nominees` | [string](#string) | repeated | Admin account addresses |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/staker/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/staker/query.proto
+
+
+
+<a name="dfinance.staker.v1beta1.QueryCallByIdRequest"></a>
+
+### QueryCallByIdRequest
+QueryCallByIdRequest is request type for Query/CallById RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  | Unique call ID |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.QueryCallByIdResponse"></a>
+
+### QueryCallByIdResponse
+QueryCallByIdResponse is response type for Query/CallById RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `call` | [Call](#dfinance.staker.v1beta1.Call) |  |  |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.QueryCallsByAccountRequest"></a>
+
+### QueryCallsByAccountRequest
+QueryCallByIdRequest is request type for Query/CallsByAccount RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `address` | [string](#string) |  | Target account address |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.QueryCallsByAccountResponse"></a>
+
+### QueryCallsByAccountResponse
+QueryCallByIdResponse is response type for Query/CallsByAccount RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `calls` | [Call](#dfinance.staker.v1beta1.Call) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="dfinance.staker.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `CallById` | [QueryCallByIdRequest](#dfinance.staker.v1beta1.QueryCallByIdRequest) | [QueryCallByIdResponse](#dfinance.staker.v1beta1.QueryCallByIdResponse) | CallById returns an existing historical call info by its unique ID | GET|/dfinance/staker/v1beta1/call|
+| `CallsByAccount` | [QueryCallsByAccountRequest](#dfinance.staker.v1beta1.QueryCallsByAccountRequest) | [QueryCallsByAccountResponse](#dfinance.staker.v1beta1.QueryCallsByAccountResponse) | CallsByAccount returns an existing historical calls info for a target account | GET|/dfinance/staker/v1beta1/calls|
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/staker/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/staker/tx.proto
+
+
+
+<a name="dfinance.staker.v1beta1.MsgDepositCall"></a>
+
+### MsgDepositCall
+MsgDepositCall defines a SDK message to perform the Deposit operation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nominee` | [string](#string) |  | Nominee account address |
+| `address` | [string](#string) |  | Target address |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Amount |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.MsgDepositCallResponse"></a>
+
+### MsgDepositCallResponse
+MsgDepositCallResponse defines the response for the Deposit operation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  | Unique call ID |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.MsgWithdrawCall"></a>
+
+### MsgWithdrawCall
+MsgWithdrawCall defines a SDK message to perform the Withdraw operation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `nominee` | [string](#string) |  | Nominee account address |
+| `address` | [string](#string) |  | Target address |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Amount |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.MsgWithdrawCallResponse"></a>
+
+### MsgWithdrawCallResponse
+MsgDepositCallResponse defines the response for the Withdraw operation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  | Unique call ID |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="dfinance.staker.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the Staker module Msg service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Deposit` | [MsgDepositCall](#dfinance.staker.v1beta1.MsgDepositCall) | [MsgDepositCallResponse](#dfinance.staker.v1beta1.MsgDepositCallResponse) | Deposit deposits (mints) coins to a target account (nominee authorized). | |
+| `Withdraw` | [MsgWithdrawCall](#dfinance.staker.v1beta1.MsgWithdrawCall) | [MsgWithdrawCallResponse](#dfinance.staker.v1beta1.MsgWithdrawCallResponse) | Withdraw withdraws (destroys) coins from a target account (nominee authorized). | |
 
  <!-- end services -->
 

@@ -13,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/simapp"
 	"github.com/dfinance/dstation/x/oracle"
 	oracleTypes "github.com/dfinance/dstation/x/oracle/types"
+	"github.com/dfinance/dstation/x/staker"
 	"github.com/gorilla/mux"
 	"github.com/rakyll/statik/fs"
 	"google.golang.org/grpc"
@@ -92,6 +93,8 @@ import (
 
 	"github.com/dfinance/dstation/pkg"
 	oracleKeeper "github.com/dfinance/dstation/x/oracle/keeper"
+	stakerKeeper "github.com/dfinance/dstation/x/staker/keeper"
+	stakerTypes "github.com/dfinance/dstation/x/staker/types"
 	"github.com/dfinance/dstation/x/vm"
 	vmConfig "github.com/dfinance/dstation/x/vm/config"
 	vmKeeper "github.com/dfinance/dstation/x/vm/keeper"
@@ -126,6 +129,7 @@ var (
 		transfer.AppModuleBasic{},
 		vesting.AppModuleBasic{},
 		// DN modules
+		staker.AppModuleBasic{},
 		oracle.AppModuleBasic{},
 		vm.AppModuleBasic{},
 	)
@@ -139,6 +143,7 @@ var (
 		stakingTypes.NotBondedPoolName: {authTypes.Burner, authTypes.Staking},
 		govTypes.ModuleName:            {authTypes.Burner},
 		ibcTransferTypes.ModuleName:    {authTypes.Minter, authTypes.Burner},
+		stakerTypes.ModuleName:         {authTypes.Minter, authTypes.Burner, authTypes.Staking},
 		vmTypes.DelPoolName:            {authTypes.Staking},
 	}
 )
@@ -180,6 +185,7 @@ type DnApp struct { // nolint: golint
 	EvidenceKeeper   evidenceKeeper.Keeper
 	TransferKeeper   ibcTransferKeeper.Keeper
 	// DN keepers
+	StakerKeeper stakerKeeper.Keeper
 	OracleKeeper oracleKeeper.Keeper
 	VmKeeper     vmKeeper.Keeper
 
@@ -398,6 +404,7 @@ func NewDnApp(
 		mintTypes.StoreKey, distrTypes.StoreKey, slashingTypes.StoreKey,
 		govTypes.StoreKey, paramsTypes.StoreKey, ibcHost.StoreKey, upgradeTypes.StoreKey,
 		evidenceTypes.StoreKey, ibcTransferTypes.StoreKey, capabilityTypes.StoreKey,
+		stakingTypes.StoreKey,
 		oracleTypes.StoreKey,
 		vmTypes.StoreKey,
 	)
@@ -471,6 +478,11 @@ func NewDnApp(
 	)
 
 	// DN keepers
+	app.StakerKeeper = stakerKeeper.NewKeeper(
+		appCodec, keys[stakingTypes.StoreKey], app.GetSubspace(stakerTypes.ModuleName),
+		app.BankKeeper,
+	)
+
 	app.OracleKeeper = oracleKeeper.NewKeeper(
 		appCodec, keys[oracleTypes.StoreKey], app.GetSubspace(oracleTypes.ModuleName),
 	)
@@ -545,6 +557,7 @@ func NewDnApp(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		// DN modules
+		staker.NewAppModule(appCodec, app.StakerKeeper),
 		oracle.NewAppModule(appCodec, app.OracleKeeper),
 		vm.NewAppModule(appCodec, app.VmKeeper, app.AccountKeeper, app.BankKeeper),
 	)
@@ -562,7 +575,6 @@ func NewDnApp(
 		stakingTypes.ModuleName,
 		ibcHost.ModuleName,
 		// DN modules
-		oracleTypes.ModuleName,
 		vmTypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(
@@ -593,6 +605,7 @@ func NewDnApp(
 		evidenceTypes.ModuleName,
 		ibcTransferTypes.ModuleName,
 		// DN modules
+		stakerTypes.ModuleName,
 		oracleTypes.ModuleName,
 		vmTypes.ModuleName,
 	)
@@ -697,6 +710,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	paramsKeeper.Subspace(ibcTransferTypes.ModuleName)
 	paramsKeeper.Subspace(ibcHost.ModuleName)
 	//
+	paramsKeeper.Subspace(stakerTypes.ModuleName)
 	paramsKeeper.Subspace(oracleTypes.ModuleName)
 
 	return paramsKeeper

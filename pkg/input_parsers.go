@@ -268,15 +268,31 @@ func ParseCoinParam(argName, argValue string, paramType ParamType) (retCoin sdk.
 		return sdk.Coin{}, fmt.Errorf("%s %s %q: parsing coin: %v", argName, paramType, argValue, err)
 	}
 
-	if err := sdk.ValidateDenom(coin.Denom); err != nil {
-		return sdk.Coin{}, fmt.Errorf("%s %s %q: validating denom: %v", argName, paramType, argValue, err)
-	}
-
-	if coin.Amount.LT(sdk.ZeroInt()) {
-		return sdk.Coin{}, fmt.Errorf("%s %s %q: amount is LT zero", argName, paramType, argValue)
+	if err := coin.Validate(); err != nil {
+		return sdk.Coin{}, fmt.Errorf("%s %s %q: validating: %v", argName, paramType, argValue, err)
 	}
 
 	return coin, nil
+}
+
+// ParseCoinsParam parses sdk.Coins param and validates it.
+func ParseCoinsParam(argName, argValue string, paramType ParamType) (retCoin sdk.Coins, retErr error) {
+	defer func() {
+		if r := recover(); r != nil {
+			retErr = fmt.Errorf("%s %s %q: parsing coins failed", argName, paramType, argValue)
+		}
+	}()
+
+	coins, err := sdk.ParseCoinsNormalized(argValue)
+	if err != nil {
+		return sdk.Coins{}, fmt.Errorf("%s %s %q: parsing coins: %v", argName, paramType, argValue, err)
+	}
+
+	if err := coins.Validate(); err != nil {
+		return sdk.Coins{}, fmt.Errorf("%s %s %q: validating: %v", argName, paramType, argValue, err)
+	}
+
+	return coins, nil
 }
 
 // ParseUnixTimestamp parses UNIX timestamp in seconds.

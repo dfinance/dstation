@@ -1,6 +1,6 @@
-// Package oracle defines module which receives rawPrices data per asset from external exchange rate providers and provides current exchange rate information.
-// Module uses nominee account as an admin account to add/modify assets.
-package oracle
+// Package staker defines module which receives Deposit and Withdraw calls from the external service and mints (destroys) tokens for a target account.
+// Module uses nominee account as an admin account for Deposit and Withdraw operations.
+package staker
 
 import (
 	"context"
@@ -12,14 +12,14 @@ import (
 	cdcTypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/dfinance/dstation/x/oracle/client/cli"
+	"github.com/dfinance/dstation/x/staker/client/cli"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
-	"github.com/dfinance/dstation/x/oracle/keeper"
-	"github.com/dfinance/dstation/x/oracle/types"
+	"github.com/dfinance/dstation/x/staker/keeper"
+	"github.com/dfinance/dstation/x/staker/types"
 )
 
 var _ module.AppModuleBasic = AppModuleBasic{}
@@ -149,7 +149,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json
 // BeginBlock returns the begin blocker for the module.
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {}
 
-// EndBlock returns the end blocker for the module.
+// EndBlock returns the end blocker for the module. It returns no validator updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return EndBlocker(ctx, am.keeper)
+	return []abci.ValidatorUpdate{}
 }

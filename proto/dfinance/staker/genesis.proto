@@ -1,0 +1,43 @@
+syntax = "proto3";
+package dfinance.staker.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+import "cosmos_proto/cosmos.proto";
+
+import "dfinance/staker/staker.proto";
+
+option go_package = "github.com/dfinance/dstation/x/staker/types";
+
+message GenesisState {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // Keeper param values
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"params\""
+  ];
+
+  // The latest unique call ID
+  string last_call_id = 2 [
+    (gogoproto.moretags) = "yaml:\"last_call_id\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint"
+  ];
+
+  // Historical call entries
+  repeated Call calls = 3 [
+    (gogoproto.moretags) = "yaml:\"calls\"",
+    (gogoproto.nullable) = false
+  ];
+}
+
+// Params keeps keeper parameters (which might be changed via Gov).
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+
+  // Admin account addresses
+  repeated string nominees = 1 [
+    (gogoproto.moretags) = "yaml:\"nominees\""
+  ];
+}

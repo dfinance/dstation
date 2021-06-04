@@ -1,0 +1,57 @@
+syntax = "proto3";
+package dfinance.staker.v1beta1;
+
+import "google/protobuf/timestamp.proto";
+import "gogoproto/gogo.proto";
+
+import "cosmos_proto/cosmos.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/dfinance/dstation/x/staker/types";
+
+// Call keeps Staker operation data.
+message Call {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  enum CallType {
+    DEPOSIT = 0;
+    WITHDRAW = 1;
+  }
+
+  // Unique call ID
+  string id = 1 [
+    (gogoproto.moretags) = "yaml:\"id\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint"
+  ];
+
+  // Operation authorized by address
+  string nominee = 2 [
+    (gogoproto.moretags) = "yaml:\"nominee\""
+  ];
+
+  // Operation target account address
+  string address = 3 [
+    (gogoproto.moretags) = "yaml:\"address\""
+  ];
+
+  // Operation direction (mint / destroy)
+  CallType type = 4 [
+    (gogoproto.moretags) = "yaml:\"type\""
+  ];
+
+  // Operation coins
+  repeated cosmos.base.v1beta1.Coin amount = 5 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+
+  // Operation createdAt
+  google.protobuf.Timestamp timestamp = 6 [
+    (gogoproto.moretags) = "yaml:\"timestamp\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.stdtime) = true
+  ];
+}

@@ -1,0 +1,84 @@
+syntax = "proto3";
+package dfinance.staker.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+import "cosmos_proto/cosmos.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+option go_package = "github.com/dfinance/dstation/x/staker/types";
+
+// Msg defines the Staker module Msg service.
+service Msg {
+  // Deposit deposits (mints) coins to a target account (nominee authorized).
+  rpc Deposit(MsgDepositCall) returns (MsgDepositCallResponse);
+
+  // Withdraw withdraws (destroys) coins from a target account (nominee authorized).
+  rpc Withdraw(MsgWithdrawCall) returns (MsgWithdrawCallResponse);
+}
+
+// MsgDepositCall defines a SDK message to perform the Deposit operation.
+message MsgDepositCall {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // Nominee account address
+  string nominee = 1 [
+    (gogoproto.moretags) = "yaml:\"nominee\""
+  ];
+
+  // Target address
+  string address = 2 [
+    (gogoproto.moretags) = "yaml:\"address\""
+  ];
+
+  // Amount
+  repeated cosmos.base.v1beta1.Coin amount = 3 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+// MsgWithdrawCall defines a SDK message to perform the Withdraw operation.
+message MsgWithdrawCall {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // Nominee account address
+  string nominee = 1 [
+    (gogoproto.moretags) = "yaml:\"nominee\""
+  ];
+
+  // Target address
+  string address = 2 [
+    (gogoproto.moretags) = "yaml:\"address\""
+  ];
+
+  // Amount
+  repeated cosmos.base.v1beta1.Coin amount = 3 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+// MsgDepositCallResponse defines the response for the Deposit operation.
+message MsgDepositCallResponse {
+  // Unique call ID
+  string id = 1 [
+    (gogoproto.moretags) = "yaml:\"id\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint"
+  ];
+}
+
+// MsgDepositCallResponse defines the response for the Withdraw operation.
+message MsgWithdrawCallResponse {
+  // Unique call ID
+  string id = 1 [
+    (gogoproto.moretags) = "yaml:\"id\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint"
+  ];
+}

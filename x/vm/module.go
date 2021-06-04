@@ -152,12 +152,12 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json
 	return cdc.MustMarshalJSON(genState)
 }
 
-// BeginBlock returns the begin blocker for the staking module.
+// BeginBlock returns the begin blocker for the module.
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
 	BeginBlocker(ctx, am.keeper)
 }
 
-// EndBlock returns the end blocker for the staking module. It returns no validator updates.
+// EndBlock returns the end blocker for the module. It returns no validator updates.
 func (am AppModule) EndBlock(ctx sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }
