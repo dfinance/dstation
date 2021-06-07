@@ -26,6 +26,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilCli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	paramsCli "github.com/cosmos/cosmos-sdk/x/params/client/cli"
+	"github.com/dfinance/dstation/pkg/logger"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -64,10 +65,18 @@ func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
 		Short: "Dfinance Cosmos SDK Stargate app",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
-				return err
+				return fmt.Errorf("client.SetCmdClientContextHandler: %w", err)
 			}
 
-			return server.InterceptConfigsPreRunHandler(cmd)
+			if err := server.InterceptConfigsPreRunHandler(cmd); err != nil {
+				return fmt.Errorf("server.InterceptConfigsPreRunHandler: %w", err)
+			}
+
+			if err := logger.OverrideCmdCtxLogger(cmd); err != nil {
+				return fmt.Errorf("logger.OverrideCmdCtxLogger: %w", err)
+			}
+
+			return nil
 		},
 	}
 
