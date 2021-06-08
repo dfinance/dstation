@@ -35,6 +35,10 @@ func (m MsgDepositCall) ValidateBasic() error {
 		return fmt.Errorf("address: %w", err)
 	}
 
+	if err := m.SourceMeta.Validate(); err != nil {
+		return fmt.Errorf("source_meta: %w", err)
+	}
+
 	if m.Amount.IsZero() {
 		return fmt.Errorf("amount: empty coins")
 	}
@@ -63,11 +67,15 @@ func (m MsgDepositCall) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgDepositCall creates a new MsgDepositCall message.
-func NewMsgDepositCall(nomineeAddress, targetAccAddress sdk.AccAddress, coins sdk.Coins) MsgDepositCall {
+func NewMsgDepositCall(nomineeAddress, targetAccAddress sdk.AccAddress, srcEthAddr, srcChainId string, coins sdk.Coins) MsgDepositCall {
 	return MsgDepositCall{
 		Nominee: nomineeAddress.String(),
 		Address: targetAccAddress.String(),
-		Amount:  coins,
+		SourceMeta: CallSourceMeta{
+			EthAddress: srcEthAddr,
+			ChainId:    srcChainId,
+		},
+		Amount: coins,
 	}
 }
 
@@ -88,6 +96,10 @@ func (m MsgWithdrawCall) ValidateBasic() error {
 
 	if _, err := sdk.AccAddressFromBech32(m.Address); err != nil {
 		return fmt.Errorf("address: %w", err)
+	}
+
+	if err := m.SourceMeta.Validate(); err != nil {
+		return fmt.Errorf("source_meta: %w", err)
 	}
 
 	if m.Amount.IsZero() {
@@ -118,10 +130,14 @@ func (m MsgWithdrawCall) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgWithdrawCall creates a new MsgDepositCall message.
-func NewMsgWithdrawCall(nomineeAddress, targetAccAddress sdk.AccAddress, coins sdk.Coins) MsgWithdrawCall {
+func NewMsgWithdrawCall(nomineeAddress, targetAccAddress sdk.AccAddress, srcEthAddr, srcChainId string, coins sdk.Coins) MsgWithdrawCall {
 	return MsgWithdrawCall{
 		Nominee: nomineeAddress.String(),
 		Address: targetAccAddress.String(),
-		Amount:  coins,
+		SourceMeta: CallSourceMeta{
+			EthAddress: srcEthAddr,
+			ChainId:    srcChainId,
+		},
+		Amount: coins,
 	}
 }

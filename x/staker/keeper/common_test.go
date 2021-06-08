@@ -51,11 +51,12 @@ func (s *KeeperTestSuite) SetupTest() {
 	s.ctx = s.app.GetContext(false)
 }
 
-func (s *KeeperTestSuite) CheckCall(ctx sdk.Context, call types.Call, expId uint64, expAccAddr sdk.AccAddress, expType types.Call_CallType, expAmt sdk.Coins) {
+func (s *KeeperTestSuite) CheckCall(ctx sdk.Context, call types.Call, expId uint64, expAccAddr sdk.AccAddress, expType types.Call_CallType, expSrcMeta types.CallSourceMeta, expAmt sdk.Coins) {
 	s.Require().Equal(expId, call.Id.Uint64(), "id")
 	s.Require().Equal(s.nominee.String(), call.Nominee, "nominee")
 	s.Require().Equal(expAccAddr.String(), call.Address, "address")
 	s.Require().Equal(expType, call.Type, "type")
+	s.Require().Equal(expSrcMeta, call.SourceMeta, "source_meta")
 	s.Require().True(expAmt.IsEqual(call.Amount), "amount")
 	s.Require().True(ctx.BlockTime().Equal(call.Timestamp), "timestamp")
 }

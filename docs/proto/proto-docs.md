@@ -108,6 +108,7 @@
   
 - [dfinance/staker/staker.proto](#dfinance/staker/staker.proto)
     - [Call](#dfinance.staker.v1beta1.Call)
+    - [CallSourceMeta](#dfinance.staker.v1beta1.CallSourceMeta)
   
     - [Call.CallType](#dfinance.staker.v1beta1.Call.CallType)
   
@@ -1503,8 +1504,25 @@ Call keeps Staker operation data.
 | `nominee` | [string](#string) |  | Operation authorized by address |
 | `address` | [string](#string) |  | Operation target account address |
 | `type` | [Call.CallType](#dfinance.staker.v1beta1.Call.CallType) |  | Operation direction (mint / destroy) |
+| `source_meta` | [CallSourceMeta](#dfinance.staker.v1beta1.CallSourceMeta) |  | Call operation source data (optional) |
 | `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Operation coins |
 | `timestamp` | [google.protobuf.Timestamp](#google.protobuf.Timestamp) |  | Operation createdAt |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.CallSourceMeta"></a>
+
+### CallSourceMeta
+CallSourceMeta keeps optional Call operation source data.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `eth_address` | [string](#string) |  | Ethereum address |
+| `chain_id` | [string](#string) |  | Chain ID |
 
 
 
@@ -1684,6 +1702,7 @@ MsgDepositCall defines a SDK message to perform the Deposit operation.
 | ----- | ---- | ----- | ----------- |
 | `nominee` | [string](#string) |  | Nominee account address |
 | `address` | [string](#string) |  | Target address |
+| `source_meta` | [CallSourceMeta](#dfinance.staker.v1beta1.CallSourceMeta) |  | Operation source data (optional) |
 | `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Amount |
 
 
@@ -1716,6 +1735,7 @@ MsgWithdrawCall defines a SDK message to perform the Withdraw operation.
 | ----- | ---- | ----- | ----------- |
 | `nominee` | [string](#string) |  | Nominee account address |
 | `address` | [string](#string) |  | Target address |
+| `source_meta` | [CallSourceMeta](#dfinance.staker.v1beta1.CallSourceMeta) |  | Operation source data (optional) |
 | `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Amount |
 
 

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/dfinance/dstation/pkg"
 )
 
 // Validate validates Call object.
@@ -24,6 +25,10 @@ func (m Call) Validate() error {
 		return fmt.Errorf("type: invalid Call_CallType")
 	}
 
+	if err := m.SourceMeta.Validate(); err != nil {
+		return fmt.Errorf("source_meta: %w", err)
+	}
+
 	if m.Amount.IsZero() {
 		return fmt.Errorf("amount: empty")
 	}
@@ -33,6 +38,17 @@ func (m Call) Validate() error {
 
 	if m.Timestamp.IsZero() {
 		return fmt.Errorf("timestamp: empty")
+	}
+
+	return nil
+}
+
+// Validate validates CallSourceMeta object.
+func (m CallSourceMeta) Validate() error {
+	if m.EthAddress != "" {
+		if err := pkg.ValidateEthereumAddress(m.EthAddress); err != nil {
+			return fmt.Errorf("eth_address: %w", err)
+		}
 	}
 
 	return nil

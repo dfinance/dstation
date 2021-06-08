@@ -9,6 +9,15 @@ import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/dfinance/dstation/x/staker/types";
 
+// CallSourceMeta keeps optional Call operation source data.
+message CallSourceMeta {
+  // Ethereum address
+  string eth_address = 1;
+
+  // Chain ID
+  string chain_id = 2;
+}
+
 // Call keeps Staker operation data.
 message Call {
   option (gogoproto.equal) = false;
@@ -41,15 +50,21 @@ message Call {
     (gogoproto.moretags) = "yaml:\"type\""
   ];
 
+  // Call operation source data (optional)
+  CallSourceMeta source_meta = 5 [
+    (gogoproto.moretags) = "yaml:\"source_meta\"",
+    (gogoproto.nullable) = false
+  ];
+
   // Operation coins
-  repeated cosmos.base.v1beta1.Coin amount = 5 [
+  repeated cosmos.base.v1beta1.Coin amount = 6 [
     (gogoproto.moretags) = "yaml:\"amount\"",
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
 
   // Operation createdAt
-  google.protobuf.Timestamp timestamp = 6 [
+  google.protobuf.Timestamp timestamp = 7 [
     (gogoproto.moretags) = "yaml:\"timestamp\"",
     (gogoproto.nullable) = false,
     (gogoproto.stdtime) = true

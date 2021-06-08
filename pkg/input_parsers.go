@@ -208,8 +208,8 @@ func ParseSpaceSepSdkAddressesParams(argName string, argValues []string, paramTy
 
 // ParseEthereumAddressParam parses and validates Ethereum address param.
 func ParseEthereumAddressParam(argName, argValue string, paramType ParamType) (string, error) {
-	if !IsEthereumAddress(argValue) {
-		return "", fmt.Errorf("%s %s %q: ethereum address validation failed", argName, paramType, argValue)
+	if err := ValidateEthereumAddress(argValue); err != nil {
+		return "", fmt.Errorf("%s %s %q: ethereum address validation failed: %w", argName, paramType, argValue, err)
 	}
 
 	return argValue, nil

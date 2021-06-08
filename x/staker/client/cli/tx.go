@@ -9,6 +9,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	flagSrcEthAddress = "src-eth-address"
+	flagSrcChainId    = "src-chain-id"
+)
+
 // GetTxCmd returns a root CLI command handler for all module transaction commands.
 func GetTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
@@ -58,8 +63,10 @@ func GetCmdTxDeposit() *cobra.Command {
 				return err
 			}
 
+			srcMeta := parseCallSource(cmd)
+
 			// Build msg
-			msg := types.NewMsgDepositCall(fromAddr, accAddr, amount)
+			msg := types.NewMsgDepositCall(fromAddr, accAddr, srcMeta.EthAddress, srcMeta.ChainId, amount)
 
 			return tx.GenerateOrBroadcastTxWithFactory(clientCtx, txf, &msg)
 		},
@@ -67,6 +74,7 @@ func GetCmdTxDeposit() *cobra.Command {
 
 	flags.AddTxFlagsToCmd(cmd)
 	_ = cmd.MarkFlagRequired(flags.FlagFrom)
+	addSourceFlags(cmd)
 
 	pkg.BuildCmdHelp(cmd, []string{
 		"target account address",
@@ -106,8 +114,10 @@ func GetCmdTxWithdraw() *cobra.Command {
 				return err
 			}
 
+			srcMeta := parseCallSource(cmd)
+
 			// Build msg
-			msg := types.NewMsgWithdrawCall(fromAddr, accAddr, amount)
+			msg := types.NewMsgWithdrawCall(fromAddr, accAddr, srcMeta.EthAddress, srcMeta.ChainId, amount)
 
 			return tx.GenerateOrBroadcastTxWithFactory(clientCtx, txf, &msg)
 		},
@@ -115,6 +125,7 @@ func GetCmdTxWithdraw() *cobra.Command {
 
 	flags.AddTxFlagsToCmd(cmd)
 	_ = cmd.MarkFlagRequired(flags.FlagFrom)
+	addSourceFlags(cmd)
 
 	pkg.BuildCmdHelp(cmd, []string{
 		"target account address",
@@ -122,4 +133,22 @@ func GetCmdTxWithdraw() *cobra.Command {
 	})
 
 	return cmd
+}
+
+func addSourceFlags(cmd *cobra.Command) {
+	cmd.Flags().String(flagSrcEthAddress, "", "operation source: Ethereum address (HEX string, optional)")
+	cmd.Flags().String(flagSrcChainId, "", "operation source: chain ID (optional)")
+}
+
+func parseCallSource(cmd *cobra.Command) types.CallSourceMeta {
+	srcMeta := types.CallSourceMeta{}
+
+	if value, err := cmd.Flags().GetString(flagSrcEthAddress); err == nil {
+		srcMeta.EthAddress = value
+	}
+	if value, err := cmd.Flags().GetString(flagSrcChainId); err == nil {
+		srcMeta.ChainId = value
+	}
+
+	return srcMeta
 }

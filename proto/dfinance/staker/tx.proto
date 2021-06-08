@@ -6,6 +6,8 @@ import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
 import "cosmos/base/v1beta1/coin.proto";
 
+import "dfinance/staker/staker.proto";
+
 option go_package = "github.com/dfinance/dstation/x/staker/types";
 
 // Msg defines the Staker module Msg service.
@@ -32,8 +34,14 @@ message MsgDepositCall {
     (gogoproto.moretags) = "yaml:\"address\""
   ];
 
+  // Operation source data (optional)
+  CallSourceMeta source_meta = 3 [
+    (gogoproto.moretags) = "yaml:\"source_meta\"",
+    (gogoproto.nullable) = false
+  ];
+
   // Amount
-  repeated cosmos.base.v1beta1.Coin amount = 3 [
+  repeated cosmos.base.v1beta1.Coin amount = 4 [
     (gogoproto.moretags) = "yaml:\"amount\"",
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
@@ -55,8 +63,14 @@ message MsgWithdrawCall {
     (gogoproto.moretags) = "yaml:\"address\""
   ];
 
+  // Operation source data (optional)
+  CallSourceMeta source_meta = 3 [
+    (gogoproto.moretags) = "yaml:\"source_meta\"",
+    (gogoproto.nullable) = false
+  ];
+
   // Amount
-  repeated cosmos.base.v1beta1.Coin amount = 3 [
+  repeated cosmos.base.v1beta1.Coin amount = 4 [
     (gogoproto.moretags) = "yaml:\"amount\"",
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"

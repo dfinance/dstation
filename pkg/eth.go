@@ -2,24 +2,33 @@ package pkg
 
 import (
 	"encoding/hex"
+	"fmt"
+	"strings"
 )
 
 const (
 	EthAddressLength = 20
 )
 
-// Check it's hex
-func isHex(s string) bool {
-	_, err := hex.DecodeString(s)
-	return err == nil
-}
-
-// IsEthereumAddress check if address is Ethereum address.
-func IsEthereumAddress(address string) bool {
-	if len(address) < 2 {
-		return false
+// ValidateEthereumAddress validates Ethereum chain address.
+func ValidateEthereumAddress(address string) error {
+	if address == "" {
+		return fmt.Errorf("empty")
 	}
 
-	s := address[2:]
-	return len(s) == 2*EthAddressLength && isHex(s)
+	if !strings.HasPrefix(address, "0x") {
+		return fmt.Errorf("should be prefixed with 0x (HEX string)")
+	}
+	address = address[2:]
+
+	addrBytes, err := hex.DecodeString(address)
+	if err != nil {
+		return fmt.Errorf("HEX decode: %w", err)
+	}
+
+	if len(addrBytes) != EthAddressLength {
+		return fmt.Errorf("length mismatch, expected / actualaddress: %d / %d", EthAddressLength, len(addrBytes))
+	}
+
+	return nil
 }
