@@ -73,7 +73,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: [OwnRegistry] Build and push docker image
+      - name: '[OwnRegistry] Build and push docker image'
         uses: dfinance/gh-actions@master
         with:
           name: registry.wings.toys/dfinance/dstation
