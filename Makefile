@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 
 # Options
-LEDGER_ENABLED := true
+LEDGER_ENABLED ?= true
 
 # Common vars
 DOCKER := $(shell which docker)
@@ -81,6 +81,7 @@ install-dstation:
 	@echo "  App version: $(app_version)"
 	@echo "  SDK version: $(cosmos_version)"
 	@echo "  TM version:  $(tm_version)"
+	@echo "  Ledger: $(LEDGER_ENABLED)"
 	@go install -ldflags "$(ldflags)" -tags "$(build_tags)" ./cmd/dstation
 
 lint:
