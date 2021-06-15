@@ -4,7 +4,7 @@ WORKDIR /go/src/github.com/dfinance/dstation
 RUN apk add --no-cache make bash
 COPY . .
 
-RUN make install
+RUN make install LEDGER_ENABLED=false
 
 # Run stage
 FROM alpine:3.13
