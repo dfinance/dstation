@@ -9,6 +9,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
+	configCmd "github.com/cosmos/cosmos-sdk/client/config"
 	"github.com/cosmos/cosmos-sdk/client/debug"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/keys"
@@ -96,6 +97,7 @@ func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
 
 		queryCommand(),
 		txCommand(),
+		configCmd.Cmd(),
 
 		migrationCli.MigrateGenesisCmd(),
 	)
