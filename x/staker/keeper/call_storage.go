@@ -93,6 +93,7 @@ func (k Keeper) setCall(ctx sdk.Context, call types.Call) {
 }
 
 // getCallIdByUniqueId returns types.Call ID by its uniqueID if found.
+// nolint: errcheck
 func (k Keeper) getCallIdByUniqueId(ctx sdk.Context, uniqueId string) *sdk.Uint {
 	store := ctx.KVStore(k.storeKey)
 	uniqueIdStore := prefix.NewStore(store, types.UniqueIdsPrefix)
