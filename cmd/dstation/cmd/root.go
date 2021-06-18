@@ -30,7 +30,6 @@ import (
 	"github.com/dfinance/dstation/pkg/logger"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	tmCli "github.com/tendermint/tendermint/libs/cli"
 	"github.com/tendermint/tendermint/libs/log"
 	tmDb "github.com/tendermint/tm-db"
@@ -111,7 +110,8 @@ func appExporter(
 	logger log.Logger, db tmDb.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string, appOpts serverTypes.AppOptions,
 ) (serverTypes.ExportedApp, error) {
 
-	vmConfig := vmConfig.ReadVMConfig(viper.GetString(flags.FlagHome))
+	nodeHomeDir := cast.ToString(appOpts.Get(flags.FlagHome))
+	vmConfig := vmConfig.ReadVMConfig(nodeHomeDir)
 
 	encCfg := app.MakeEncodingConfig() // Ideally, we would reuse the one created by NewRootCmd.
 	encCfg.Marshaler = codec.NewProtoCodec(encCfg.InterfaceRegistry)
@@ -219,7 +219,8 @@ func setDefaultTxCmdFlags(cmd *cobra.Command) {
 func newApp(logger log.Logger, db tmDb.DB, traceStore io.Writer, appOpts serverTypes.AppOptions) serverTypes.Application {
 	var cache sdk.MultiStorePersistentCache
 
-	vmConfig := vmConfig.ReadVMConfig(viper.GetString(flags.FlagHome))
+	nodeHomeDir := cast.ToString(appOpts.Get(flags.FlagHome))
+	vmConfig := vmConfig.ReadVMConfig(nodeHomeDir)
 
 	if cast.ToBool(appOpts.Get(server.FlagInterBlockCache)) {
 		cache = store.NewCommitKVStoreCacheManager()
@@ -247,7 +248,7 @@ func newApp(logger log.Logger, db tmDb.DB, traceStore io.Writer, appOpts serverT
 
 	return app.NewDnApp(
 		logger, db, traceStore, true, skipUpgradeHeights,
-		cast.ToString(appOpts.Get(flags.FlagHome)),
+		nodeHomeDir,
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
 		app.MakeEncodingConfig(), // Ideally, we would reuse the one created by NewRootCmd.
 		&vmConfig,
