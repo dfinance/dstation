@@ -8,21 +8,31 @@ import (
 	"github.com/dfinance/dstation/x/staker/types"
 )
 
-// GetCall returns an types.Call if exists.
-func (k Keeper) GetCall(ctx sdk.Context, id sdk.Uint) *types.Call {
+// GetCallById returns a types.Call by ID if exists.
+func (k Keeper) GetCallById(ctx sdk.Context, id sdk.Uint) *types.Call {
 	store := ctx.KVStore(k.storeKey)
 	callStore := prefix.NewStore(store, types.CallsPrefix)
-	key, _ := id.Marshal()
+	keyCallId, _ := id.Marshal()
 
-	bz := callStore.Get(key)
-	if bz == nil {
+	callBz := callStore.Get(keyCallId)
+	if callBz == nil {
 		return nil
 	}
 
 	call := &types.Call{}
-	k.cdc.MustUnmarshalBinaryBare(bz, call)
+	k.cdc.MustUnmarshalBinaryBare(callBz, call)
 
 	return call
+}
+
+// GetCallByUniqueId returns a types.Call by unique ID if match exists.
+func (k Keeper) GetCallByUniqueId(ctx sdk.Context, uniqueId string) *types.Call {
+	callId := k.getCallIdByUniqueId(ctx, uniqueId)
+	if callId == nil {
+		return nil
+	}
+
+	return k.GetCallById(ctx, *callId)
 }
 
 // GetAllCalls returns all stored types.Call entries.
@@ -67,15 +77,36 @@ func (k Keeper) IterateAllCalls(ctx sdk.Context, handler func(call types.Call) (
 	}
 }
 
-// setCall sets an types.Call.
+// setCall sets a types.Call and call.uniqueId <-> call.Id match.
 func (k Keeper) setCall(ctx sdk.Context, call types.Call) {
 	store := ctx.KVStore(k.storeKey)
 	callStore := prefix.NewStore(store, types.CallsPrefix)
+	uniqueIdStore := prefix.NewStore(store, types.UniqueIdsPrefix)
 
-	key, _ := call.Id.Marshal()
-	bz := k.cdc.MustMarshalBinaryBare(&call)
+	keyCallId, _ := call.Id.Marshal()
+	keyCallUniqueId := []byte(call.UniqueId)
+	callBz := k.cdc.MustMarshalBinaryBare(&call)
+	callIdBz, _ := call.Id.Marshal()
 
-	callStore.Set(key, bz)
+	callStore.Set(keyCallId, callBz)
+	uniqueIdStore.Set(keyCallUniqueId, callIdBz)
+}
+
+// getCallIdByUniqueId returns types.Call ID by its uniqueID if found.
+func (k Keeper) getCallIdByUniqueId(ctx sdk.Context, uniqueId string) *sdk.Uint {
+	store := ctx.KVStore(k.storeKey)
+	uniqueIdStore := prefix.NewStore(store, types.UniqueIdsPrefix)
+
+	keyUniqueId := []byte(uniqueId)
+	callIdBz := uniqueIdStore.Get(keyUniqueId)
+	if callIdBz == nil {
+		return nil
+	}
+
+	var callId sdk.Uint
+	callId.Unmarshal(callIdBz)
+
+	return &callId
 }
 
 // getLastCallID returns the latest stored unique types.Call ID.

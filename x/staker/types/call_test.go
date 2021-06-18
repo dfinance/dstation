@@ -15,6 +15,7 @@ func TestStaker_Call(t *testing.T) {
 
 	call := types.Call{
 		Id:        sdk.ZeroUint(),
+		UniqueId: "unique_id",
 		Nominee:   mockAddr.String(),
 		Address:   mockAddr.String(),
 		Type:      types.Call_DEPOSIT,
@@ -31,6 +32,13 @@ func TestStaker_Call(t *testing.T) {
 	{
 		c := call
 		c.Id = sdk.Uint{}
+		require.Error(t, c.Validate())
+	}
+
+	// fail: unique_id: empty
+	{
+		c := call
+		c.UniqueId = ""
 		require.Error(t, c.Validate())
 	}
 

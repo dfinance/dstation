@@ -4,12 +4,13 @@ import (
 	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkErrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/dfinance/dstation/x/staker/types"
 )
 
 // Deposit creates a new types.Call, mints coins and sends them to the target account.
 func (k Keeper) Deposit(ctx sdk.Context, msg types.MsgDepositCall) (types.Call, error) {
-	call, err := k.createNewCall(ctx, types.Call_DEPOSIT, msg.Nominee, msg.Address, msg.SourceMeta, msg.Amount)
+	call, err := k.createNewCall(ctx, msg.UniqueId, types.Call_DEPOSIT, msg.Nominee, msg.Address, msg.SourceMeta, msg.Amount)
 	if err != nil {
 		return types.Call{}, err
 	}
@@ -27,7 +28,7 @@ func (k Keeper) Deposit(ctx sdk.Context, msg types.MsgDepositCall) (types.Call, 
 
 // Withdraw creates a new types.Call, withdraws coins from the target account and burns them.
 func (k Keeper) Withdraw(ctx sdk.Context, msg types.MsgWithdrawCall) (types.Call, error) {
-	call, err := k.createNewCall(ctx, types.Call_WITHDRAW, msg.Nominee, msg.Address, msg.SourceMeta, msg.Amount)
+	call, err := k.createNewCall(ctx, msg.UniqueId, types.Call_WITHDRAW, msg.Nominee, msg.Address, msg.SourceMeta, msg.Amount)
 	if err != nil {
 		return types.Call{}, err
 	}
@@ -44,13 +45,18 @@ func (k Keeper) Withdraw(ctx sdk.Context, msg types.MsgWithdrawCall) (types.Call
 }
 
 // createNewCall creates and saves a new types.Call.
-func (k Keeper) createNewCall(ctx sdk.Context, callType types.Call_CallType, nomineeAddr, accAddr string, srcMeta types.CallSourceMeta, amount sdk.Coins) (types.Call, error) {
+func (k Keeper) createNewCall(ctx sdk.Context, uniqueId string, callType types.Call_CallType, nomineeAddr, accAddr string, srcMeta types.CallSourceMeta, amount sdk.Coins) (types.Call, error) {
 	if err := k.IsNominee(ctx, nomineeAddr); err != nil {
 		return types.Call{}, err
 	}
 
+	if callId := k.getCallIdByUniqueId(ctx, uniqueId); callId != nil {
+		return types.Call{}, sdkErrors.Wrapf(types.ErrUniqueIdExists, "used for Call (%s)", callId.String())
+	}
+
 	call := types.Call{
 		Id:         k.getNextCallID(ctx),
+		UniqueId:   uniqueId,
 		Nominee:    nomineeAddr,
 		Address:    accAddr,
 		Type:       callType,

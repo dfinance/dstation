@@ -24,7 +24,19 @@ func (k Querier) CallById(c context.Context, req *types.QueryCallByIdRequest) (*
 	ctx := sdk.UnwrapSDKContext(c)
 
 	return &types.QueryCallByIdResponse{
-		Call: k.Keeper.GetCall(ctx, req.Id),
+		Call: k.Keeper.GetCallById(ctx, req.Id),
+	}, nil
+}
+
+func (k Querier) CallByUniqueId(c context.Context, req *types.QueryCallByUniqueIdRequest) (*types.QueryCallByUniqueIdResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "empty request")
+	}
+
+	ctx := sdk.UnwrapSDKContext(c)
+
+	return &types.QueryCallByUniqueIdResponse{
+		Call: k.Keeper.GetCallByUniqueId(ctx, req.UniqueId),
 	}, nil
 }
 
@@ -41,5 +53,14 @@ func (k Querier) CallsByAccount(c context.Context, req *types.QueryCallsByAccoun
 
 	return &types.QueryCallsByAccountResponse{
 		Calls: k.Keeper.GetAddressCalls(ctx, accAddr),
+	}, nil
+}
+
+func (k Querier) Params(c context.Context, req *types.QueryParamsRequest) (*types.QueryParamsResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	params := k.GetParams(ctx)
+
+	return &types.QueryParamsResponse{
+		Params: params,
 	}, nil
 }

@@ -14,6 +14,10 @@ func (m Call) Validate() error {
 		return fmt.Errorf("id: nil sdk.Uint")
 	}
 
+	if m.UniqueId == "" {
+		return fmt.Errorf("unique_id: empty")
+	}
+
 	if _, err := sdk.AccAddressFromBech32(m.Nominee); err != nil {
 		return fmt.Errorf("nominee: invalid AccAddress: %w", err)
 	}

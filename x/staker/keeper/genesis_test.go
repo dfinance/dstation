@@ -26,6 +26,7 @@ func TestStakerKeeper_Genesis(t *testing.T) {
 		Calls: []types.Call{
 			{
 				Id:        sdk.NewUint(0),
+				UniqueId:  "0",
 				Nominee:   mockAddr.String(),
 				Address:   mockAddr.String(),
 				Type:      types.Call_DEPOSIT,

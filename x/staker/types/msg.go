@@ -27,6 +27,10 @@ func (MsgDepositCall) Type() string {
 }
 
 func (m MsgDepositCall) ValidateBasic() error {
+	if m.UniqueId == "" {
+		return fmt.Errorf("unique_id: empty")
+	}
+
 	if _, err := sdk.AccAddressFromBech32(m.Nominee); err != nil {
 		return fmt.Errorf("nominee: %w", err)
 	}
@@ -67,10 +71,11 @@ func (m MsgDepositCall) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgDepositCall creates a new MsgDepositCall message.
-func NewMsgDepositCall(nomineeAddress, targetAccAddress sdk.AccAddress, srcEthAddr, srcChainId string, coins sdk.Coins) MsgDepositCall {
+func NewMsgDepositCall(uniqueId string, nomineeAddress, targetAccAddress sdk.AccAddress, srcEthAddr, srcChainId string, coins sdk.Coins) MsgDepositCall {
 	return MsgDepositCall{
-		Nominee: nomineeAddress.String(),
-		Address: targetAccAddress.String(),
+		UniqueId: uniqueId,
+		Nominee:  nomineeAddress.String(),
+		Address:  targetAccAddress.String(),
 		SourceMeta: CallSourceMeta{
 			EthAddress: srcEthAddr,
 			ChainId:    srcChainId,
@@ -90,6 +95,10 @@ func (MsgWithdrawCall) Type() string {
 }
 
 func (m MsgWithdrawCall) ValidateBasic() error {
+	if m.UniqueId == "" {
+		return fmt.Errorf("unique_id: empty")
+	}
+
 	if _, err := sdk.AccAddressFromBech32(m.Nominee); err != nil {
 		return fmt.Errorf("nominee: %w", err)
 	}
@@ -130,10 +139,11 @@ func (m MsgWithdrawCall) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgWithdrawCall creates a new MsgDepositCall message.
-func NewMsgWithdrawCall(nomineeAddress, targetAccAddress sdk.AccAddress, srcEthAddr, srcChainId string, coins sdk.Coins) MsgWithdrawCall {
+func NewMsgWithdrawCall(uniqueId string, nomineeAddress, targetAccAddress sdk.AccAddress, srcEthAddr, srcChainId string, coins sdk.Coins) MsgWithdrawCall {
 	return MsgWithdrawCall{
-		Nominee: nomineeAddress.String(),
-		Address: targetAccAddress.String(),
+		UniqueId: uniqueId,
+		Nominee:  nomineeAddress.String(),
+		Address:  targetAccAddress.String(),
 		SourceMeta: CallSourceMeta{
 			EthAddress: srcEthAddr,
 			ChainId:    srcChainId,

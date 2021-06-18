@@ -24,24 +24,29 @@ message MsgDepositCall {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
+  // Operation unique ID
+  string unique_id = 1 [
+    (gogoproto.moretags) = "yaml:\"unique_id\""
+  ];
+
   // Nominee account address
-  string nominee = 1 [
+  string nominee = 2 [
     (gogoproto.moretags) = "yaml:\"nominee\""
   ];
 
   // Target address
-  string address = 2 [
+  string address = 3 [
     (gogoproto.moretags) = "yaml:\"address\""
   ];
 
   // Operation source data (optional)
-  CallSourceMeta source_meta = 3 [
+  CallSourceMeta source_meta = 4 [
     (gogoproto.moretags) = "yaml:\"source_meta\"",
     (gogoproto.nullable) = false
   ];
 
   // Amount
-  repeated cosmos.base.v1beta1.Coin amount = 4 [
+  repeated cosmos.base.v1beta1.Coin amount = 5 [
     (gogoproto.moretags) = "yaml:\"amount\"",
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
@@ -53,24 +58,28 @@ message MsgWithdrawCall {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
 
+  string unique_id = 1 [
+    (gogoproto.moretags) = "yaml:\"unique_id\""
+  ];
+
   // Nominee account address
-  string nominee = 1 [
+  string nominee = 2 [
     (gogoproto.moretags) = "yaml:\"nominee\""
   ];
 
   // Target address
-  string address = 2 [
+  string address = 3 [
     (gogoproto.moretags) = "yaml:\"address\""
   ];
 
   // Operation source data (optional)
-  CallSourceMeta source_meta = 3 [
+  CallSourceMeta source_meta = 4 [
     (gogoproto.moretags) = "yaml:\"source_meta\"",
     (gogoproto.nullable) = false
   ];
 
   // Amount
-  repeated cosmos.base.v1beta1.Coin amount = 4 [
+  repeated cosmos.base.v1beta1.Coin amount = 5 [
     (gogoproto.moretags) = "yaml:\"amount\"",
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
@@ -79,7 +88,7 @@ message MsgWithdrawCall {
 
 // MsgDepositCallResponse defines the response for the Deposit operation.
 message MsgDepositCallResponse {
-  // Unique call ID
+  // Call ID
   string id = 1 [
     (gogoproto.moretags) = "yaml:\"id\"",
     (gogoproto.nullable) = false,
@@ -89,7 +98,7 @@ message MsgDepositCallResponse {
 
 // MsgDepositCallResponse defines the response for the Withdraw operation.
 message MsgWithdrawCallResponse {
-  // Unique call ID
+  // Call ID
   string id = 1 [
     (gogoproto.moretags) = "yaml:\"id\"",
     (gogoproto.nullable) = false,

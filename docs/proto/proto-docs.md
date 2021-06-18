@@ -119,8 +119,12 @@
 - [dfinance/staker/query.proto](#dfinance/staker/query.proto)
     - [QueryCallByIdRequest](#dfinance.staker.v1beta1.QueryCallByIdRequest)
     - [QueryCallByIdResponse](#dfinance.staker.v1beta1.QueryCallByIdResponse)
+    - [QueryCallByUniqueIdRequest](#dfinance.staker.v1beta1.QueryCallByUniqueIdRequest)
+    - [QueryCallByUniqueIdResponse](#dfinance.staker.v1beta1.QueryCallByUniqueIdResponse)
     - [QueryCallsByAccountRequest](#dfinance.staker.v1beta1.QueryCallsByAccountRequest)
     - [QueryCallsByAccountResponse](#dfinance.staker.v1beta1.QueryCallsByAccountResponse)
+    - [QueryParamsRequest](#dfinance.staker.v1beta1.QueryParamsRequest)
+    - [QueryParamsResponse](#dfinance.staker.v1beta1.QueryParamsResponse)
   
     - [Query](#dfinance.staker.v1beta1.Query)
   
@@ -1500,7 +1504,8 @@ Call keeps Staker operation data.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `id` | [string](#string) |  | Unique call ID |
+| `id` | [string](#string) |  | Call ID (series, defined by module) |
+| `unique_id` | [string](#string) |  | Unique operation ID (defined by nominee) Ethereum Tx for example |
 | `nominee` | [string](#string) |  | Operation authorized by address |
 | `address` | [string](#string) |  | Operation target account address |
 | `type` | [Call.CallType](#dfinance.staker.v1beta1.Call.CallType) |  | Operation direction (mint / destroy) |
@@ -1613,7 +1618,7 @@ QueryCallByIdRequest is request type for Query/CallById RPC method.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `id` | [string](#string) |  | Unique call ID |
+| `id` | [string](#string) |  | Call ID |
 
 
 
@@ -1624,6 +1629,36 @@ QueryCallByIdRequest is request type for Query/CallById RPC method.
 
 ### QueryCallByIdResponse
 QueryCallByIdResponse is response type for Query/CallById RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `call` | [Call](#dfinance.staker.v1beta1.Call) |  |  |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.QueryCallByUniqueIdRequest"></a>
+
+### QueryCallByUniqueIdRequest
+QueryCallByIdRequest is request type for Query/CallByUniqueId RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `unique_id` | [string](#string) |  | Unique operation ID |
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.QueryCallByUniqueIdResponse"></a>
+
+### QueryCallByUniqueIdResponse
+QueryCallByIdResponse is response type for Query/CallByUniqueId RPC method.
 
 
 | Field | Type | Label | Description |
@@ -1664,6 +1699,31 @@ QueryCallByIdResponse is response type for Query/CallsByAccount RPC method.
 
 
 
+
+<a name="dfinance.staker.v1beta1.QueryParamsRequest"></a>
+
+### QueryParamsRequest
+QueryParamsRequest is request type for Query/Params RPC method.
+
+
+
+
+
+
+<a name="dfinance.staker.v1beta1.QueryParamsResponse"></a>
+
+### QueryParamsResponse
+QueryParamsResponse is response type for Query/Params RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#dfinance.staker.v1beta1.Params) |  |  |
+
+
+
+
+
  <!-- end messages -->
 
  <!-- end enums -->
@@ -1678,8 +1738,10 @@ Query defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `CallById` | [QueryCallByIdRequest](#dfinance.staker.v1beta1.QueryCallByIdRequest) | [QueryCallByIdResponse](#dfinance.staker.v1beta1.QueryCallByIdResponse) | CallById returns an existing historical call info by its unique ID | GET|/dfinance/staker/v1beta1/call|
+| `CallById` | [QueryCallByIdRequest](#dfinance.staker.v1beta1.QueryCallByIdRequest) | [QueryCallByIdResponse](#dfinance.staker.v1beta1.QueryCallByIdResponse) | CallById returns an existing historical call info by its ID | GET|/dfinance/staker/v1beta1/call|
+| `CallByUniqueId` | [QueryCallByUniqueIdRequest](#dfinance.staker.v1beta1.QueryCallByUniqueIdRequest) | [QueryCallByUniqueIdResponse](#dfinance.staker.v1beta1.QueryCallByUniqueIdResponse) | CallByUniqueId returns an existing historical call info by its unique operation ID | GET|/dfinance/staker/v1beta1/unique|
 | `CallsByAccount` | [QueryCallsByAccountRequest](#dfinance.staker.v1beta1.QueryCallsByAccountRequest) | [QueryCallsByAccountResponse](#dfinance.staker.v1beta1.QueryCallsByAccountResponse) | CallsByAccount returns an existing historical calls info for a target account | GET|/dfinance/staker/v1beta1/calls|
+| `Params` | [QueryParamsRequest](#dfinance.staker.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#dfinance.staker.v1beta1.QueryParamsResponse) |  | GET|/dfinance/staker/v1beta1/params|
 
  <!-- end services -->
 
@@ -1700,6 +1762,7 @@ MsgDepositCall defines a SDK message to perform the Deposit operation.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `unique_id` | [string](#string) |  | Operation unique ID |
 | `nominee` | [string](#string) |  | Nominee account address |
 | `address` | [string](#string) |  | Target address |
 | `source_meta` | [CallSourceMeta](#dfinance.staker.v1beta1.CallSourceMeta) |  | Operation source data (optional) |
@@ -1718,7 +1781,7 @@ MsgDepositCallResponse defines the response for the Deposit operation.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `id` | [string](#string) |  | Unique call ID |
+| `id` | [string](#string) |  | Call ID |
 
 
 
@@ -1733,6 +1796,7 @@ MsgWithdrawCall defines a SDK message to perform the Withdraw operation.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `unique_id` | [string](#string) |  |  |
 | `nominee` | [string](#string) |  | Nominee account address |
 | `address` | [string](#string) |  | Target address |
 | `source_meta` | [CallSourceMeta](#dfinance.staker.v1beta1.CallSourceMeta) |  | Operation source data (optional) |
@@ -1751,7 +1815,7 @@ MsgDepositCallResponse defines the response for the Withdraw operation.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `id` | [string](#string) |  | Unique call ID |
+| `id` | [string](#string) |  | Call ID |
 
 
 

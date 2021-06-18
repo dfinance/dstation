@@ -20,7 +20,9 @@ func GetQueryCmd() *cobra.Command {
 
 	queryCmd.AddCommand(
 		GetCmdQueryCall(),
+		GetCmdQueryCallByUniqueId(),
 		GetCmdQueryAccCalls(),
+		GetCmdQueryParams(),
 	)
 
 	return queryCmd
@@ -30,7 +32,7 @@ func GetQueryCmd() *cobra.Command {
 func GetCmdQueryCall() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:     "call [callID]",
-		Short:   "Get Call by unique ID",
+		Short:   "Get Call by ID",
 		Example: "call 100",
 		Args:    cobra.MinimumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -48,6 +50,38 @@ func GetCmdQueryCall() *cobra.Command {
 
 			// Build and send request
 			res, err := queryClient.CallById(cmd.Context(), &types.QueryCallByIdRequest{Id: id})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdQueryCallByUniqueId returns query command that implement keeper querier.
+func GetCmdQueryCallByUniqueId() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "call-unique [uniqueID]",
+		Short:   "Get Call by unique operation ID",
+		Example: "call-unique 0x0BAF",
+		Args:    cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+
+			// Parse inputs
+			uniqueId := args[0]
+
+			// Build and send request
+			res, err := queryClient.CallByUniqueId(cmd.Context(), &types.QueryCallByUniqueIdRequest{UniqueId: uniqueId})
 			if err != nil {
 				return err
 			}
@@ -83,6 +117,33 @@ func GetCmdQueryAccCalls() *cobra.Command {
 
 			// Build and send request
 			res, err := queryClient.CallsByAccount(cmd.Context(), &types.QueryCallsByAccountRequest{Address: accAddr.String()})
+			if err != nil {
+				return err
+			}
+
+			return clientCtx.PrintProto(res)
+		},
+	}
+
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// GetCmdQueryParams returns query command that implement keeper querier.
+func GetCmdQueryParams() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:     "params",
+		Short:   "Get Staker module parameters",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+			queryClient := types.NewQueryClient(clientCtx)
+
+			// Build and send request
+			res, err := queryClient.Params(cmd.Context(), &types.QueryParamsRequest{})
 			if err != nil {
 				return err
 			}

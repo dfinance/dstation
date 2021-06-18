@@ -36,10 +36,10 @@ func GetTxCmd() *cobra.Command {
 // GetCmdTxDeposit returns tx command that implement keeper handler.
 func GetCmdTxDeposit() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "deposit [targetAccAddress] [amount]",
+		Use:     "deposit [uniqueId] [targetAccAddress] [amount]",
 		Short:   "Deposit tokens to the target account",
 		Example: "deposit wallet1jk4ld0uu6wdrj9t8u3gghm9jt583hxx7xp7he8 1xfi,1btc --from nominee_account --fees 10000xfi --gas 500000",
-		Args:    cobra.MinimumNArgs(2),
+		Args:    cobra.MinimumNArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -48,17 +48,19 @@ func GetCmdTxDeposit() *cobra.Command {
 			txf := tx.NewFactoryCLI(clientCtx, cmd.Flags()).WithTxConfig(clientCtx.TxConfig).WithAccountRetriever(clientCtx.AccountRetriever)
 
 			// Parse inputs
+			uniqueId := args[0]
+
 			fromAddr, err := pkg.ParseFromFlag(clientCtx)
 			if err != nil {
 				return err
 			}
 
-			accAddr, err := pkg.ParseSdkAddressParam("targetAccAddress", args[0], pkg.ParamTypeCliArg)
+			accAddr, err := pkg.ParseSdkAddressParam("targetAccAddress", args[1], pkg.ParamTypeCliArg)
 			if err != nil {
 				return err
 			}
 
-			amount, err := pkg.ParseCoinsParam("amount", args[1], pkg.ParamTypeCliArg)
+			amount, err := pkg.ParseCoinsParam("amount", args[2], pkg.ParamTypeCliArg)
 			if err != nil {
 				return err
 			}
@@ -66,7 +68,7 @@ func GetCmdTxDeposit() *cobra.Command {
 			srcMeta := parseCallSource(cmd)
 
 			// Build msg
-			msg := types.NewMsgDepositCall(fromAddr, accAddr, srcMeta.EthAddress, srcMeta.ChainId, amount)
+			msg := types.NewMsgDepositCall(uniqueId, fromAddr, accAddr, srcMeta.EthAddress, srcMeta.ChainId, amount)
 
 			return tx.GenerateOrBroadcastTxWithFactory(clientCtx, txf, &msg)
 		},
@@ -77,6 +79,7 @@ func GetCmdTxDeposit() *cobra.Command {
 	addSourceFlags(cmd)
 
 	pkg.BuildCmdHelp(cmd, []string{
+		"unique operation ID (Ethereum Tx hash for example)",
 		"target account address",
 		"operation amount (coins)",
 	})
@@ -87,10 +90,10 @@ func GetCmdTxDeposit() *cobra.Command {
 // GetCmdTxWithdraw returns tx command that implement keeper handler.
 func GetCmdTxWithdraw() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "withdraw [targetAccAddress] [amount]",
+		Use:     "withdraw [uniqueId] [targetAccAddress] [amount]",
 		Short:   "Withdraw tokens from the target account",
 		Example: "withdraw wallet1jk4ld0uu6wdrj9t8u3gghm9jt583hxx7xp7he8 1xfi,1btc --from nominee_account --fees 10000xfi --gas 500000",
-		Args:    cobra.MinimumNArgs(2),
+		Args:    cobra.MinimumNArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -99,17 +102,19 @@ func GetCmdTxWithdraw() *cobra.Command {
 			txf := tx.NewFactoryCLI(clientCtx, cmd.Flags()).WithTxConfig(clientCtx.TxConfig).WithAccountRetriever(clientCtx.AccountRetriever)
 
 			// Parse inputs
+			uniqueId := args[0]
+
 			fromAddr, err := pkg.ParseFromFlag(clientCtx)
 			if err != nil {
 				return err
 			}
 
-			accAddr, err := pkg.ParseSdkAddressParam("targetAccAddress", args[0], pkg.ParamTypeCliArg)
+			accAddr, err := pkg.ParseSdkAddressParam("targetAccAddress", args[1], pkg.ParamTypeCliArg)
 			if err != nil {
 				return err
 			}
 
-			amount, err := pkg.ParseCoinsParam("amount", args[1], pkg.ParamTypeCliArg)
+			amount, err := pkg.ParseCoinsParam("amount", args[2], pkg.ParamTypeCliArg)
 			if err != nil {
 				return err
 			}
@@ -117,7 +122,7 @@ func GetCmdTxWithdraw() *cobra.Command {
 			srcMeta := parseCallSource(cmd)
 
 			// Build msg
-			msg := types.NewMsgWithdrawCall(fromAddr, accAddr, srcMeta.EthAddress, srcMeta.ChainId, amount)
+			msg := types.NewMsgWithdrawCall(uniqueId, fromAddr, accAddr, srcMeta.EthAddress, srcMeta.ChainId, amount)
 
 			return tx.GenerateOrBroadcastTxWithFactory(clientCtx, txf, &msg)
 		},
@@ -128,6 +133,7 @@ func GetCmdTxWithdraw() *cobra.Command {
 	addSourceFlags(cmd)
 
 	pkg.BuildCmdHelp(cmd, []string{
+		"unique operation ID (Ethereum Tx hash for example)",
 		"target account address",
 		"operation amount (coins)",
 	})

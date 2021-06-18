@@ -15,13 +15,14 @@ func TestStaker_Genesis(t *testing.T) {
 
 	lastCallId := sdk.NewUint(1)
 	gen := types.GenesisState{
-		Params:     types.Params{
+		Params: types.Params{
 			Nominees: []string{mockAddr.String()},
 		},
 		LastCallId: &lastCallId,
-		Calls:      []types.Call{
+		Calls: []types.Call{
 			{
 				Id:        sdk.NewUint(0),
+				UniqueId:  "unique_0",
 				Nominee:   mockAddr.String(),
 				Address:   mockAddr.String(),
 				Type:      types.Call_DEPOSIT,
@@ -30,6 +31,7 @@ func TestStaker_Genesis(t *testing.T) {
 			},
 			{
 				Id:        sdk.NewUint(1),
+				UniqueId:  "unique_1",
 				Nominee:   mockAddr.String(),
 				Address:   mockAddr.String(),
 				Type:      types.Call_WITHDRAW,

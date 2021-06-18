@@ -28,43 +28,49 @@ message Call {
     WITHDRAW = 1;
   }
 
-  // Unique call ID
+  // Call ID (series, defined by module)
   string id = 1 [
     (gogoproto.moretags) = "yaml:\"id\"",
     (gogoproto.nullable) = false,
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint"
   ];
 
+  // Unique operation ID (defined by nominee)
+  // Ethereum Tx for example
+  string unique_id = 2 [
+    (gogoproto.moretags) = "yaml:\"unique_id\""
+  ];
+
   // Operation authorized by address
-  string nominee = 2 [
+  string nominee = 3 [
     (gogoproto.moretags) = "yaml:\"nominee\""
   ];
 
   // Operation target account address
-  string address = 3 [
+  string address = 4 [
     (gogoproto.moretags) = "yaml:\"address\""
   ];
 
   // Operation direction (mint / destroy)
-  CallType type = 4 [
+  CallType type = 5 [
     (gogoproto.moretags) = "yaml:\"type\""
   ];
 
   // Call operation source data (optional)
-  CallSourceMeta source_meta = 5 [
+  CallSourceMeta source_meta = 6 [
     (gogoproto.moretags) = "yaml:\"source_meta\"",
     (gogoproto.nullable) = false
   ];
 
   // Operation coins
-  repeated cosmos.base.v1beta1.Coin amount = 6 [
+  repeated cosmos.base.v1beta1.Coin amount = 7 [
     (gogoproto.moretags) = "yaml:\"amount\"",
     (gogoproto.nullable) = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
 
   // Operation createdAt
-  google.protobuf.Timestamp timestamp = 7 [
+  google.protobuf.Timestamp timestamp = 8 [
     (gogoproto.moretags) = "yaml:\"timestamp\"",
     (gogoproto.nullable) = false,
     (gogoproto.stdtime) = true
