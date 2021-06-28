@@ -156,9 +156,9 @@ var (
 // DnApp extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
-type DnApp struct { // nolint: golint
+type DnApp struct { // nolint:golint
 	*baseapp.BaseApp
-	legacyAmino       *codec.LegacyAmino
+	legacyAmino       *codec.LegacyAmino // nolint:staticcheck
 	appCodec          codec.Marshaler
 	interfaceRegistry types.InterfaceRegistry
 
@@ -246,6 +246,7 @@ func (app *DnApp) ModuleAccountAddrs() map[string]bool {
 //
 // NOTE: This is solely to be used for testing purposes as it may be desirable
 // for modules to register their own custom testing types.
+// nolint:staticcheck
 func (app *DnApp) LegacyAmino() *codec.LegacyAmino {
 	return app.legacyAmino
 }
@@ -695,7 +696,8 @@ func GetMaccPerms() map[string][]string {
 	return dupMaccPerms
 }
 
-// initParamsKeeper init params keeper and its subspaces
+// initParamsKeeper init params keeper and its subspaces.
+// nolint:staticcheck
 func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyAmino, key, tkey sdk.StoreKey) paramsKeeper.Keeper {
 	paramsKeeper := paramsKeeper.NewKeeper(appCodec, legacyAmino, key, tkey)
 

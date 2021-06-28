@@ -11,16 +11,17 @@ func (g DumbGasMeter) GasConsumed() sdk.Gas {
 	return 0
 }
 
-func (g DumbGasMeter) Limit() sdk.Gas {
-	return 0
-}
-
 func (g DumbGasMeter) GasConsumedToLimit() sdk.Gas {
 	return 0
 }
 
-func (g *DumbGasMeter) ConsumeGas(_ sdk.Gas, _ string) {
+func (g DumbGasMeter) Limit() sdk.Gas {
+	return 0
 }
+
+func (g *DumbGasMeter) ConsumeGas(_ sdk.Gas, _ string) {}
+
+func (g *DumbGasMeter) RefundGas(_ sdk.Gas, _ string) {}
 
 func (g DumbGasMeter) IsPastLimit() bool {
 	return false

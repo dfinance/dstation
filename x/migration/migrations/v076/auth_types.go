@@ -386,6 +386,7 @@ func ValidatePermissions(permissions ...string) error {
 	return nil
 }
 
+// nolint:staticcheck
 func RegisterAuthLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cryptoCodec.RegisterCrypto(cdc)
 	cdc.RegisterInterface((*GenesisAccount)(nil), nil)

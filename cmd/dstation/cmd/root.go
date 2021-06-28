@@ -58,13 +58,19 @@ func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithHomeDir(dnConfig.DefaultNodeHome)
+		WithHomeDir(dnConfig.DefaultNodeHome).
+		WithViper("DSTATION")
 
 	rootCmd := &cobra.Command{
 		Use:   "dstation",
 		Short: "Dfinance Cosmos SDK Stargate app",
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
-			if err := client.SetCmdClientContextHandler(initClientCtx, cmd); err != nil {
+			clientCtx, err := configCmd.ReadFromClientConfig(initClientCtx)
+			if err != nil {
+				return fmt.Errorf("configCmd.ReadFromClientConfig: %w", err)
+			}
+
+			if err := client.SetCmdClientContextHandler(clientCtx, cmd); err != nil {
 				return fmt.Errorf("client.SetCmdClientContextHandler: %w", err)
 			}
 
