@@ -9,7 +9,7 @@ import (
 )
 
 // GetQueryCmd returns the cli query commands for this module.
-func GetQueryCmd() *cobra.Command {
+func 	GetQueryCmd() *cobra.Command {
 	queryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the Staker module",

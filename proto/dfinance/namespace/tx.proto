@@ -1,0 +1,73 @@
+syntax = "proto3";
+package dfinance.namespace.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+import "cosmos_proto/cosmos.proto";
+import "cosmos/base/v1beta1/coin.proto";
+
+import "dfinance/namespace/namespace.proto";
+
+option go_package = "github.com/dfinance/dstation/x/namespace/types";
+
+// Msg defines the Namespace module Msg service.
+service Msg {
+  // Buy buy name.
+  rpc Buy(MsgBuyCall) returns (MsgBuyResponse);
+  // Delete  name.
+  rpc Delete(MsgDeleteCall) returns (MsgDeleteResponse);
+}
+
+// MsgDepositCall defines a SDK message to perform the Deposit operation.
+message MsgBuyCall {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // Domain name
+  string value = 1 [
+    (gogoproto.moretags) = "yaml:\"value\""
+  ];
+
+  // Whois account address
+  string address = 2 [
+    (gogoproto.moretags) = "yaml:\"address\""
+  ];
+
+  // Amount
+  repeated cosmos.base.v1beta1.Coin amount = 3 [
+    (gogoproto.moretags) = "yaml:\"amount\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
+}
+
+// MsgByResponse defines the response for the Deposit operation.
+message MsgBuyResponse {
+  // Call ID
+  string id = 1 [
+    (gogoproto.moretags) = "yaml:\"id\"",
+    (gogoproto.nullable) = false,
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint"
+  ];
+}
+
+
+// MsgDeleteCall defines a SDK message delete domain.
+message MsgDeleteCall {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // Domain name
+  string value = 1 [
+    (gogoproto.moretags) = "yaml:\"value\""
+  ];
+
+  // Whois account address
+  string address = 2 [
+    (gogoproto.moretags) = "yaml:\"address\""
+  ];
+}
+
+// MsgByResponse defines the response for the Deposit operation.
+message MsgDeleteResponse {
+}

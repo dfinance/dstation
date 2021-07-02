@@ -73,6 +73,26 @@
     - [VMModulePublisher](#dfinance.dvm.VMModulePublisher)
     - [VMScriptExecutor](#dfinance.dvm.VMScriptExecutor)
   
+- [dfinance/namespace/namespace.proto](#dfinance/namespace/namespace.proto)
+    - [Whois](#dfinance.namespace.v1beta1.Whois)
+  
+- [dfinance/namespace/genesis.proto](#dfinance/namespace/genesis.proto)
+    - [GenesisState](#dfinance.namespace.v1beta1.GenesisState)
+  
+- [dfinance/namespace/query.proto](#dfinance/namespace/query.proto)
+    - [DomainsAccountRequest](#dfinance.namespace.v1beta1.DomainsAccountRequest)
+    - [DomainsAccountResponse](#dfinance.namespace.v1beta1.DomainsAccountResponse)
+  
+    - [Query](#dfinance.namespace.v1beta1.Query)
+  
+- [dfinance/namespace/tx.proto](#dfinance/namespace/tx.proto)
+    - [MsgBuyCall](#dfinance.namespace.v1beta1.MsgBuyCall)
+    - [MsgBuyResponse](#dfinance.namespace.v1beta1.MsgBuyResponse)
+    - [MsgDeleteCall](#dfinance.namespace.v1beta1.MsgDeleteCall)
+    - [MsgDeleteResponse](#dfinance.namespace.v1beta1.MsgDeleteResponse)
+  
+    - [Msg](#dfinance.namespace.v1beta1.Msg)
+  
 - [dfinance/oracle/oracle.proto](#dfinance/oracle/oracle.proto)
     - [Asset](#dfinance.oracle.v1beta1.Asset)
     - [CurrentPrice](#dfinance.oracle.v1beta1.CurrentPrice)
@@ -1088,6 +1108,213 @@ GRPC service
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 | `ExecuteScript` | [VMExecuteScript](#dfinance.dvm.VMExecuteScript) | [VMExecuteResponse](#dfinance.dvm.VMExecuteResponse) |  | |
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/namespace/namespace.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/namespace/namespace.proto
+
+
+
+<a name="dfinance.namespace.v1beta1.Whois"></a>
+
+### Whois
+Whois to sell and buy.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ID` | [string](#string) |  | ID. |
+| `Creator` | [string](#string) |  | Creator address. |
+| `Value` | [string](#string) |  | Value (domain name). |
+| `Price` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Price. |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/namespace/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/namespace/genesis.proto
+
+
+
+<a name="dfinance.namespace.v1beta1.GenesisState"></a>
+
+### GenesisState
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `last_whois_id` | [string](#string) |  | The latest unique call ID |
+| `whois` | [Whois](#dfinance.namespace.v1beta1.Whois) | repeated | Historical call entries |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/namespace/query.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/namespace/query.proto
+
+
+
+<a name="dfinance.namespace.v1beta1.DomainsAccountRequest"></a>
+
+### DomainsAccountRequest
+DomainsAccountRequest is request type for Query/BuyName RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `address` | [string](#string) |  |  |
+
+
+
+
+
+
+<a name="dfinance.namespace.v1beta1.DomainsAccountResponse"></a>
+
+### DomainsAccountResponse
+DomainsAccountResponse is response type for Query/BuyName RPC method.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `whois` | [Whois](#dfinance.namespace.v1beta1.Whois) | repeated |  |
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="dfinance.namespace.v1beta1.Query"></a>
+
+### Query
+Query defines the gRPC querier service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `DomainsAccount` | [DomainsAccountRequest](#dfinance.namespace.v1beta1.DomainsAccountRequest) | [DomainsAccountResponse](#dfinance.namespace.v1beta1.DomainsAccountResponse) |  | POST|/dfinance/namespace/v1beta1/params|
+
+ <!-- end services -->
+
+
+
+<a name="dfinance/namespace/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## dfinance/namespace/tx.proto
+
+
+
+<a name="dfinance.namespace.v1beta1.MsgBuyCall"></a>
+
+### MsgBuyCall
+MsgDepositCall defines a SDK message to perform the Deposit operation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [string](#string) |  | Domain name |
+| `address` | [string](#string) |  | Whois account address |
+| `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated | Amount |
+
+
+
+
+
+
+<a name="dfinance.namespace.v1beta1.MsgBuyResponse"></a>
+
+### MsgBuyResponse
+MsgByResponse defines the response for the Deposit operation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `id` | [string](#string) |  | Call ID |
+
+
+
+
+
+
+<a name="dfinance.namespace.v1beta1.MsgDeleteCall"></a>
+
+### MsgDeleteCall
+MsgDeleteCall defines a SDK message delete domain.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `value` | [string](#string) |  | Domain name |
+| `address` | [string](#string) |  | Whois account address |
+
+
+
+
+
+
+<a name="dfinance.namespace.v1beta1.MsgDeleteResponse"></a>
+
+### MsgDeleteResponse
+MsgByResponse defines the response for the Deposit operation.
+
+
+
+
+
+ <!-- end messages -->
+
+ <!-- end enums -->
+
+ <!-- end HasExtensions -->
+
+
+<a name="dfinance.namespace.v1beta1.Msg"></a>
+
+### Msg
+Msg defines the Namespace module Msg service.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `Buy` | [MsgBuyCall](#dfinance.namespace.v1beta1.MsgBuyCall) | [MsgBuyResponse](#dfinance.namespace.v1beta1.MsgBuyResponse) | Buy buy name. | |
+| `Delete` | [MsgDeleteCall](#dfinance.namespace.v1beta1.MsgDeleteCall) | [MsgDeleteResponse](#dfinance.namespace.v1beta1.MsgDeleteResponse) | Delete name. | |
 
  <!-- end services -->
 

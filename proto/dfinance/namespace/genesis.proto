@@ -1,0 +1,27 @@
+syntax = "proto3";
+package dfinance.namespace.v1beta1;
+
+import "gogoproto/gogo.proto";
+
+import "cosmos_proto/cosmos.proto";
+
+import "dfinance/namespace/namespace.proto";
+
+option go_package = "github.com/dfinance/dstation/x/namespace/types";
+
+message GenesisState {
+  option (gogoproto.equal) = false;
+  option (gogoproto.goproto_getters) = false;
+
+  // The latest unique call ID
+  string last_whois_id = 1 [
+    (gogoproto.moretags) = "yaml:\"last_whois_id\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint"
+  ];
+
+  // Historical call entries
+  repeated Whois whois = 2 [
+    (gogoproto.moretags) = "yaml:\"whois\"",
+    (gogoproto.nullable) = false
+  ];
+}
