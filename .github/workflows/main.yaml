@@ -22,7 +22,7 @@ jobs:
       fail-fast: true
       matrix:
         go:
-          - 1.15.12
+          - 1.15.13
         os:
           - ubuntu-latest
 
@@ -46,17 +46,23 @@ jobs:
   release-build:
     name: Release Build
     runs-on: ubuntu-latest
+    env:
+      GOPATH: /home/runner/work/dstation/dstation
+      working-directory: src/github.com/${{ github.repository }}
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
       - name: Install Go toolchain
         uses: actions/setup-go@v2
         with:
-          go-version: 1.15.12
+          go-version: 1.15.13
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          path: ${{ env.working-directory }}
 
       - name: Binaries crossbuild
+        working-directory: ${{ env.working-directory }}
         run: |
           make build-binaries
 
@@ -66,7 +72,7 @@ jobs:
         with:
           draft: true
           files: |
-            .builds/dstation-*
+            ${{ env.GOPATH }}/${{ env.working-directory }}/builds/dstation-*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

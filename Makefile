@@ -116,4 +116,4 @@ build-binaries: go.sum
 	@echo "  TM version:  $(tm_version)"
 	@mkdir -p ./builds
 	@go get github.com/crazy-max/xgo
-	xgo -go 1.15.11 --ldflags='$(ldflags)' --tags='$(build_tags)' --out='./builds/dstation-${app_version}' -targets='windows/amd64,linux/amd64,darwin/amd64' ./cmd/dstation
+	xgo -go='1.15.13' --ldflags='$(ldflags)' --tags='$(build_tags)' --out='./builds/dstation-${app_version}' -targets='windows/amd64,linux/amd64,darwin/amd64' ./cmd/dstation
