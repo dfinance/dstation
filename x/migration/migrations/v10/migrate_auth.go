@@ -48,7 +48,7 @@ func migrateAuthModule(cdc codec.Marshaler, oldStateBz, newStateBz json.RawMessa
 		case *v076.ModuleAccount:
 			continue
 		case *v076.BaseAccount:
-			newAcc := authTypes.NewBaseAccount(oldAcc.Address, oldAcc.PubKey, oldAcc.AccountNumber, oldAcc.Sequence)
+			newAcc := authTypes.NewBaseAccount(oldAcc.Address, oldAcc.PubKey, oldAcc.AccountNumber, 0)
 			newAccs = append(newAccs, newAcc)
 		default:
 			return nil, fmt.Errorf("account (%s): unsupported account type (%T)", oldAccRaw.GetAddress(), oldAcc)
