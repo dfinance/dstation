@@ -69,6 +69,7 @@ func NewRootCmd() (*cobra.Command, app.EncodingConfig) {
 			if err != nil {
 				return fmt.Errorf("configCmd.ReadFromClientConfig: %w", err)
 			}
+			vmConfig.ReadVMConfig(clientCtx.HomeDir)
 
 			if err := client.SetCmdClientContextHandler(clientCtx, cmd); err != nil {
 				return fmt.Errorf("client.SetCmdClientContextHandler: %w", err)
