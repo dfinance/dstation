@@ -94,3 +94,13 @@ jobs:
           build_params: --build-arg CI_PIPELINE_ID=${{ github.run_id }} --build-arg CI_COMMIT_REF_NAME=${{ github.ref }} --build-arg CI_COMMIT_SHA=${{ github.sha }}
           registry: registry.wings.toys
           cache: true
+
+      - name: '[DockerHub] Build and push docker image'
+        uses: dfinance/gh-actions@master
+        with:
+          name: dfinance/dstation
+          username: ${{ secrets.DH_REGISTRY_USR }}
+          password: ${{ secrets.DH_REGISTRY_PWD }}
+          dockerfile: Dockerfile
+          build_params: --build-arg CI_PIPELINE_ID=${{ github.run_id }} --build-arg CI_COMMIT_REF_NAME=${{ github.ref }} --build-arg CI_COMMIT_SHA=${{ github.sha }}
+          cache: true
