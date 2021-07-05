@@ -128,3 +128,159 @@ Depending on VM execution status, module emits multiple events per Tx with varia
     - `sub_status` - error subStatus [uint];
     - `message` - error message [string];
  
+ 
+ # User Migration v1.0.0
+ 
+ ## Introduction
+ 
+ We are happy to announce a new version of the Dfinance node - [dstation](https://github.com/dfinance/dstation). This version is based on the **Cosmos SDK v0.42.6**, and **Tendermint v0.34.11,** introduces fixes for the critical HDD space usage issue and opens the doors to continue support of the Dfinance blockchain: implementing new features and functionality. The changes are significant therefore validator nodes will be required to migrate to the new version - meaning all validators will need to be re-created and delegators will be required to redelegate. 
+ 
+ ## Migration
+ 
+ Step 1 - Navigate to your server with dfinance node and stop it:
+ 
+ ```bash
+ cd dfinance-bootstrap
+ docker-compose down
+ cd ../
+ ```
+ 
+ Step 2 - Clone the new version of [docker-compose](https://github.com/dfinance/bootstrap) from Github:
+ 
+ ```bash
+ git clone https://github.com/dfinance/bootstrap.git dstation-bootstrap
+ cd dstation-bootstrap
+ cp .env.mainnet .env
+ docker-compose pull
+ ```
+ 
+ Step 3 - Launch node:
+ 
+ ```bash
+ docker-compose up -d # Up node in background
+ docker-compose logs -f # Check logs
+ ```
+ 
+ Now you can remove *dfinance-bootstrap* folder and all blockchain data there.
+ 
+ Step 4 - Recreate your validator / delegations.
+ 
+ **Create validator:**
+ 
+ ```bash
+ cd dstation-bootstrap
+ docker-compose exec node sh # Login into docker container
+ ./dstation tendermint show-validator # Show validator key (copy it)
+ exit # Exit from contaier
+ ```
+ 
+ Now install dstation from [Github](https://github.com/dfinance/dstation/releases/tag/v1.0.1) Releases.
+ 
+ For Linux: 
+ 
+ ```bash
+ wget https://github.com/dfinance/dstation/releases/download/v1.0.1/dstation-v1.0.1-82f51b96214efa654b318484fbb218437cd2f773-linux-amd64
+ mv dstation-v1.0.1-82f51b96214efa654b318484fbb218437cd2f773-linux-amd64 ./dstation
+ sudo chmod +x ./dstation
+ mv dstation /usr/local/bin/dstation
+ ```
+ 
+ For Mac OS (download dstation from [Github](https://github.com/dfinance/dstation/releases/tag/v1.0.1)), and run  following commands in terminal:
+ 
+ ```bash
+ mv ./dstation-v1.0.1-82f51b96214efa654b318484fbb218437cd2f773-darwin-10.12-amd64 ./dstation
+ sudo chmod +x ./dstation
+ mv ./dstation /usr/local/bin/
+ ```
+ 
+ For Windows:
+ 
+ 1. Download binary from [Github](https://github.com/dfinance/dstation/releases/tag/v1.0.1).
+ 2. Go to **"Program Files"** directory.
+ 3. Create there **"dn"** directory.
+ 4. Rename the downloaded file to **"dstation"** and put it into **"dn"** directory.
+ 
+ Now run **"cmd"** and execute:
+ 
+ ```
+ setx path "%path%;%ProgramFiles%\dn"
+ ```
+ 
+ Now restart **"cmd"**.
+ 
+ Configure dstation:
+ 
+ ```bash
+ dstation config chain-id dn-alpha-mainnet
+ dstation config output text
+ dstation config node https://rpc.dfinance.co:443
+ dstation config keyring-backend file
+ ```
+ 
+ Add your keys to dstation:
+ 
+ ```bash
+ dstation keys add <name> --recover # Add with existing mnemonic
+ dstation keys add <name> --recover --index <index> # Add with existing mnemonic and indexx
+ dstation keys add <name> --ledger # Add with ledger
+ 
+ # See list of added keys
+ dstation keys list
+ 
+ # Query your account balance
+ dstation q bank balances <address> 
+ ```
+ 
+ Send transaction to create validator:
+ 
+ ```bash
+ dstation tx staking create-validator \
+    --amount=100000000000000000000000xfi \
+    --pubkey=<your pub key> \
+    --moniker=<moniker> \
+    --commission-rate="0.10" \
+    --commission-max-rate="0.20" \
+    --commission-max-change-rate="0.01" \
+    --min-self-delegation="1000000000000000000000" \ 
+    --from <account>
+ ```
+ 
+ Where:
+ 
+ - `amount` - XFI amount to self-stake, at least 1 XFI.
+ - `pubkey` - validator consensus public key received during `dstation tendermint show-validator` command.
+ - `moniker` - name of your validator.
+ - `commission-rate` - how much your validator is going to take a commission from received rewards/fees, currently 10% by default.
+ - `commission-max-rate` - maximum that validator can take as commission, 20% by default.
+ - `commission-max-change-rate` - how percent per day validator can change commission, currently 1% per day.
+ - `from` - an account that is going to send transaction and will self-stake coins for your validator, also, you can use this account to manage your validator later.
+ 
+ Almost all commands similar to previous dnode, so you can look at our previous [docs](https://docs.dfinance.co) (will be updated in the near time) and dstation help:
+ 
+ ```bash
+ dstation help
+ ```
+ 
+ *dstation-bootstrap/config/.dstation/priv_validator_key.json* - private key of validator, backup it and don't miss, as it's the only way to access your validator.
+ 
+ ### Changes
+ 
+ **Staking**
+ 
+ In parallel with the development of the new version we also researched the Cosmos [Gravity Bridge](https://github.com/cosmos/gravity-bridge). Our main goal is to enable transfers of assets between the Ethereum and Dfinance chains. While preparations for the Gravity Bridge have been implemented, the Gravity Bridge itself is not yet production-ready, therefore for the time being we continue to use our [Staking Portal](https://stake.dfinance.co) until the stable release of the Gravity Bridge. 
+ 
+ The [Staking Portal](https://stake.dfinance.co) can be used to stake your XFI tokens.  The new version also enables the transfer of XFI tokens between accounts within the Dfinance network. Note that only addresses connected through the Staking Portal will remain eligible for rewards. If you unstake your XFI tokens using Staking Portal without withdrawing, your XFI will remain within the Dfinance network and your account would be marked as disabled, however, you will not be eligible to receive any rewards. 
+ 
+ **XFI Staking**
+ 
+ The new version also contains inflation changes. The new inflation model continues to allow to stake XFI and earn rewards while the inflation and block rewards have been updated to float between 20% till 7% per year. The staking goal is 67% of the total XFI which would reduce the inflation reduces to 7% p.a. Lower amounts will increase the inflation amount up to 20% p.a.
+ 
+ Please note that all inflation parameters are not final and might be subject to changes through governance.
+ 
+ **LP Staking**
+ 
+ LP staking is now disabled within the Dfinance node and will not be available for the time being. LP staking will be later re-enabled using an out-of-blockchain approach. 
+ 
+ **IBC**
+ 
+ Lastly, the new version implements the latest version of IBC as well, however remains disabled as IBC is not being production-ready and is currently not yet enabled in the Cosmos network. Once enabled, IBC will allow the transfer of assets between Cosmos-based chains.
