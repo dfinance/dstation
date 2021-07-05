@@ -14,5 +14,6 @@ ARG CI_COMMIT_REF_NAME="unset"
 ARG CI_COMMIT_SHA="unset"
 
 RUN apk --no-cache add ca-certificates
+RUN ln -s /opt/app/dstation /usr/local/bin/dstation
 WORKDIR /opt/app
 COPY --from=build-env /go/bin/dstation .
