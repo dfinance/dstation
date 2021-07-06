@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"github.com/dfinance/dstation/x/namespace"
 	"io"
 	"math/big"
 	"net"
@@ -99,8 +100,13 @@ import (
 	vmConfig "github.com/dfinance/dstation/x/vm/config"
 	vmKeeper "github.com/dfinance/dstation/x/vm/keeper"
 	vmTypes "github.com/dfinance/dstation/x/vm/types"
+
+	namespaceKeeper "github.com/dfinance/dstation/x/namespace/keeper"
+	namespaceTypes "github.com/dfinance/dstation/x/namespace/types"
 	// unnamed import of statik for swagger UI support
 	_ "github.com/cosmos/cosmos-sdk/client/docs/statik"
+
+
 )
 
 const appName = "DfinanceNode"
@@ -132,6 +138,7 @@ var (
 		staker.AppModuleBasic{},
 		oracle.AppModuleBasic{},
 		vm.AppModuleBasic{},
+		namespace.AppModuleBasic{},
 	)
 
 	// module account permissions
@@ -188,6 +195,7 @@ type DnApp struct { // nolint:golint
 	StakerKeeper stakerKeeper.Keeper
 	OracleKeeper oracleKeeper.Keeper
 	VmKeeper     vmKeeper.Keeper
+	NamespaceKeeper namespaceKeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilityKeeper.ScopedKeeper
@@ -494,6 +502,8 @@ func NewDnApp(
 		app.AccountKeeper, app.BankKeeper, app.OracleKeeper,
 	)
 
+	app.NamespaceKeeper = namespaceKeeper.NewKeeper(appCodec, keys[namespaceTypes.StoreKey], app.BankKeeper)
+
 	// Register the proposal types
 	govRouter := govTypes.NewRouter()
 	govRouter.AddRoute(govTypes.RouterKey, govTypes.ProposalHandler).
@@ -561,6 +571,7 @@ func NewDnApp(
 		staker.NewAppModule(appCodec, app.StakerKeeper),
 		oracle.NewAppModule(appCodec, app.OracleKeeper),
 		vm.NewAppModule(appCodec, app.VmKeeper, app.AccountKeeper, app.BankKeeper),
+		namespace.NewAppModule(appCodec, app.NamespaceKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -609,6 +620,7 @@ func NewDnApp(
 		stakerTypes.ModuleName,
 		oracleTypes.ModuleName,
 		vmTypes.ModuleName,
+		namespaceTypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -714,6 +726,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 	//
 	paramsKeeper.Subspace(stakerTypes.ModuleName)
 	paramsKeeper.Subspace(oracleTypes.ModuleName)
+	paramsKeeper.Subspace(namespaceTypes.ModuleName)
 
 	return paramsKeeper
 }
