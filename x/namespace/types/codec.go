@@ -10,6 +10,7 @@ import (
 
 // RegisterLegacyAminoCodec registers the necessary x/staking interfaces and concrete types
 // on the provided LegacyAmino codec. These types are used for Amino JSON serialization.
+// nolint:staticcheck
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgBuyCall{}, ModuleName+"/MsgBuyCall", nil)
 }
