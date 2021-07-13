@@ -17,14 +17,6 @@ type Keeper struct {
 	storeKey   sdk.StoreKey
 	cdc        codec.BinaryMarshaler
 	paramSpace paramTypes.Subspace
-	//
-	cache *keeperCache
-}
-
-// keeperCache optimized Gas usage for frequent PostPrice operations.
-type keeperCache struct {
-	oracles map[string]types.Oracle // key: AccAddress
-	assets  map[string]types.Asset  // key: AssetCode
 }
 
 // IsNominee checks if nominee exist within keeper parameters and returns sdk wrapped error.
@@ -57,9 +49,5 @@ func NewKeeper(
 		cdc:        cdc,
 		storeKey:   storeKey,
 		paramSpace: paramSpace,
-		cache: &keeperCache{
-			oracles: make(map[string]types.Oracle),
-			assets:  make(map[string]types.Asset),
-		},
 	}
 }

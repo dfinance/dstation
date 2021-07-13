@@ -10,10 +10,6 @@ import (
 
 // GetAsset returns an types.Asset if exists.
 func (k Keeper) GetAsset(ctx sdk.Context, assetCode dnTypes.AssetCode) *types.Asset {
-	if cachedValue, found := k.cache.assets[assetCode.String()]; found {
-		return &cachedValue
-	}
-
 	store := ctx.KVStore(k.storeKey)
 	assetStore := prefix.NewStore(store, types.AssetsPrefix)
 	key, _ := assetCode.Marshal()
@@ -25,8 +21,6 @@ func (k Keeper) GetAsset(ctx sdk.Context, assetCode dnTypes.AssetCode) *types.As
 
 	asset := &types.Asset{}
 	k.cdc.MustUnmarshalBinaryBare(bz, asset)
-
-	k.cache.assets[asset.AssetCode.String()] = *asset
 
 	return asset
 }
@@ -74,6 +68,4 @@ func (k Keeper) setAsset(ctx sdk.Context, asset types.Asset) {
 
 	bz := k.cdc.MustMarshalBinaryBare(&asset)
 	assetStore.Set(key, bz)
-
-	k.cache.assets[asset.AssetCode.String()] = asset
 }
