@@ -317,7 +317,10 @@ docker-compose down -v
 ```bash
 git pull origin master
 docker-compose pull
-mv .env.mainnet .env
+cp .env.mainnet .env
+
+ # If you want to change moniker or open p2p port edit .env content 
+nano .env
 ```
 
 **Remove data folder:**
