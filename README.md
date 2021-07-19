@@ -297,13 +297,13 @@ Depending on VM execution status, module emits multiple events per Tx with varia
  
  ```bash
  cd dstation-bootstrap
- cp ./config/.dstation/priv_validator_key.json ../v1.0.1_priv_validator_key.json
+ cp ./config/.dstation/priv_validator_key.json ../v1.0.0_priv_validator_key.json
 ```
 
 **Check if it copied correctly (don't share content of your private key with anyone!):**
 
 ```bash
-cat ../v1.0.1_priv_validator_key.json
+cat ../v1.0.0_priv_validator_key.json
 ```
 
 **Stop your node:**
@@ -312,7 +312,7 @@ cat ../v1.0.1_priv_validator_key.json
 docker-compose down -v
 ```
 
-**Pull the latest version of boostrap:**
+**Pull the latest version of bootstrap:**
 
 ```bash
 git pull origin master
@@ -336,7 +336,8 @@ docker-compose up -d
 
 ```bash
 wget https://github.com/dfinance/dstation/releases/download/v1.1.0/dstation-v1.1.0-571475329ddacd76e50e3428755db63e87130d79-linux-amd64
-chmod + x ./dstation
+mv dstation-v1.1.0-571475329ddacd76e50e3428755db63e87130d79-linux-amd64 ./dstation
+chmod +x ./dstation
 mv ./dstation /usr/local/bin/
 ```
 
