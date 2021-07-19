@@ -284,3 +284,73 @@ Depending on VM execution status, module emits multiple events per Tx with varia
  **IBC**
  
  Lastly, the new version implements the latest version of IBC as well, however remains disabled as IBC is not being production-ready and is currently not yet enabled in the Cosmos network. Once enabled, IBC will allow the transfer of assets between Cosmos-based chains.
+ 
+ # User Migration v1.1.0
+ 
+ We released a new version of dstation v1.1.0 that fixed an issue with node synchronization that happened during v1.0.0 usage.
+ 
+ During the update, at 2021-07-19 10:00:00 UTC time the network stopped at block 211948 because of a successful upgrade proposal.
+ 
+ Here is instruction for validators how to update their nodes:
+ 
+ **First of all, backup your validator private key:**
+ 
+ ```bash
+ cd dstation-bootstrap
+ cp ./config/.dstation/priv_validator_key.json ../v1.0.1_priv_validator_key.json
+```
+
+**Check if it copied correctly (don't share content of your private key with anyone!):**
+
+```bash
+cat ../v1.0.1_priv_validator_key.json
+```
+
+**Stop your node:**
+
+```bash
+docker-compose down -v
+```
+
+**Pull the latest version of boostrap:**
+
+```bash
+git pull origin master
+docker-compose pull
+mv .env.mainnet .env
+```
+
+**Remove data folder:**
+
+```bash
+rm -rf ./data
+```
+
+**Start your validator:**
+
+```bash
+docker-compose up -d
+```
+
+**Install the latest dstation:**
+
+```bash
+wget https://github.com/dfinance/dstation/releases/download/v1.1.0/dstation-v1.1.0-571475329ddacd76e50e3428755db63e87130d79-linux-amd64
+chmod + x ./dstation
+mv ./dstation /usr/local/bin/
+```
+
+**Change chain-id:**
+
+```bash
+dstation config chain-id dn-alpha-mainnet-v1-1-0
+```
+
+Because of migration almost all validators got jailed, so network could be migrated without risks of stuck.
+You need to unjail your validator, so it's become active.
+
+**Send unjail transaction**
+
+```bash
+dstation tx slashing unjail --from <mynodename>
+```
