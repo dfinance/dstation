@@ -356,5 +356,5 @@ You need to unjail your validator, so it's become active.
 **Send unjail transaction**
 
 ```bash
-dstation tx slashing unjail --from <mynodename>
+dstation tx slashing unjail --from <account> # Account you used during validator creation.
 ```
