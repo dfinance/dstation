@@ -6,6 +6,7 @@ require (
 	github.com/OneOfOne/xxhash v1.2.2
 	github.com/atlassian/go-sentry-api v0.0.0-20210507210027-8175592dcf60
 	github.com/cosmos/cosmos-sdk v0.42.6
+	github.com/cosmos/iavl v0.16.0 // indirect
 	github.com/fsouza/go-dockerclient v1.7.2
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/gogo/protobuf v1.3.3

@@ -1,0 +1,20 @@
+{
+    "compiled_items": [
+        {
+            "byte_code": "oRzrCwEAAAAGAQACAwIFBQcHBw4UCCIUDDZ4AAAAAQAAAAEDAwMDAQAJRmlib25hY2NpCWNhbGN1bGF0ZQFVVhaSdErwnsuQBIuWGogOFu39AAEAASYKAAYBAAAAAAAAACEDBQUICAwDBQwKAAYCAAAAAAAAACEMAwsDAw8FEQYBAAAAAAAAAAIKAAYDAAAAAAAAACEDFgUYBgIAAAAAAAAAAgoABgEAAAAAAAAAFxEADAEKAAYCAAAAAAAAABcRAAwCCgEKAhYCAA==",
+            "name": "Fibonacci",
+            "methods": [
+                {
+                    "name": "calculate",
+                    "isPublic": true,
+                    "arguments": [
+                        "u64"
+                    ],
+                    "returns": [
+                        "u64"
+                    ]
+                }
+            ]
+        }
+    ]
+}
