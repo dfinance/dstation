@@ -37,14 +37,14 @@ dstation q -h
 To communicate with a specific chain you have to define its parameters:
 
 ```bash
-dstation --chain-id dn-testnet-v3 --node https://rpc.demo1.dfinance.co:443 tx wallet1unv2d9vw2f3jdnwqnm5qfl2kkm8tz2zuw2c3xu 1xfi --from user1 -y
+dstation --chain-id dn-alpha-mainnet-v1-1-0 --node https://rpc.dfinance.co:44 tx wallet1unv2d9vw2f3jdnwqnm5qfl2kkm8tz2zuw2c3xu 1xfi --from user1 -y
 ```
 
 To avoid typing in `chain-id` and `node` credentials for every request, you can store them into local config (`${HOME}/.dstation/config/client.toml`):
 
 ```bash
-dstation config chain-id dn-testnet-v3
-dstation config node https://rpc.demo1.dfinance.co:443
+dstation config chain-id dn-alpha-mainnet-v1-1-0
+dstation config node https://rpc.dfinance.co:443
 ```
 
 ## Events
