@@ -91,6 +91,10 @@ func (k Keeper) processVMExecution(ctx sdk.Context, exec *dvmTypes.VMExecuteResp
 		for _, vmEvent := range exec.Events {
 			ctx.EventManager().EmitEvent(types.NewMoveEvent(ctx.GasMeter(), vmEvent))
 		}
+
+		// Update DS context with the current changes to be visible for other Tx messages (if any)
+		// DS context is updated within BeginBlock as well
+		k.SetDSContext(ctx)
 	}
 }
 
