@@ -466,6 +466,9 @@ func NewDnApp(
 		app.GetSubspace(crisisTypes.ModuleName), invCheckPeriod, app.BankKeeper, authTypes.FeeCollectorName,
 	)
 	app.UpgradeKeeper = upgradeKeeper.NewKeeper(skipUpgradeHeights, keys[upgradeTypes.StoreKey], appCodec, homePath)
+	app.UpgradeKeeper.SetUpgradeHandler("v1.2.0", func(ctx sdk.Context, plan upgradeTypes.Plan) {
+		logger.Info("App has been upgraded to v1.2.0")
+	})
 
 	// Register the staking hooks
 	// NOTE: stakingKeeper above is passed by reference, so that it will contain these hooks

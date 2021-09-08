@@ -8,11 +8,10 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkErrors "github.com/cosmos/cosmos-sdk/types/errors"
-	oracleTypes "github.com/dfinance/dstation/x/oracle/types"
-
 	dnConfig "github.com/dfinance/dstation/cmd/dstation/config"
 	"github.com/dfinance/dstation/pkg/tests"
 	dvmTypes "github.com/dfinance/dstation/pkg/types/dvm"
+	oracleTypes "github.com/dfinance/dstation/x/oracle/types"
 	"github.com/dfinance/dstation/x/vm/client"
 	"github.com/dfinance/dstation/x/vm/types"
 )
@@ -683,5 +682,71 @@ func (s *ModuleDVVTestSuite) TestDeployExecuteEdgeCases() {
 				"module_script.move", nil,
 			),
 		)
+	}
+}
+
+func (s *ModuleDVVTestSuite) TestContextUpdateWithinBlock() {
+	acc, accPrivKey := s.app.AddAccount(s.ctx, sdk.NewCoin(dnConfig.MainDenom, sdk.NewInt(1000)))
+	addValue1, addValue2 := uint64(1), uint64(2)
+
+	// Deploy module
+	{
+		s.CheckContractExecuted(
+			s.DeployModule(acc.GetAddress(), accPrivKey,
+				"accumulator/module.move", nil,
+			),
+		)
+	}
+
+	// Compile script
+	var scriptByteCode []byte
+	{
+		byteCodes := s.CompileMoveFile(
+			acc.GetAddress(),
+			"accumulator/script.template.move",
+			s.GetLibraAccAddressString(acc.GetAddress()),
+		)
+		s.Require().Len(byteCodes, 1, "VM script execution: compiledUnits len mismatch")
+
+		scriptByteCode = byteCodes[0]
+	}
+
+	// Execute two scripts in one block (two msgs)
+	var executionResult *sdk.Result
+	var executionErr error
+	{
+		msg1 := types.NewMsgExecuteScript(acc.GetAddress(), scriptByteCode, s.BuildScriptArg(strconv.FormatUint(addValue1, 10), client.NewU64ScriptArg))
+		msg2 := types.NewMsgExecuteScript(acc.GetAddress(), scriptByteCode, s.BuildScriptArg(strconv.FormatUint(addValue2, 10), client.NewU64ScriptArg))
+
+		_, executionResult, executionErr = s.app.DeliverTx(s.ctx, acc.GetAddress(), accPrivKey, []sdk.Msg{&msg1, &msg2})
+	}
+
+	// Check scripts events
+	{
+		getExpectedEventValue := func(value uint64) string {
+			expectedValueArg, err := client.NewU64ScriptArg(strconv.FormatUint(value, 10))
+			s.Require().NoError(err)
+			return hex.EncodeToString(expectedValueArg.Value)
+		}
+		expectedEventValue1 := getExpectedEventValue(addValue1)
+		expectedEventValue2 := getExpectedEventValue(addValue1 + addValue2)
+
+		_, executionEvents := s.CheckContractExecuted(sdk.GasInfo{}, executionResult, executionErr)
+		s.CheckABCIEventsContain(executionEvents, []sdk.Event{
+			sdk.NewEvent(
+				types.EventTypeMoveEvent,
+				sdk.NewAttribute(types.AttributeVmEventSender, acc.GetAddress().String()),
+				sdk.NewAttribute(types.AttributeVmEventSource, types.AttributeValueSourceScript),
+				sdk.NewAttribute(types.AttributeVmEventType, "u64"),
+				sdk.NewAttribute(types.AttributeVmEventData, expectedEventValue1),
+			),
+			sdk.NewEvent(
+				types.EventTypeMoveEvent,
+				sdk.NewAttribute(types.AttributeVmEventSender, acc.GetAddress().String()),
+				sdk.NewAttribute(types.AttributeVmEventSource, types.AttributeValueSourceScript),
+				sdk.NewAttribute(types.AttributeVmEventType, "u64"),
+				sdk.NewAttribute(types.AttributeVmEventData, expectedEventValue2),
+			),
+		})
 	}
 }
