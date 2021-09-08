@@ -8,10 +8,6 @@ import (
 
 // GetOracle returns an types.Oracle if exists.
 func (k Keeper) GetOracle(ctx sdk.Context, addr string) *types.Oracle {
-	if cachedValue, found := k.cache.oracles[addr]; found {
-		return &cachedValue
-	}
-
 	store := ctx.KVStore(k.storeKey)
 	oracleStore := prefix.NewStore(store, types.OraclesPrefix)
 	key := types.GetOraclesKey(addr)
@@ -23,8 +19,6 @@ func (k Keeper) GetOracle(ctx sdk.Context, addr string) *types.Oracle {
 
 	oracle := &types.Oracle{}
 	k.cdc.MustUnmarshalBinaryBare(bz, oracle)
-
-	k.cache.oracles[addr] = *oracle
 
 	return oracle
 }
@@ -60,10 +54,6 @@ func (k Keeper) SetOracle(ctx sdk.Context, msg types.MsgSetOracle) error {
 
 // hasOracle checks if types.Oracle with addr is registered.
 func (k Keeper) hasOracle(ctx sdk.Context, addr string) bool {
-	if _, found := k.cache.oracles[addr]; found {
-		return found
-	}
-
 	store := ctx.KVStore(k.storeKey)
 	oracleStore := prefix.NewStore(store, types.OraclesPrefix)
 	key := types.GetOraclesKey(addr)
@@ -79,6 +69,4 @@ func (k Keeper) setOracle(ctx sdk.Context, oracle types.Oracle) {
 
 	bz := k.cdc.MustMarshalBinaryBare(&oracle)
 	oracleStore.Set(key, bz)
-
-	k.cache.oracles[oracle.AccAddress] = oracle
 }

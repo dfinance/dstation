@@ -90,6 +90,7 @@ lint:
 
 tests:
 	@echo "--> Running tests"
+	go clean -testcache
 	go test ./... -v
 
 proto-gen:
